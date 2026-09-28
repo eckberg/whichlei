@@ -1,0 +1,1109 @@
+query	target_lei	stratum	split	qtype	alt_leis	entity_name	qid	sitelinks
+atvia	25490002QDEB2KTLNK39	typo	train	typo_first3:delete		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+latva	25490002QDEB2KTLNK39	typo	train	typo_later:delete		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+nuited nations	549300HYGYJKXU2J8X74	typo	test	typo_first3:transpose		United Nations	Q1065	336
+unitev nations	549300HYGYJKXU2J8X74	typo	test	typo_later:substitute		United Nations	Q1065	336
+brlin	529900Y6Q7R44JF7XX56	typo	train	typo_first3:delete		Land Berlin	Q64	334
+berli	529900Y6Q7R44JF7XX56	typo	train	typo_later:delete		Land Berlin	Q64	334
+now york city	549300ABYZD2SFD5JB29	typo	train	typo_first3:substitute		City of New York	Q60	325
+new york ity	549300ABYZD2SFD5JB29	typo	train	typo_later:delete		City of New York	Q60	325
+elsinki	7437005GCN3H6F2GOW62	typo	test	typo_first3:delete		Helsingin kaupunki	Q1757	293
+helisnki	7437005GCN3H6F2GOW62	typo	test	typo_later:transpose		Helsingin kaupunki	Q1757	293
+loz angeles	549300E7TO710PTXPJ65	typo	test	typo_first3:substitute		City of Los Angeles	Q65	280
+los angels	549300E7TO710PTXPJ65	typo	test	typo_later:delete		City of Los Angeles	Q65	280
+pqague	31570010000000033463	typo	test	typo_first3:substitute		HLAVNÍ MĚSTO PRAHA	Q1085	268
+prageu	31570010000000033463	typo	test	typo_later:transpose		HLAVNÍ MĚSTO PRAHA	Q1085	268
+lorida	5493004G5XFOOUT0LQ57	typo	train	typo_first3:delete		State of Florida	Q812	260
+floridf	5493004G5XFOOUT0LQ57	typo	train	typo_later:substitute		State of Florida	Q812	260
+txas	549300X9CH74QB747L76	typo	test	typo_first3:delete		State of Texas	Q1439	259
+texss	549300X9CH74QB747L76	typo	test	typo_later:substitute		State of Texas	Q1439	259
+albama	549300TKZX0YNENZC895	typo	train	typo_first3:delete		State of Alabama	Q173	241
+alajama	549300TKZX0YNENZC895	typo	train	typo_later:substitute		State of Alabama	Q173	241
+burssels	549300W772UG3LSKUE60	typo	train	typo_first3:transpose		VILLE DE BRUXELLES	Q239	240
+bruwsels	549300W772UG3LSKUE60	typo	train	typo_later:substitute		VILLE DE BRUXELLES	Q239	240
+saz francisco	549300RA28ZEFOB6M782	typo	train	typo_first3:substitute		City and County of San Francisco	Q62	238
+san francisoc	549300RA28ZEFOB6M782	typo	train	typo_later:transpose		City and County of San Francisco	Q62	238
+lilinois	54930048FV8RWPR02D67	typo	train	typo_first3:transpose		State of Illinois	Q1204	238
+illionis	54930048FV8RWPR02D67	typo	train	typo_later:transpose		State of Illinois	Q1204	238
+assachusetts	5493001N1YCXNI1O7K10	typo	train	typo_first3:delete		The Commonwealth of Massachusetts	Q771	229
+massachusetst	5493001N1YCXNI1O7K10	typo	train	typo_later:transpose		The Commonwealth of Massachusetts	Q771	229
+mihcigan	CADMV8WVNQO7XM117W54	typo	train	typo_first3:transpose		State of Michigan Retirement System	Q1166	225
+michian	CADMV8WVNQO7XM117W54	typo	train	typo_later:delete		State of Michigan Retirement System	Q1166	225
+idiana	Q8JDSMXPZ6YQWY5J7W63	typo	test	typo_first3:delete		State of Indiana	Q1415	225
+indiaa	Q8JDSMXPZ6YQWY5J7W63	typo	test	typo_later:delete		State of Indiana	Q1415	225
+wsconsin	549300VTAT608CNZ5827	typo	train	typo_first3:delete		State of Wisconsin	Q1537	225
+wiscosnin	549300VTAT608CNZ5827	typo	train	typo_later:transpose		State of Wisconsin	Q1537	225
+ncw mexico	549300H4YLM23QKOGK29	typo	train	typo_first3:substitute		State of New Mexico	Q1522	223
+new mexict	549300H4YLM23QKOGK29	typo	train	typo_later:substitute		State of New Mexico	Q1522	223
+coenecticut	5493007GRO6CU0IKP741	typo	train	typo_first3:substitute		The State of Connecticut, acting through its Treasurer	Q779	222
+connrcticut	5493007GRO6CU0IKP741	typo	train	typo_later:substitute		The State of Connecticut, acting through its Treasurer	Q779	222
+misissippi	549300JRWW5RFQUB7P94	typo	test	typo_first3:delete		State of Mississippi	Q1494	220
+mississipxi	549300JRWW5RFQUB7P94	typo	test	typo_later:substitute		State of Mississippi	Q1494	220
+ywoming	HZT38E4FBDF4XOBCMR95	typo	train	typo_first3:transpose		State of Wyoming	Q1214	217
+wyoimng	HZT38E4FBDF4XOBCMR95	typo	train	typo_later:transpose		State of Wyoming	Q1214	217
+nhode island	549300TK0QTLW5HQGC62	typo	test	typo_first3:substitute		State of Rhode Island and Providence Plantations	Q1387	214
+rhode islacd	549300TK0QTLW5HQGC62	typo	test	typo_later:substitute		State of Rhode Island and Providence Plantations	Q1387	214
+gcogle	7ZW8QJWVPR4P1J1KQY45	typo	train	typo_first3:substitute		GOOGLE LLC	Q95	211
+googlf	7ZW8QJWVPR4P1J1KQY45	typo	train	typo_later:substitute		GOOGLE LLC	Q95	211
+huoston	549300C64URYS0WQQY42	typo	test	typo_first3:transpose		City of Houston, Texas	Q16555	192
+houscon	549300C64URYS0WQQY42	typo	test	typo_later:substitute		City of Houston, Texas	Q16555	192
+devner	MMTY7HA2MSCBUO4F7J71	typo	test	typo_first3:transpose		City and County of Denver	Q16554	185
+denve	MMTY7HA2MSCBUO4F7J71	typo	test	typo_later:delete		City and County of Denver	Q16554	185
+aplpe inc.	HWUPKR0MPOU8FGXBT394	typo	train	typo_first3:transpose		Apple Inc.	Q312	183
+apple nic.	HWUPKR0MPOU8FGXBT394	typo	train	typo_later:transpose		Apple Inc.	Q312	183
+gadalajara	4469000001CON7X1U240	typo	test	typo_first3:delete		MUNICIPIO DE GUADALAJARA	Q9022	183
+guadclajara	4469000001CON7X1U240	typo	test	typo_later:substitute		MUNICIPIO DE GUADALAJARA	Q9022	183
+mxcrosoft	INR2EJN1ERAN0W5ZP974	typo	test	typo_first3:substitute		MICROSOFT CORPORATION	Q2283	178
+micrsoft	INR2EJN1ERAN0W5ZP974	typo	test	typo_later:delete		MICROSOFT CORPORATION	Q2283	178
+etroit	549300BQRJP7MKKHOY28	typo	test	typo_first3:delete		City of Detroit, Michigan	Q12439	175
+detorit	549300BQRJP7MKKHOY28	typo	test	typo_later:transpose		City of Detroit, Michigan	Q12439	175
+autin	IW10PQVTU7HKS3JMW253	typo	train	typo_first3:delete		City of Austin	Q16559	169
+ausitn	IW10PQVTU7HKS3JMW253	typo	train	typo_later:transpose		City of Austin	Q16559	169
+ampere	743700PZKMCR95473V34	typo	train	typo_first3:delete		Tampereen kaupunki	Q40840	169
+tamepre	743700PZKMCR95473V34	typo	train	typo_later:transpose		Tampereen kaupunki	Q40840	169
+anjwerp	967600JP2P61UFGUMJ66	typo	test	typo_first3:substitute		STAD ANTWERPEN	Q12892	162
+antwvrp	967600JP2P61UFGUMJ66	typo	test	typo_later:substitute		STAD ANTWERPEN	Q12892	162
+nternational monetary fund	E7EXN6FJGRUTJYNZ3Z71	typo	train	typo_first3:delete		International Monetary Fund	Q7804	160
+internatinal monetary fund	E7EXN6FJGRUTJYNZ3Z71	typo	train	typo_later:delete		International Monetary Fund	Q7804	160
+bjltimore	5493006QYFB72E0IOO54	typo	train	typo_first3:substitute		Mayor and City Council of Baltimore	Q5092	158
+balimore	5493006QYFB72E0IOO54	typo	train	typo_later:delete		Mayor and City Council of Baltimore	Q5092	158
+hc barcelona	95980020140005871781	typo	train	typo_first3:substitute		FUTBOL CLUB BARCELONA	Q7156	153
+fc barclona	95980020140005871781	typo	train	typo_later:delete		FUTBOL CLUB BARCELONA	Q7156	153
+birtish broadcasting corporation	5493000IBP32UQZ0KL24	typo	test	typo_first3:transpose		BRITISH BROADCASTING CORPORATION	Q9531	149
+british broadcastifg corporation	5493000IBP32UQZ0KL24	typo	test	typo_later:substitute		BRITISH BROADCASTING CORPORATION	Q9531	149
+oyota	5493006W3QUS5LMH6R84	typo	train	typo_first3:delete		トヨタ自動車株式会社	Q53268	149
+toyoa	5493006W3QUS5LMH6R84	typo	train	typo_later:delete		トヨタ自動車株式会社	Q53268	149
+mnchester united f.c.	213800CNW6K7XWOTB808	typo	train	typo_first3:delete		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+manchester nuited f.c.	213800CNW6K7XWOTB808	typo	train	typo_later:transpose		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+unversity of oxford	5493009OEHU6YS545T65	typo	test	typo_first3:delete		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+univrsity of oxford	5493009OEHU6YS545T65	typo	test	typo_later:delete		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+trku	743700NV4PWQPQI6U405	typo	train	typo_first3:delete		Turun kaupunki	Q38511	148
+tursu	743700NV4PWQPQI6U405	typo	train	typo_later:substitute		Turun kaupunki	Q38511	148
+hgent	549300HJ1DDDKEOO9B33	typo	train	typo_first3:transpose		Stad Gent	Q1296	146
+ghet	549300HJ1DDDKEOO9B33	typo	train	typo_later:delete		Stad Gent	Q1296	146
+mineapolis	54930069TEI1INHRHS55	typo	train	typo_first3:delete		City of Minneapolis, Minnesota	Q36091	146
+minneapoli	54930069TEI1INHRHS55	typo	train	typo_later:delete		City of Minneapolis, Minnesota	Q36091	146
+hte walt disney company	549300GZKULIZ0WOW665	typo	train	typo_first3:transpose		THE WALT DISNEY COMPANY	Q7414	142
+the walt disney compay	549300GZKULIZ0WOW665	typo	train	typo_later:delete		THE WALT DISNEY COMPANY	Q7414	142
+alvuquerque	549300MV7H0GASZUCG39	typo	train	typo_first3:substitute		City of Albuquerque	Q34804	138
+albuqueryue	549300MV7H0GASZUCG39	typo	train	typo_later:substitute		City of Albuquerque	Q34804	138
+s. louis	5493004O38W8EYGEZ656	typo	test	typo_first3:delete		The City of St. Louis, Missouri	Q38022	138
+st. lquis	5493004O38W8EYGEZ656	typo	test	typo_later:substitute		The City of St. Louis, Missouri	Q38022	138
+cdonald's	UE2136O97NLB5BYP9H04	typo	test	typo_first3:delete		MCDONALD'S CORPORATION	Q38076	136
+mcdonald'	UE2136O97NLB5BYP9H04	typo	test	typo_later:delete		MCDONALD'S CORPORATION	Q38076	136
+jvuentus fc	815600A253A0AF58C166	typo	test	typo_first3:transpose		JUVENTUS F.C. - S.P.A. O JUVENTUS FOOTBALL CLUB S.P.A.	Q1422	132
+juventus jc	815600A253A0AF58C166	typo	test	typo_later:substitute		JUVENTUS F.C. - S.P.A. O JUVENTUS FOOTBALL CLUB S.P.A.	Q1422	132
+rolando	G8GZFWRIKS3AFD6AWU52	typo	test	typo_first3:transpose		City of Orlando	Q49233	132
+orlandp	G8GZFWRIKS3AFD6AWU52	typo	test	typo_later:substitute		City of Orlando	Q49233	132
+nitnendo	353800FEEXU6I9M0ZF27	typo	test	typo_first3:transpose		任天堂株式会社	Q8093	131
+nintnedo	353800FEEXU6I9M0ZF27	typo	test	typo_later:transpose		任天堂株式会社	Q8093	131
+dooer	HOGTPH9YOZG642NQXS47	typo	test	typo_first3:substitute		The City of Dover, Delaware	Q33518	129
+doveh	HOGTPH9YOZG642NQXS47	typo	test	typo_later:substitute		The City of Dover, Delaware	Q33518	129
+binmarck	5493004YS3DDNIKCWV33	typo	test	typo_first3:substitute		City of Bismarck, North Dakota	Q37066	129
+bisuarck	5493004YS3DDNIKCWV33	typo	test	typo_later:substitute		City of Bismarck, North Dakota	Q37066	129
+lige	549300FIVF63QBHEZ887	typo	train	typo_first3:delete		Ville de Liège	Q3992	127
+lieeg	549300FIVF63QBHEZ887	typo	train	typo_later:transpose		Ville de Liège	Q3992	127
+hcarlotte	5493001QNY6JJFWHQ568	typo	test	typo_first3:transpose		City of Charlotte	Q16565	127
+charlote	5493001QNY6JJFWHQ568	typo	test	typo_later:delete		City of Charlotte	Q16565	127
+khopio	743700JLIWJ0EXR8D809	typo	train	typo_first3:substitute		Kuopion kaupunki	Q162279	127
+kuopia	743700JLIWJ0EXR8D809	typo	train	typo_later:substitute		Kuopion kaupunki	Q162279	127
+mazon	ZXTILKJKG63JELOEG630	typo	train	typo_first3:delete		AMAZON.COM, INC.	Q3884	124
+amaon	ZXTILKJKG63JELOEG630	typo	train	typo_later:delete		AMAZON.COM, INC.	Q3884	124
+konsas city	549300EGAE3I3XU7XE19	typo	train	typo_first3:substitute		City of Kansas City, Missouri	Q41819	123
+kansaw city	549300EGAE3I3XU7XE19	typo	train	typo_later:substitute		City of Kansas City, Missouri	Q41819	123
+buges	549300DLQQV8DKLFGG51	typo	train	typo_first3:delete		Stad Brugge	Q12994	119
+brugey	549300DLQQV8DKLFGG51	typo	train	typo_later:substitute		Stad Brugge	Q12994	119
+plen	315700FETWHC4X2ET516	typo	test	typo_first3:delete		Statutární město Plzeň	Q43453	119
+plzn	315700FETWHC4X2ET516	typo	test	typo_later:delete		Statutární město Plzeň	Q43453	119
+uricef	5493003PODH0BS5ZOF16	typo	test	typo_first3:substitute		United Nations Children's Fund	Q740308	118
+unicrf	5493003PODH0BS5ZOF16	typo	test	typo_later:substitute		United Nations Children's Fund	Q740308	118
+osrtava	31570010000000025994	typo	train	typo_first3:transpose		Statutární město Ostrava	Q8385	116
+ostrva	31570010000000025994	typo	train	typo_later:delete		Statutární město Ostrava	Q8385	116
+ewark	5493008RBPM01QHRYX34	typo	test	typo_first3:delete		City of Newark	Q25395	116
+newauk	5493008RBPM01QHRYX34	typo	test	typo_later:substitute		City of Newark	Q25395	116
+sptcex	549300B9WLO96RQCXP87	typo	test	typo_first3:substitute		SPACE EXPLORATION TECHNOLOGIES CORP.	Q193701	116
+spacx	549300B9WLO96RQCXP87	typo	test	typo_later:delete		SPACE EXPLORATION TECHNOLOGIES CORP.	Q193701	116
+adi ag	529900J1PXYSZJVZ3Z09	typo	train	typo_first3:delete		AUDI Aktiengesellschaft	Q23317	115
+audi g	529900J1PXYSZJVZ3Z09	typo	train	typo_later:delete		AUDI Aktiengesellschaft	Q23317	115
+tomso municipality	5967007LIEEXZXHVC053	typo	train	typo_first3:delete		TROMSØ KOMMUNE	Q26087	114
+tromso municpality	5967007LIEEXZXHVC053	typo	train	typo_later:delete		TROMSØ KOMMUNE	Q26087	114
+spny group	529900R5WX9N2OI2N910	typo	test	typo_first3:substitute		ソニーグループ株式会社	Q41187	114
+sony gorup	529900R5WX9N2OI2N910	typo	test	typo_later:transpose		ソニーグループ株式会社	Q41187	114
+gord motor company	20S05OYHG0MQM4VUIC57	typo	train	typo_first3:substitute		FORD MOTOR COMPANY	Q44294	114
+ford motr company	20S05OYHG0MQM4VUIC57	typo	train	typo_later:delete		FORD MOTOR COMPANY	Q44294	114
+ajlisco	25490036KQCCNCIJ1O24	typo	train	typo_first3:transpose		Jalisco	Q13160	113
+jaliso	25490036KQCCNCIJ1O24	typo	train	typo_later:delete		Jalisco	Q13160	113
+olng beach	549300XH3OUOL3JO1O51	typo	train	typo_first3:transpose		City of Long Beach, California	Q16739	113
+lonw beach	549300XH3OUOL3JO1O51	typo	train	typo_later:substitute		City of Long Beach, California	Q16739	113
+ovaniemi	743700IOME3XMJLVNM06	typo	train	typo_first3:delete		Rovaniemen kaupunki	Q103717	113
+rovaneimi	743700IOME3XMJLVNM06	typo	train	typo_later:transpose		Rovaniemen kaupunki	Q103717	113
+noika	549300A0JPRWG1KI7U06	typo	train	typo_first3:transpose		Nokia Oyj	Q1418	112
+noka	549300A0JPRWG1KI7U06	typo	train	typo_later:delete		Nokia Oyj	Q1418	112
+msasachusetts institute of technology	DLZO3A31IADZ27B62557	typo	train	typo_first3:transpose		MASSACHUSETTS INSTITUTE OF TECHNOLOGY	Q49108	112
+massfchusetts institute of technology	DLZO3A31IADZ27B62557	typo	train	typo_later:substitute		MASSACHUSETTS INSTITUTE OF TECHNOLOGY	Q49108	112
+bugrer king	549300EA6A3Z2G47TI15	typo	test	typo_first3:transpose		BURGER KING WORLDWIDE, INC.	Q177054	112
+burger knig	549300EA6A3Z2G47TI15	typo	test	typo_later:transpose		BURGER KING WORLDWIDE, INC.	Q177054	112
+stvnford university	JIUV0DC2REIJXQ26CR37	typo	train	typo_first3:substitute		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+stanfod university	JIUV0DC2REIJXQ26CR37	typo	train	typo_later:delete		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+tec paris	969500EA7ZKCS3W9KL36	typo	test	typo_first3:substitute		ETABLISSEMENT D ENSEIGNEMENT SUPERIEUR CONSULAIRE HAUTES ETUDES COMMERCIALES DE PARIS	Q273535	111
+hec parns	969500EA7ZKCS3W9KL36	typo	test	typo_later:substitute		ETABLISSEMENT D ENSEIGNEMENT SUPERIEUR CONSULAIRE HAUTES ETUDES COMMERCIALES DE PARIS	Q273535	111
+reault	969500F7JLTX36OUI695	typo	test	typo_first3:delete		RENAULT	Q6686	110
+renauat	969500F7JLTX36OUI695	typo	test	typo_later:substitute		RENAULT	Q6686	110
+atetico madrid	959800PEZFMBKHG8NZ30	typo	test	typo_first3:delete		CLUB ATLETICO DE MADRID SAD	Q8701	109
+atletcio madrid	959800PEZFMBKHG8NZ30	typo	test	typo_later:transpose		CLUB ATLETICO DE MADRID SAD	Q8701	109
+terla	54930043XZGB27CTOV49	typo	train	typo_first3:substitute		TESLA, INC.	Q478214	109
+tesca	54930043XZGB27CTOV49	typo	train	typo_later:substitute		TESLA, INC.	Q478214	109
+tspoo	743700JQ02JPWS874D16	typo	train	typo_first3:substitute		Espoon kaupunki	Q47034	108
+espo	743700JQ02JPWS874D16	typo	train	typo_later:delete		Espoon kaupunki	Q47034	108
+nwe haven	549300U4OHEAZ124LQ06	typo	test	typo_first3:transpose		City of New Haven	Q49145	108
+new haevn	549300U4OHEAZ124LQ06	typo	test	typo_later:transpose		City of New Haven	Q49145	108
+boieng	RVHJWBXLJ1RFUBSY1F30	typo	test	typo_first3:transpose		THE BOEING COMPANY	Q66	106
+boeint	RVHJWBXLJ1RFUBSY1F30	typo	test	typo_later:substitute		THE BOEING COMPANY	Q66	106
+ale university	9SFB6DIM0FRWV0EV8S84	typo	train	typo_first3:delete		YALE UNIVERSITY	Q49112	106
+yale univesity	9SFB6DIM0FRWV0EV8S84	typo	train	typo_later:delete		YALE UNIVERSITY	Q49112	106
+addas ag	549300JSX0Z4CW0V5023	typo	test	typo_first3:delete		adidas AG	Q3895	105
+adidas ax	549300JSX0Z4CW0V5023	typo	test	typo_later:substitute		adidas AG	Q3895	105
+hoida	549300P7ZYCQJ36CCS16	typo	test	typo_first3:substitute		本田技研工業株式会社	Q9584	105
+honja	549300P7ZYCQJ36CCS16	typo	test	typo_later:substitute		本田技研工業株式会社	Q9584	105
+ogranization for economic cooperation and development	969500Y2NFIMDP5MO798	typo	test	typo_first3:transpose		ORGANIS COOPERATION DEVELOPP ECONOMIQUE	Q41550	105
+organization for economi cooperation and development	969500Y2NFIMDP5MO798	typo	test	typo_later:delete		ORGANIS COOPERATION DEVELOPP ECONOMIQUE	Q41550	105
+rupo televisa	549300O4AF0C816ILN62	typo	train	typo_first3:delete		GRUPO TELEVISA S A B	Q47099	105
+grupo tleevisa	549300O4AF0C816ILN62	typo	train	typo_later:transpose		GRUPO TELEVISA S A B	Q47099	105
+mjriehamn	743700IIRAGPDQR4LG96	typo	test	typo_first3:substitute		Mariehamns stad	Q48329	105
+mariehamw	743700IIRAGPDQR4LG96	typo	test	typo_later:substitute		Mariehamns stad	Q48329	105
+anmur	549300G4756BWTGGD551	typo	test	typo_first3:transpose		VILLE DE NAMUR	Q134121	105
+namxr	549300G4756BWTGGD551	typo	test	typo_later:substitute		VILLE DE NAMUR	Q134121	105
+siqt-truiden	549300O6FXMQWBJJNN75	typo	test	typo_first3:substitute		Stad Sint-Truiden	Q37792	104
+sine-truiden	549300O6FXMQWBJJNN75	typo	test	typo_later:substitute		Stad Sint-Truiden	Q37792	104
+lirary of congress	549300X91O5FQA359330	typo	train	typo_first3:delete		Library of Congress - FP	Q131454	103
+library o congress	549300X91O5FQA359330	typo	train	typo_later:delete		Library of Congress - FP	Q131454	103
+pais saint-germain fc	96950021OGUOTYRUC719	typo	test	typo_first3:delete		PARIS SAINT GERMAIN FOOTBALL	Q483020	103
+paris saint-gerain fc	96950021OGUOTYRUC719	typo	test	typo_later:delete		PARIS SAINT GERMAIN FOOTBALL	Q483020	103
+itnel	KNX4USFCNGPY45LOCE31	typo	train	typo_first3:transpose		INTEL CORPORATION	Q248	101
+intle	KNX4USFCNGPY45LOCE31	typo	train	typo_later:transpose		INTEL CORPORATION	Q248	101
+lutfhansa	529900PH63HYJ86ASW55	typo	test	typo_first3:transpose		Deutsche Lufthansa Aktiengesellschaft	Q9325	101
+lufthans	529900PH63HYJ86ASW55	typo	test	typo_later:delete		Deutsche Lufthansa Aktiengesellschaft	Q9325	101
+jvaskyla	743700PJ485U3PKFEE08	typo	test	typo_first3:delete		Jyväskylän kaupunki	Q134620	100
+jyvabkyla	743700PJ485U3PKFEE08	typo	test	typo_later:substitute		Jyväskylän kaupunki	Q134620	100
+yorussia dortmund	5299007FATCKT9465814	typo	train	typo_first3:substitute	529900XO0YTOOKCLQB44	Ballspielverein Borussia 09 e.V. Dortmund	Q41420	99
+borussia drotmund	5299007FATCKT9465814	typo	train	typo_later:transpose	529900XO0YTOOKCLQB44	Ballspielverein Borussia 09 e.V. Dortmund	Q41420	99
+arner bros. entertainment	549300U1JWW9SCOH3W56	typo	train	typo_first3:delete		Warner Bros. Entertainment Inc.	Q126399	99
+warner bors. entertainment	549300U1JWW9SCOH3W56	typo	train	typo_later:transpose		Warner Bros. Entertainment Inc.	Q126399	99
+vuntaa	743700TC1V4TPW6YRP73	typo	train	typo_first3:substitute		Vantaan kaupunki	Q127623	99
+vanata	743700TC1V4TPW6YRP73	typo	train	typo_later:transpose		Vantaan kaupunki	Q127623	99
+arlovy vary	315700PN3J57ZUNF1V00	typo	train	typo_first3:delete		Statutární město Karlovy Vary	Q384544	99
+karlovy vayr	315700PN3J57ZUNF1V00	typo	train	typo_later:transpose		Statutární město Karlovy Vary	Q384544	99
+ajrbus commercial aircraft	529900FCMZ4LKXFD0R69	typo	test	typo_first3:substitute		AIRBUS	Q67	98
+airbus commercila aircraft	529900FCMZ4LKXFD0R69	typo	test	typo_later:transpose		AIRBUS	Q67	98
+bahti	743700MUKX0ZHN7HX889	typo	test	typo_first3:substitute		Lahden kaupunki	Q28911	98
+lahmi	743700MUKX0ZHN7HX889	typo	test	typo_later:substitute		Lahden kaupunki	Q28911	98
+zaoppan	4469000001CZK6SXIY24	typo	train	typo_first3:transpose		MUNICIPIO DE ZAPOPAN JALISCO	Q147402	98
+zapopmn	4469000001CZK6SXIY24	typo	train	typo_later:substitute		MUNICIPIO DE ZAPOPAN JALISCO	Q147402	98
+jensuu	7437000BH90YQVLNR854	typo	test	typo_first3:delete		Joensuun kaupunki	Q186237	98
+joensur	7437000BH90YQVLNR854	typo	test	typo_later:substitute		Joensuun kaupunki	Q186237	98
+acoma	549300R2ZDWKQB6DIV86	typo	train	typo_first3:delete		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+tacmoa	549300R2ZDWKQB6DIV86	typo	train	typo_later:transpose		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+efrrari	5493002AZWJSSO4XME42	typo	test	typo_first3:transpose		FERRARI S.P.A.	Q27586	97
+ferraji	5493002AZWJSSO4XME42	typo	test	typo_later:substitute		FERRARI S.P.A.	Q27586	97
+ornell university	549300ZZIJPNT0RZWP17	typo	test	typo_first3:delete		Cornell University	Q49115	97
+cornll university	549300ZZIJPNT0RZWP17	typo	test	typo_later:delete		Cornell University	Q49115	97
+olumbia university	54930058W39DHS3GTG15	typo	test	typo_first3:delete		The Trustees of Columbia University in the City of New York	Q49088	96
+columbca university	54930058W39DHS3GTG15	typo	test	typo_later:substitute		The Trustees of Columbia University in the City of New York	Q49088	96
+beske budejovice	315700BH7PHQLBKS1J24	typo	train	typo_first3:substitute		Statutární město České Budějovice	Q16506	95
+cesce budejovice	315700BH7PHQLBKS1J24	typo	train	typo_later:substitute		Statutární město České Budějovice	Q16506	95
+uhawei	300300G4NLFHF8PDPY52	typo	train	typo_first3:transpose		华为技术有限公司	Q160120	95
+huaei	300300G4NLFHF8PDPY52	typo	train	typo_later:delete		华为技术有限公司	Q160120	95
+wfw international	5067009T3573P9JA7765	typo	test	typo_first3:transpose		WWF - WORLD WIDE FUND FOR NATURE (formerly World Wildlife Fund)	Q117892	94
+wwf knternational	5067009T3573P9JA7765	typo	test	typo_later:substitute		WWF - WORLD WIDE FUND FOR NATURE (formerly World Wildlife Fund)	Q117892	94
+tovedo	549300I365GIDPR4BM68	typo	train	typo_first3:substitute		City of Toledo	Q49239	93
+toldeo	549300I365GIDPR4BM68	typo	train	typo_later:transpose		City of Toledo	Q49239	93
+aymaha motor company	3538004LR5NXILJDHY88	typo	test	typo_first3:transpose		ヤマハ発動機株式会社	Q158888	93
+yamaha motor compay	3538004LR5NXILJDHY88	typo	test	typo_later:delete		ヤマハ発動機株式会社	Q158888	93
+wst flanders	894500JUQNA1CVAQUP40	typo	test	typo_first3:delete		Provincie West-Vlaanderen	Q1113	92
+west flandern	894500JUQNA1CVAQUP40	typo	test	typo_later:substitute		Provincie West-Vlaanderen	Q1113	92
+hianaut	5493004YC3W2JPOGB832	typo	test	typo_first3:transpose		PROVINCE DU HAINAUT	Q1129	92
+hainatu	5493004YC3W2JPOGB832	typo	test	typo_later:transpose		PROVINCE DU HAINAUT	Q1129	92
+sarbucks	OQSJ1DU9TAOC51A47K68	typo	train	typo_first3:delete		STARBUCKS CORPORATION	Q37158	92
+starbucxs	OQSJ1DU9TAOC51A47K68	typo	train	typo_later:substitute		STARBUCKS CORPORATION	Q37158	92
+bubrank	549300ZM3JZEC5HV6I83	typo	test	typo_first3:transpose		City of Burbank	Q39561	92
+burban	549300ZM3JZEC5HV6I83	typo	test	typo_later:delete		City of Burbank	Q39561	92
+eluven	894500GZKI6NTONKVM87	typo	train	typo_first3:transpose		Stad Leuven	Q118958	92
+leuen	894500GZKI6NTONKVM87	typo	train	typo_later:delete		Stad Leuven	Q118958	92
+aasa	743700VE07JAOHXTGB26	typo	test	typo_first3:delete		Vaasan kaupunki	Q125080	92
+vaaea	743700VE07JAOHXTGB26	typo	test	typo_later:substitute		Vaasan kaupunki	Q125080	92
+orsche	529900EWEX125AULXI58	typo	train	typo_first3:delete		Dr. Ing. h.c. F. Porsche Aktiengesellschaft	Q40993	91
+porschu	529900EWEX125AULXI58	typo	train	typo_later:substitute		Dr. Ing. h.c. F. Porsche Aktiengesellschaft	Q40993	91
+liebrec	315700XAMVXR3HJGMN61	typo	test	typo_first3:transpose		STATUTÁRNÍ MĚSTO LIBEREC	Q146351	91
+libere	315700XAMVXR3HJGMN61	typo	test	typo_later:delete		STATUTÁRNÍ MĚSTO LIBEREC	Q146351	91
+nstle	KY37LUS27QQX7BB93L28	typo	test	typo_first3:delete		NESTLÉ S.A.	Q160746	91
+nestel	KY37LUS27QQX7BB93L28	typo	test	typo_later:transpose		NESTLÉ S.A.	Q160746	91
+koxville	5493002KM0TCCHHCDT47	typo	test	typo_first3:delete		City of Knoxville, Tennessee	Q185582	91
+knoxvilxe	5493002KM0TCCHHCDT47	typo	test	typo_later:substitute		City of Knoxville, Tennessee	Q185582	91
+eait flanders	875500JOJWI5MN6DAR95	typo	test	typo_first3:substitute		Provincie Oost-Vlaanderen	Q1114	90
+east flander	875500JOJWI5MN6DAR95	typo	test	typo_later:delete		Provincie Oost-Vlaanderen	Q1114	90
+niisan	353800DRBDH1LUTNAY26	typo	train	typo_first3:substitute		日産自動車株式会社	Q20165	90
+nissae	353800DRBDH1LUTNAY26	typo	train	typo_later:substitute		日産自動車株式会社	Q20165	90
+geberal motors	54930070NSV60J38I987	typo	test	typo_first3:substitute		GENERAL MOTORS COMPANY	Q81965	90
+general moors	54930070NSV60J38I987	typo	test	typo_later:delete		GENERAL MOTORS COMPANY	Q81965	90
+ssnowiec	25940024HPNLK5JRXD58	typo	train	typo_first3:delete		SOSNOWIEC - MIASTO NA PRAWACH POWIATU	Q105060	90
+sosnowiep	25940024HPNLK5JRXD58	typo	train	typo_later:substitute		SOSNOWIEC - MIASTO NA PRAWACH POWIATU	Q105060	90
+nristiansand municipality	254900BNRTDMSXRSG549	typo	train	typo_first3:substitute		Kristiansand Kommune	Q2415	89
+kristiasnand municipality	254900BNRTDMSXRSG549	typo	train	typo_later:transpose		Kristiansand Kommune	Q2415	89
+trkish airlines	789000EV8M3BL7ZPFB03	typo	test	typo_first3:delete		Türk Hava Yolları Anonim Ortaklığı	Q4548	89
+turkish airlineq	789000EV8M3BL7ZPFB03	typo	test	typo_later:substitute		Türk Hava Yolları Anonim Ortaklığı	Q4548	89
+nke, inc.	787RXPR0UX0O0XUXPZ81	typo	train	typo_first3:delete		NIKE, INC.	Q483915	89
+nike, ic.	787RXPR0UX0O0XUXPZ81	typo	train	typo_later:delete		NIKE, INC.	Q483915	89
+srhalke 04	391200ALDJEBKNZFZ849	typo	test	typo_first3:substitute		Fußballclub Gelsenkirchen-Schalke 04 e.V.	Q32494	88
+schake 04	391200ALDJEBKNZFZ849	typo	test	typo_later:delete		Fußballclub Gelsenkirchen-Schalke 04 e.V.	Q32494	88
+mertopolitan museum of art	549300LS1O4XQ1SY7T11	typo	train	typo_first3:transpose		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+metropolitan museim of art	549300LS1O4XQ1SY7T11	typo	train	typo_later:substitute		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+koka	7437001PQQSMIWTQB678	typo	train	typo_first3:delete		Kotkan kaupunki	Q192155	88
+kota	7437001PQQSMIWTQB678	typo	train	typo_later:delete		Kotkan kaupunki	Q192155	88
+boluder	549300XPX2TFRF3HOE79	typo	test	typo_first3:transpose		City of Boulder, Colorado	Q192517	88
+boulaer	549300XPX2TFRF3HOE79	typo	test	typo_later:substitute		City of Boulder, Colorado	Q192517	88
+02th century studios	549300W3HBISRNJS8308	typo	test	typo_first3:transpose		Twentieth Century Fox Film Corporation	Q434841	88
+20th century studigs	549300W3HBISRNJS8308	typo	test	typo_later:substitute		Twentieth Century Fox Film Corporation	Q434841	88
+glndale	5493005GIMHE00RK2Z80	typo	test	typo_first3:delete		City of Glendale	Q485716	88
+glednale	5493005GIMHE00RK2Z80	typo	test	typo_later:transpose		City of Glendale	Q485716	88
+ixaomi	2549001ACVFAZRNMKL32	typo	test	typo_first3:transpose		Xiaomi Corporation	Q1636958	88
+xiamoi	2549001ACVFAZRNMKL32	typo	test	typo_later:transpose		Xiaomi Corporation	Q1636958	88
+zeta platforms	BQ4BKCS1HXDV9HN80Z93	typo	train	typo_first3:substitute		META PLATFORMS, INC.	Q380	87
+meta platforsm	BQ4BKCS1HXDV9HN80Z93	typo	train	typo_later:transpose		META PLATFORMS, INC.	Q380	87
+edobe	FU4LY2G4933NH2E1CP29	typo	train	typo_first3:substitute		ADOBE INC.	Q11463	87
+adoeb	FU4LY2G4933NH2E1CP29	typo	train	typo_later:transpose		ADOBE INC.	Q11463	87
+uiversity of chicago	54930099Y7GU6182V326	typo	train	typo_first3:delete		THE UNIVERSITY OF CHICAGO	Q131252	87
+university f chicago	54930099Y7GU6182V326	typo	train	typo_later:delete		THE UNIVERSITY OF CHICAGO	Q131252	87
+paamount pictures	549300OJ7WHJ5FFDOQ11	typo	train	typo_first3:delete		PARAMOUNT PICTURES CORPORATION	Q159846	87
+paramount picturse	549300OJ7WHJ5FFDOQ11	typo	train	typo_later:transpose		PARAMOUNT PICTURES CORPORATION	Q159846	87
+ai france	969500TQO0037942GI28	typo	test	typo_first3:delete	969500YFR8LV8JTEUI91	SOCIETE AIR FRANCE	Q131005	86
+air rance	969500TQO0037942GI28	typo	test	typo_later:delete	969500YFR8LV8JTEUI91	SOCIETE AIR FRANCE	Q131005	86
+nuiversity of tubingen	391200AUF1RMTMZLE883	typo	test	typo_first3:transpose		Eberhard Karls Universität Tübingen	Q153978	86
+university of tuibngen	391200AUF1RMTMZLE883	typo	test	typo_later:transpose		Eberhard Karls Universität Tübingen	Q153978	86
+pal allen	549300BLLKNST2MBEX87	typo	test	typo_first3:delete		Paul G. Allen	Q162005	86
+paul allne	549300BLLKNST2MBEX87	typo	test	typo_later:transpose		Paul G. Allen	Q162005	86
+dluth	54930056ACOJTRDUDE38	typo	test	typo_first3:delete		City of Duluth, Minnesota	Q485708	86
+dullth	54930056ACOJTRDUDE38	typo	test	typo_later:substitute		City of Duluth, Minnesota	Q485708	86
+okrtrijk	699400OBMKSEDNGFR779	typo	train	typo_first3:transpose		Stad Kortrijk	Q12995	85
+kortrmjk	699400OBMKSEDNGFR779	typo	train	typo_later:substitute		Stad Kortrijk	Q12995	85
+unviersity of pennsylvania	549300FG60YK9HZ7DS75	typo	test	typo_first3:transpose		The Trustees of the University of Pennsylvania	Q49117	85
+university of pnensylvania	549300FG60YK9HZ7DS75	typo	test	typo_later:transpose		The Trustees of the University of Pennsylvania	Q49117	85
+helwett-packard	WHKXQACZ14C5XRO8LW03	typo	train	typo_first3:transpose		HP INC.	Q80978	85
+hewlet-packard	WHKXQACZ14C5XRO8LW03	typo	train	typo_later:delete		HP INC.	Q80978	85
+loympique de marseille	969500P3L8EMQV5F5S02	typo	test	typo_first3:transpose		OLYMPIQUE DE MARSEILLE	Q132885	85
+olympique de harseille	969500P3L8EMQV5F5S02	typo	test	typo_later:substitute		OLYMPIQUE DE MARSEILLE	Q132885	85
+aalifornia institute of technology	549300CITPNHOTVPHC04	typo	train	typo_first3:substitute		CALIFORNIA INSTITUTE OF TECHNOLOGY	Q161562	85
+california instetute of technology	549300CITPNHOTVPHC04	typo	train	typo_later:substitute		CALIFORNIA INSTITUTE OF TECHNOLOGY	Q161562	85
+agusta	5493003SV3MDU2RCAW31	typo	test	typo_first3:delete		Augusta, Georgia	Q181962	85
+augusa	5493003SV3MDU2RCAW31	typo	test	typo_later:delete		Augusta, Georgia	Q181962	85
+prvoo	743700UG9Q46HSIVLZ24	typo	test	typo_first3:delete		Porvoon kaupunki	Q193367	85
+porvo	743700UG9Q46HSIVLZ24	typo	test	typo_later:delete		Porvoon kaupunki	Q193367	85
+scxanton	549300L3VEEX7ZRPMU24	typo	test	typo_first3:substitute		City of Scranton, Pennsylvania	Q271395	85
+scrnton	549300L3VEEX7ZRPMU24	typo	test	typo_later:delete		City of Scranton, Pennsylvania	Q271395	85
+t azteca	549300H2ZXE4KL0NUV88	typo	train	typo_first3:delete		TV AZTECA S A B DE C V	Q1281055	85
+tv aztoca	549300H2ZXE4KL0NUV88	typo	train	typo_later:substitute		TV AZTECA S A B DE C V	Q1281055	85
+gendale	5493002BC35ZY7XRQ949	typo	test	typo_first3:delete		City of Glendale, Arizona	Q51682	84
+glendalx	5493002BC35ZY7XRQ949	typo	test	typo_later:substitute		City of Glendale, Arizona	Q51682	84
+lislehammer	5967007LIEEXZXHHG029	typo	test	typo_first3:substitute		LILLEHAMMER KOMMUNE	Q101341	84
+lillehmamer	5967007LIEEXZXHHG029	typo	test	typo_later:transpose		LILLEHAMMER KOMMUNE	Q101341	84
+yrpes	875500BVTCRM49X8PC30	typo	train	typo_first3:transpose		Stad Ieper	Q102728	84
+yprs	875500BVTCRM49X8PC30	typo	train	typo_later:delete		Stad Ieper	Q102728	84
+asnta clara	5493006XV9S6LSLH1666	typo	train	typo_first3:transpose		City of Santa Clara, California	Q159260	84
+santa clraa	5493006XV9S6LSLH1666	typo	train	typo_later:transpose		City of Santa Clara, California	Q159260	84
+owrld economic forum	5067004M7JGX8HX78O39	typo	test	typo_first3:transpose		FORUM MONDIAL DE L'ECONOMIE	Q170418	84
+world ecnoomic forum	5067004M7JGX8HX78O39	typo	test	typo_later:transpose		FORUM MONDIAL DE L'ECONOMIE	Q170418	84
+ritish airways	375X9PSJLLOV7F21O626	typo	train	typo_first3:delete		BRITISH AIRWAYS PLC	Q8766	83
+british airwys	375X9PSJLLOV7F21O626	typo	train	typo_later:delete		BRITISH AIRWAYS PLC	Q8766	83
+cahrles university	31570010000000135022	typo	train	typo_first3:transpose		Univerzita Karlova	Q31519	83
+chalres university	31570010000000135022	typo	train	typo_later:transpose		Univerzita Karlova	Q31519	83
+asociated press	549300JTLJBPW24WC760	typo	test	typo_first3:delete		The Associated Press	Q40469	83
+associated prets	549300JTLJBPW24WC760	typo	test	typo_later:substitute		The Associated Press	Q40469	83
+aamrillo	549300PA08RG2E5SSJ56	typo	train	typo_first3:transpose		City of Amarillo, Texas	Q51691	83
+amarlilo	549300PA08RG2E5SSJ56	typo	train	typo_later:transpose		City of Amarillo, Texas	Q51691	83
+suuzki motor corporation	353800D83H0V3ZV1SV24	typo	train	typo_first3:transpose		スズキ株式会社	Q181642	83
+suzuki motor corproation	353800D83H0V3ZV1SV24	typo	train	typo_later:transpose		スズキ株式会社	Q181642	83
+lapeenranta	743700IYFBEBRQLD6D87	typo	train	typo_first3:delete		Lappeenrannan kaupunki	Q181854	83
+lappeenarnta	743700IYFBEBRQLD6D87	typo	train	typo_later:transpose		Lappeenrannan kaupunki	Q181854	83
+soevreign military order of malta	549300FCAO9VQ1IF2590	typo	test	typo_first3:transpose		Sovereign Military Hospitaller Order of St. John of Jerusalem of Rhodes and of Malta, Federal Association, U.S.A.	Q190353	83
+sovereign milwtary order of malta	549300FCAO9VQ1IF2590	typo	test	typo_later:substitute		Sovereign Military Hospitaller Order of St. John of Jerusalem of Rhodes and of Malta, Federal Association, U.S.A.	Q190353	83
+unversity of michigan	549300MFOB21PM9P9H72	typo	train	typo_first3:delete		Regents of the University of Michigan	Q230492	83
+university of mschigan	549300MFOB21PM9P9H72	typo	train	typo_later:substitute		Regents of the University of Michigan	Q230492	83
+mzda	52990044YZJLICDQKK92	typo	train	typo_first3:delete		マツダ株式会社	Q35996	82
+mazla	52990044YZJLICDQKK92	typo	train	typo_later:substitute		マツダ株式会社	Q35996	82
+ahsselt	549300BNOL003YS08X98	typo	test	typo_first3:transpose		Stad Hasselt	Q58780	82
+haseslt	549300BNOL003YS08X98	typo	test	typo_later:transpose		Stad Hasselt	Q58780	82
+uinversity of gottingen	967600E4XFSV4W93SC89	typo	train	typo_first3:transpose		Georg-August-Universität Göttingen	Q152838	82
+university of ottingen	967600E4XFSV4W93SC89	typo	train	typo_later:delete		Georg-August-Universität Göttingen	Q152838	82
+eavnsville	5493004FNKVUBIYGJO12	typo	train	typo_first3:transpose		City of Evansville, Indiana	Q486459	82
+evansvilke	5493004FNKVUBIYGJO12	typo	train	typo_later:substitute		City of Evansville, Indiana	Q486459	82
+loympique lyonnais	969500QCBXQ8TVYB0P26	typo	train	typo_first3:transpose		OLYMPIQUE LYONNAIS	Q704	81
+olympique lyonais	969500QCBXQ8TVYB0P26	typo	train	typo_later:delete		OLYMPIQUE LYONNAIS	Q704	81
+cletic f.c.	2138004FBHLJQ1EAGI88	typo	train	typo_first3:transpose		CELTIC PLC	Q19593	81
+celic f.c.	2138004FBHLJQ1EAGI88	typo	train	typo_later:delete		CELTIC PLC	Q19593	81
+owell	549300GXJ4CE6FSCJA35	typo	test	typo_first3:delete		City of Lowell, Massachusetts	Q49162	81
+lowel	549300GXJ4CE6FSCJA35	typo	test	typo_later:delete		City of Lowell, Massachusetts	Q49162	81
+wumboldt-universitat zu berlin	391200JKTIHRTUIJB380	typo	test	typo_first3:substitute		Humboldt-Universität zu Berlin	Q152087	81
+humboldt-unversitat zu berlin	391200JKTIHRTUIJB380	typo	test	typo_later:delete		Humboldt-Universität zu Berlin	Q152087	81
+bechelen	549300PG6J548GL1XY22	typo	train	typo_first3:substitute		STAD MECHELEN	Q162022	81
+mecehlen	549300PG6J548GL1XY22	typo	train	typo_later:transpose		STAD MECHELEN	Q162022	81
+hrldec kralove	315700PQR4XGC6UXNL26	typo	test	typo_first3:substitute		Statutární město Hradec Králové	Q180139	81
+hradec kwalove	315700PQR4XGC6UXNL26	typo	test	typo_later:substitute		Statutární město Hradec Králové	Q180139	81
+hvidia	549300S4KLFTLO7GSQ80	typo	test	typo_first3:substitute		NVIDIA CORPORATION	Q182477	81
+nviia	549300S4KLFTLO7GSQ80	typo	test	typo_later:delete		NVIDIA CORPORATION	Q182477	81
+pecgeot	969500LWIVUNQM3TGI58	typo	train	typo_first3:substitute		AUTOMOBILES PEUGEOT	Q6742	80
+peugeoy	969500LWIVUNQM3TGI58	typo	train	typo_later:substitute		AUTOMOBILES PEUGEOT	Q6742	80
+sokda auto	529900I8XOZDM4ZQSQ21	typo	train	typo_first3:transpose		ŠKODA AUTO a.s.	Q29637	80
+skod auto	529900I8XOZDM4ZQSQ21	typo	train	typo_later:delete		ŠKODA AUTO a.s.	Q29637	80
+ojhns hopkins university	549300Z1XKWYKTIOM958	typo	train	typo_first3:transpose		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+johns hopkins unviersity	549300Z1XKWYKTIOM958	typo	train	typo_later:transpose		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+apnasonic holdings corporation	254900GE1G59KGWPHX32	typo	test	typo_first3:transpose		パナソニックホールディングス株式会社	Q53247	79
+panasonic howdings corporation	254900GE1G59KGWPHX32	typo	test	typo_later:substitute		パナソニックホールディングス株式会社	Q53247	79
+iemens	529900ZZVLZ93I1AW009	typo	test	typo_first3:delete	W38RGI023J3WT1HWRP32	SIEMENS PLC	Q81230	79
+siemess	529900ZZVLZ93I1AW009	typo	test	typo_later:substitute	W38RGI023J3WT1HWRP32	SIEMENS PLC	Q81230	79
+nnited airlines	K1OQBWM7XEOO08LDNP29	typo	train	typo_first3:substitute		UNITED AIRLINES, INC.	Q174769	79
+united ailines	K1OQBWM7XEOO08LDNP29	typo	train	typo_later:delete		UNITED AIRLINES, INC.	Q174769	79
+hayeenlinna	74370038WST7JVM1ZT45	typo	train	typo_first3:substitute		Hämeenlinnan kaupunki	Q202158	79
+hamefnlinna	74370038WST7JVM1ZT45	typo	train	typo_later:substitute		Hämeenlinnan kaupunki	Q202158	79
+orcale corporation	1Z4GXXU7ZHVWFCD8TV52	typo	test	typo_first3:transpose		ORACLE CORPORATION	Q19900	78
+oracle corporarion	1Z4GXXU7ZHVWFCD8TV52	typo	test	typo_later:substitute		ORACLE CORPORATION	Q19900	78
+cpital region of denmark	2138006O2IWB2JU16484	typo	test	typo_first3:delete		REGION HOVEDSTADEN	Q26073	78
+capital region of demnark	2138006O2IWB2JU16484	typo	test	typo_later:transpose		REGION HOVEDSTADEN	Q26073	78
+entral denmark	213800GBFOFCCXDVIA19	typo	test	typo_first3:delete		Region Midtjylland	Q26586	78
+cenrtal denmark	213800GBFOFCCXDVIA19	typo	test	typo_later:transpose		Region Midtjylland	Q26586	78
+ned york university	R2G7YMC4K0KXSX0BGX71	typo	train	typo_first3:substitute		New York University	Q49210	78
+new yonk university	R2G7YMC4K0KXSX0BGX71	typo	train	typo_later:substitute		New York University	Q49210	78
+wiston-salem	549300AUJB2WE4FMLE24	typo	train	typo_first3:delete		City of Winston-Salem	Q49227	78
+winton-salem	549300AUJB2WE4FMLE24	typo	train	typo_later:delete		City of Winston-Salem	Q49227	78
+gzzprom	213800FD9J2IHTA7YX78	typo	test	typo_first3:substitute		ПУБЛИЧНОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО "ГАЗПРОМ"	Q102673	78
+gazkrom	213800FD9J2IHTA7YX78	typo	test	typo_later:substitute		ПУБЛИЧНОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО "ГАЗПРОМ"	Q102673	78
+unted nations development programme	213800HHKG1TKV8LMW56	typo	train	typo_first3:delete		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+united nations development peogramme	213800HHKG1TKV8LMW56	typo	train	typo_later:substitute		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+miwkeli	743700PSI19TAX2K9Y77	typo	test	typo_first3:substitute		Mikkelin kaupunki	Q190583	78
+mikkel	743700PSI19TAX2K9Y77	typo	test	typo_later:delete		Mikkelin kaupunki	Q190583	78
+suoth moravian region	31570010000000026091	typo	train	typo_first3:transpose		Jihomoravský kraj	Q192697	78
+south moravian regino	31570010000000026091	typo	train	typo_later:transpose		Jihomoravský kraj	Q192697	78
+ctroen	9695008DZ9VGHKZUYG11	typo	train	typo_first3:delete		AUTOMOBILES CITROEN	Q6746	77
+citrown	9695008DZ9VGHKZUYG11	typo	train	typo_later:substitute		AUTOMOBILES CITROEN	Q6746	77
+osuthern denmark	549300GTXJV6WPVBZN64	typo	train	typo_first3:transpose		Region Syddanmark	Q26061	77
+southern dnemark	549300GTXJV6WPVBZN64	typo	train	typo_later:transpose		Region Syddanmark	Q26061	77
+oninklijke philips nv	H1FJE8H61JGM1JSGM897	typo	test	typo_first3:delete		Koninklijke Philips N.V.	Q170416	77
+koninklijke philis nv	H1FJE8H61JGM1JSGM897	typo	test	typo_later:delete		Koninklijke Philips N.V.	Q170416	77
+mero-goldwyn-mayer	8JA4NT75BITP5LG6P072	typo	train	typo_first3:delete		METRO-GOLDWYN-MAYER INC.	Q179200	77
+metro-goldwyn-maye	8JA4NT75BITP5LG6P072	typo	train	typo_later:delete		METRO-GOLDWYN-MAYER INC.	Q179200	77
+aast	5493004J7J1W2I7RV807	typo	test	typo_first3:delete		STAD AALST	Q13121	76
+aalts	5493004J7J1W2I7RV807	typo	test	typo_later:transpose		STAD AALST	Q13121	76
+nrth denmark region	549300L5KYQI8JEG3329	typo	train	typo_first3:delete		Region Nordjylland	Q26067	76
+north dinmark region	549300L5KYQI8JEG3329	typo	train	typo_later:substitute		Region Nordjylland	Q26067	76
+hvundai motor company	9884004RQX8PRBXQ8S60	typo	train	typo_first3:substitute		현대자동차 (주)	Q55931	76
+hyunda motor company	9884004RQX8PRBXQ8S60	typo	train	typo_later:delete		현대자동차 (주)	Q55931	76
+sell	21380068P1DRHMJ8KU70	typo	train	typo_first3:delete		SHELL PLC	Q154950	76
+shelv	21380068P1DRHMJ8KU70	typo	train	typo_later:substitute		SHELL PLC	Q154950	76
+unviersity of copenhagen	549300W1BYDE7TQT8448	typo	train	typo_first3:transpose		Københavns Universitet	Q186285	76
+university tf copenhagen	549300W1BYDE7TQT8448	typo	train	typo_later:substitute		Københavns Universitet	Q186285	76
+qfizer	765LHXWGK1KXCLTFYQ30	typo	test	typo_first3:substitute		PFIZER INC.	Q206921	76
+pfier	765LHXWGK1KXCLTFYQ30	typo	test	typo_later:delete		PFIZER INC.	Q206921	76
+ensacola	549300Y7HMDKHDFTZ042	typo	test	typo_first3:delete		City of Pensacola, Florida	Q486306	76
+penacola	549300Y7HMDKHDFTZ042	typo	test	typo_later:delete		City of Pensacola, Florida	Q486306	76
+tohiba	549300LBHTST91VKHO68	typo	train	typo_first3:delete		株式会社東芝	Q49125	75
+toshib	549300LBHTST91VKHO68	typo	train	typo_later:delete		株式会社東芝	Q49125	75
+aroflot	253400MSLG0NS4C3NB96	typo	test	typo_first3:delete		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+aerolfot	253400MSLG0NS4C3NB96	typo	test	typo_later:transpose		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+enedictines	549300T5ENN23FXHVW63	typo	test	typo_first3:delete		Order of St. Benedict	Q131132	75
+benedctines	549300T5ENN23FXHVW63	typo	test	typo_later:delete		Order of St. Benedict	Q131132	75
+rynair	635400BR2ROC1FVEBQ56	typo	train	typo_first3:delete		Ryanair Holdings Public Limited Company	Q170614	75
+ryanar	635400BR2ROC1FVEBQ56	typo	train	typo_later:delete		Ryanair Holdings Public Limited Company	Q170614	75
+gcci	5493005M8G26W9LE2608	typo	test	typo_first3:delete		GUCCIO GUCCI S.P.A.	Q178516	75
+gucc	5493005M8G26W9LE2608	typo	test	typo_later:delete		GUCCIO GUCCI S.P.A.	Q178516	75
+sinajoki	74370096NR9VM7Z2CV59	typo	train	typo_first3:delete		Seinäjoen kaupunki	Q6157	74
+seinajowi	74370096NR9VM7Z2CV59	typo	train	typo_later:substitute		Seinäjoen kaupunki	Q6157	74
+reigon zealand	213800MIHXQJFJUAWV35	typo	test	typo_first3:transpose		Region Sjælland	Q26589	74
+region zealadn	213800MIHXQJFJUAWV35	typo	test	typo_later:transpose		Region Sjælland	Q26589	74
+krown university	9M13ULPHBPDR83N6CB89	typo	test	typo_first3:substitute		Brown University	Q49114	74
+brown universit	9M13ULPHBPDR83N6CB89	typo	test	typo_later:delete		Brown University	Q49114	74
+kbtna hora	315700ZMTCM8U4TTV847	typo	test	typo_first3:substitute		Město Kutná Hora	Q155975	74
+kutn hora	315700ZMTCM8U4TTV847	typo	test	typo_later:delete		Město Kutná Hora	Q155975	74
+kludno	315700KYZ0CZDWXZI529	typo	train	typo_first3:substitute		Statutární město Kladno	Q155993	74
+klaqno	315700KYZ0CZDWXZI529	typo	train	typo_later:substitute		Statutární město Kladno	Q155993	74
+yuke university	FY5ICUIRRDCHN4HHL592	typo	train	typo_first3:substitute		DUKE UNIVERSITY	Q168751	74
+duke nuiversity	FY5ICUIRRDCHN4HHL592	typo	train	typo_later:transpose		DUKE UNIVERSITY	Q168751	74
+elta air lines	Q2CCMS6R0AS67HJMBN42	typo	test	typo_first3:delete		Delta Air Lines, Inc.	Q188920	74
+delta air uines	Q2CCMS6R0AS67HJMBN42	typo	test	typo_later:substitute		Delta Air Lines, Inc.	Q188920	74
+vsyocina region	315700Y5DZLBAPT7XZ15	typo	test	typo_first3:transpose		Kraj Vysočina	Q190930	74
+vysooina region	315700Y5DZLBAPT7XZ15	typo	test	typo_later:substitute		Kraj Vysočina	Q190930	74
+aplhabet inc.	5493006MHB84DD0ZWV18	typo	test	typo_first3:transpose		ALPHABET INC.	Q20800404	74
+alphaben inc.	5493006MHB84DD0ZWV18	typo	test	typo_later:substitute		ALPHABET INC.	Q20800404	74
+emrcedes-benz group	529900R27DL06UVNT076	typo	test	typo_first3:transpose		Mercedes-Benz Group AG	Q27530	73
+mercedse-benz group	529900R27DL06UVNT076	typo	test	typo_later:transpose		Mercedes-Benz Group AG	Q27530	73
+saian development bank	549300X0MVH42CY8Q105	typo	train	typo_first3:transpose		ASIAN DEVELOPMENT BANK	Q188822	73
+asian developmetn bank	549300X0MVH42CY8Q105	typo	train	typo_later:transpose		ASIAN DEVELOPMENT BANK	Q188822	73
+orwegian air shuttle	549300IEUH2FEM2Y6B51	typo	train	typo_first3:delete		NORWEGIAN AIR SHUTTLE ASA	Q215392	73
+norwrgian air shuttle	549300IEUH2FEM2Y6B51	typo	train	typo_later:substitute		NORWEGIAN AIR SHUTTLE ASA	Q215392	73
+hte coca-cola company	UWJKFUJFZ02DKWI3RY53	typo	train	typo_first3:transpose		THE COCA-COLA COMPANY	Q3295867	73
+the oca-cola company	UWJKFUJFZ02DKWI3RY53	typo	train	typo_later:delete		THE COCA-COLA COMPANY	Q3295867	73
+yadnex	253400QS6NB20B1EVG74	typo	test	typo_first3:transpose		Общество с ограниченной ответственностью "ЯНДЕКС"	Q5281	72
+yanex	253400QS6NB20B1EVG74	typo	test	typo_later:delete		Общество с ограниченной ответственностью "ЯНДЕКС"	Q5281	72
+s freiburg	39120045YTKQBVB0ON31	typo	train	typo_first3:delete		Sport-Club Freiburg e. V.	Q106394	72
+sc freibrug	39120045YTKQBVB0ON31	typo	train	typo_later:transpose		Sport-Club Freiburg e. V.	Q106394	72
+ab bolvo	549300HGV012CNC8JD22	typo	train	typo_first3:substitute		Aktiebolaget Volvo	Q163810	72
+ab volov	549300HGV012CNC8JD22	typo	train	typo_later:transpose		Aktiebolaget Volvo	Q163810	72
+loldon stock exchange	213800D1EI4B9WTWWD28	typo	test	typo_first3:substitute		LONDON STOCK EXCHANGE PLC	Q171240	72
+london stock exchnage	213800D1EI4B9WTWWD28	typo	test	typo_later:transpose		LONDON STOCK EXCHANGE PLC	Q171240	72
+oravian-silesian region	315700JQ4GLOLYCHUD80	typo	test	typo_first3:delete		Moravskoslezský kraj	Q190550	72
+moravuan-silesian region	315700JQ4GLOLYCHUD80	typo	test	typo_later:substitute		Moravskoslezský kraj	Q190550	72
+rohester	549300006EX3INSHXA95	typo	train	typo_first3:delete		City of Rochester, Minnesota	Q486479	72
+rochestre	549300006EX3INSHXA95	typo	train	typo_later:transpose		City of Rochester, Minnesota	Q486479	72
+naidu	254900AL64IANZYI1E02	typo	train	typo_first3:substitute		BAIDU, INC.	Q14772	71
+baiud	254900AL64IANZYI1E02	typo	train	typo_later:transpose		BAIDU, INC.	Q14772	71
+amjor league soccer	5493005Z1VSYZZ2JED42	typo	train	typo_first3:transpose		MAJOR LEAGUE SOCCER, L.L.C.	Q18543	71
+major league soccr	5493005Z1VSYZZ2JED42	typo	train	typo_later:delete		MAJOR LEAGUE SOCCER, L.L.C.	Q18543	71
+aemrican airlines	IWUQB36BXD6OWD6X4T14	typo	test	typo_first3:transpose		American Airlines Group Inc.	Q32396	71
+american irlines	IWUQB36BXD6OWD6X4T14	typo	test	typo_later:delete		American Airlines Group Inc.	Q32396	71
+cnon inc.	529900JH1GSC035SSP77	typo	test	typo_first3:delete		キヤノン株式会社	Q62621	71
+canon in.	529900JH1GSC035SSP77	typo	test	typo_later:delete		キヤノン株式会社	Q62621	71
+exqonmobil	J3WHBG0MTS7O8ZVMDC91	typo	train	typo_first3:substitute		EXXON MOBIL CORPORATION	Q156238	71
+exxofmobil	J3WHBG0MTS7O8ZVMDC91	typo	train	typo_later:substitute		EXXON MOBIL CORPORATION	Q156238	71
+eelctronic arts	549300O7A67PUEYKDL45	typo	train	typo_first3:transpose		ELECTRONIC ARTS INC.	Q173941	71
+electroic arts	549300O7A67PUEYKDL45	typo	train	typo_later:delete		ELECTRONIC ARTS INC.	Q173941	71
+lvberec region	315700GUWWWSHORZNH06	typo	train	typo_first3:substitute		Liberecký kraj	Q193266	71
+libeec region	315700GUWWWSHORZNH06	typo	train	typo_later:delete		Liberecký kraj	Q193266	71
+clraksville	5493000GGEJLABLR8E68	typo	train	typo_first3:transpose		City of Clarksville, Tennessee	Q328941	71
+clarksvlile	5493000GGEJLABLR8E68	typo	train	typo_later:transpose		City of Clarksville, Tennessee	Q328941	71
+lcokheed martin	DPRBOZP0K5RM2YE8UU08	typo	train	typo_first3:transpose		LOCKHEED MARTIN CORPORATION	Q7240	70
+lockheed martn	DPRBOZP0K5RM2YE8UU08	typo	train	typo_later:delete		LOCKHEED MARTIN CORPORATION	Q7240	70
+aqntas airways	YLXNW6TI6QSK1H8H0N82	typo	test	typo_first3:transpose		QANTAS AIRWAYS LIMITED	Q32491	70
+qants airways	YLXNW6TI6QSK1H8H0N82	typo	test	typo_later:delete		QANTAS AIRWAYS LIMITED	Q32491	70
+boton university	549300M1CR2B2GU2ZU17	typo	test	typo_first3:delete		TRUSTEES OF BOSTON UNIVERSITY	Q49110	70
+boston uinversity	549300M1CR2B2GU2ZU17	typo	test	typo_later:transpose		TRUSTEES OF BOSTON UNIVERSITY	Q49110	70
+cristian social union of bavaria	3912009JG3JSITYOGP33	typo	test	typo_first3:delete		Christlich-Soziale Union in Bayern eingetragener Verein	Q49763	70
+christian social union of bvaria	3912009JG3JSITYOGP33	typo	test	typo_later:delete		Christlich-Soziale Union in Bayern eingetragener Verein	Q49763	70
+eutsche bank	7LTWFZYICNSX8D621K86	typo	test	typo_first3:delete		DEUTSCHE BANK AKTIENGESELLSCHAFT	Q66048	70
+deutsche bak	7LTWFZYICNSX8D621K86	typo	test	typo_later:delete		DEUTSCHE BANK AKTIENGESELLSCHAFT	Q66048	70
+msithsonian institution	549300ZJ87IUCDSX4306	typo	test	typo_first3:transpose		SMITHSONIAN INSTITUTION	Q131626	70
+smithsonian instittuion	549300ZJ87IUCDSX4306	typo	test	typo_later:transpose		SMITHSONIAN INSTITUTION	Q131626	70
+ijhlava	315700NRO1VQB9V8VS04	typo	test	typo_first3:transpose		Statutární město Jihlava	Q183111	70
+jihalva	315700NRO1VQB9V8VS04	typo	test	typo_later:transpose		Statutární město Jihlava	Q183111	70
+kovuola	743700KM515NKCCZ2D33	typo	test	typo_first3:transpose		Kouvolan kaupunki	Q204382	70
+kouvoa	743700KM515NKCCZ2D33	typo	test	typo_later:delete		Kouvolan kaupunki	Q204382	70
+alcbaba group	5493001NTNQJDH60PM02	typo	train	typo_first3:substitute		Alibaba Group Holding Limited	Q1359568	70
+alibaba grofp	5493001NTNQJDH60PM02	typo	train	typo_later:substitute		Alibaba Group Holding Limited	Q1359568	70
+vokswagen group	529900NNUPAGGOMPXZ31	typo	train	typo_first3:delete		VOLKSWAGEN AKTIENGESELLSCHAFT	Q156578	69
+volkswagen gorup	529900NNUPAGGOMPXZ31	typo	train	typo_later:transpose		VOLKSWAGEN AKTIENGESELLSCHAFT	Q156578	69
+isco	549300LKFJ962MZ46593	typo	train	typo_first3:delete		CISCO SYSTEMS, INC.	Q173395	69
+cisc	549300LKFJ962MZ46593	typo	train	typo_later:delete		CISCO SYSTEMS, INC.	Q173395	69
+iar canada	4B4HI3CGXMBDC0G6BM51	typo	train	typo_first3:transpose		AIR CANADA	Q185339	69
+air yanada	4B4HI3CGXMBDC0G6BM51	typo	train	typo_later:substitute		AIR CANADA	Q185339	69
+loius vuitton	969500UCUCRLUC0YBF90	typo	test	typo_first3:transpose		LOUIS VUITTON MALLETIER	Q191485	69
+louis vutton	969500UCUCRLUC0YBF90	typo	test	typo_later:delete		LOUIS VUITTON MALLETIER	Q191485	69
+oqomouc region	315700B4P4IJX7N9QQ20	typo	test	typo_first3:substitute		Olomoucký kraj	Q193307	69
+olomouc regirn	315700B4P4IJX7N9QQ20	typo	test	typo_later:substitute		Olomoucký kraj	Q193307	69
+rfesno county	549300JJ6NWR5CVGI705	typo	test	typo_first3:transpose		County of Fresno, California	Q271915	69
+fresno conty	549300JJ6NWR5CVGI705	typo	test	typo_later:delete		County of Fresno, California	Q271915	69
+ngu-ulm	391200FUHZU0RKB6SI13	typo	test	typo_first3:substitute		Stadt Neu-Ulm	Q4120	68
+neu-uml	391200FUHZU0RKB6SI13	typo	test	typo_later:transpose		Stadt Neu-Ulm	Q4120	68
+anyerlecht	549300Q9L8F1Y3B5W484	typo	test	typo_first3:substitute		Gemeente Anderlecht	Q12886	68
+anderlecth	549300Q9L8F1Y3B5W484	typo	test	typo_later:transpose		Gemeente Anderlecht	Q12886	68
+atson martin lagonda	213800167WOVOK5ZC776	typo	test	typo_first3:transpose		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+aston marti lagonda	213800167WOVOK5ZC776	typo	test	typo_later:delete		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+cloumbia	549300VPLMZFZSZPNV09	typo	test	typo_first3:transpose		City of Columbia, Missouri	Q59670	68
+colmubia	549300VPLMZFZSZPNV09	typo	test	typo_later:transpose		City of Columbia, Missouri	Q59670	68
+clzb brugge k.v.	9676008V5Q1U1S8JSX89	typo	train	typo_first3:substitute		CLUB BRUGGE	Q190916	68
+club brurge k.v.	9676008V5Q1U1S8JSX89	typo	train	typo_later:substitute		CLUB BRUGGE	Q190916	68
+zin region	315700EXYLQ9BNJ21D92	typo	train	typo_first3:delete		Zlínský kraj	Q192536	68
+zlin rgeion	315700EXYLQ9BNJ21D92	typo	train	typo_later:transpose		Zlínský kraj	Q192536	68
+fhyetteville	5493005PJCLNCCO7GU16	typo	train	typo_first3:substitute		City of Fayetteville, Arkansas	Q219526	68
+fayettevlle	5493005PJCLNCCO7GU16	typo	train	typo_later:delete		City of Fayetteville, Arkansas	Q219526	68
+amcon	549300ZKSJB5TY1OAJ37	typo	train	typo_first3:transpose		City of Macon, Georgia	Q219656	68
+maco	549300ZKSJB5TY1OAJ37	typo	train	typo_later:delete		City of Macon, Georgia	Q219656	68
+mafaysia airlines	254900OXA1QQLTW68560	typo	test	typo_first3:substitute		Malaysia Airlines Berhad	Q308952	68
+malaysia ahrlines	254900OXA1QQLTW68560	typo	test	typo_later:substitute		Malaysia Airlines Berhad	Q308952	68
+cmopton	5493008IGOHB0IDNPZ86	typo	train	typo_first3:transpose		City of Compton, California	Q487119	68
+compto	5493008IGOHB0IDNPZ86	typo	train	typo_later:delete		City of Compton, California	Q487119	68
+nuiversity of southern california	0GMCSQ6M60R4T46U5511	typo	train	typo_first3:transpose		UNIVERSITY OF SOUTHERN CALIFORNIA	Q4614	67
+university of southenr california	0GMCSQ6M60R4T46U5511	typo	train	typo_later:transpose		UNIVERSITY OF SOUTHERN CALIFORNIA	Q4614	67
+vzolen	097900BICU0000138519	typo	train	typo_first3:transpose		Mesto Zvolen	Q11874	67
+zvofen	097900BICU0000138519	typo	train	typo_later:substitute		Mesto Zvolen	Q11874	67
+1. fvs mainz 05	529900XP8P80S4TI7511	typo	train	typo_first3:transpose		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+1. fsv mainq 05	529900XP8P80S4TI7511	typo	train	typo_later:substitute		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+antional geographic society	549300Y716V0TJC41G95	typo	test	typo_first3:transpose		NATIONAL GEOGRAPHIC SOCIETY	Q167186	67
+national geogarphic society	549300Y716V0TJC41G95	typo	test	typo_later:transpose		NATIONAL GEOGRAPHIC SOCIETY	Q167186	67
+srada	8156000FE0A2DC5B7852	typo	train	typo_first3:substitute		PRADA S.P.A.	Q193136	67
+praad	8156000FE0A2DC5B7852	typo	train	typo_later:transpose		PRADA S.P.A.	Q193136	67
+kjaani	7437006XYZLOSYXUS057	typo	train	typo_first3:delete		Kajaanin kaupunki	Q193180	67
+kajmani	7437006XYZLOSYXUS057	typo	train	typo_later:substitute		Kajaanin kaupunki	Q193180	67
+rocert bosch	529900F0LT5OP4SV6122	typo	train	typo_first3:substitute		Robert Bosch Gesellschaft mit beschränkter Haftung	Q234021	67
+robret bosch	529900F0LT5OP4SV6122	typo	train	typo_later:transpose		Robert Bosch Gesellschaft mit beschränkter Haftung	Q234021	67
+loomington	5493005Q4CKD9B975C61	typo	train	typo_first3:delete		City of Bloomington, Indiana	Q490385	67
+blooimngton	5493005Q4CKD9B975C61	typo	train	typo_later:transpose		City of Bloomington, Indiana	Q490385	67
+lavrence	5493004LLF0HG6XS2E46	typo	train	typo_first3:substitute		City of Lawrence, Kansas	Q493840	67
+lawence	5493004LLF0HG6XS2E46	typo	train	typo_later:delete		City of Lawrence, Kansas	Q493840	67
+cursera	984500573CA1QB7DAC30	typo	train	typo_first3:delete		COURSERA, INC.	Q499962	67
+coursra	984500573CA1QB7DAC30	typo	train	typo_later:delete		COURSERA, INC.	Q499962	67
+nijon	549300X7LIS9RFELXJ98	typo	train	typo_first3:substitute		NIKON CORPORATION	Q1218180	67
+nikoh	549300X7LIS9RFELXJ98	typo	train	typo_later:substitute		NIKON CORPORATION	Q1218180	67
+1. c kaiserslautern	529900WV51JLO1QEAQ95	typo	test	typo_first3:delete		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+1. fc kaisersloutern	529900WV51JLO1QEAQ95	typo	test	typo_later:substitute		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+ingapore airlines	549300ZG62N2599PWR15	typo	train	typo_first3:delete		SINGAPORE AIRLINES LIMITED	Q32245	66
+singapome airlines	549300ZG62N2599PWR15	typo	train	typo_later:substitute		SINGAPORE AIRLINES LIMITED	Q32245	66
+rloex	506700KOZ1A1V0IY7741	typo	train	typo_first3:transpose		ROLEX SA	Q62288	66
+rolax	506700KOZ1A1V0IY7741	typo	train	typo_later:substitute		ROLEX SA	Q62288	66
+baeyr	549300J4U55H3WP1XT59	typo	train	typo_first3:transpose		Bayer Aktiengesellschaft	Q152051	66
+baynr	549300J4U55H3WP1XT59	typo	train	typo_later:substitute		Bayer Aktiengesellschaft	Q152051	66
+klamazoo	549300HLUQ75FKMC2544	typo	train	typo_first3:delete		City of Kalamazoo	Q167155	66
+kalmaazoo	549300HLUQ75FKMC2544	typo	train	typo_later:transpose		City of Kalamazoo	Q167155	66
+koqkola	743700XMLJ2M409G7C91	typo	train	typo_first3:substitute		Kokkolan kaupunki	Q207891	66
+kokola	743700XMLJ2M409G7C91	typo	train	typo_later:delete		Kokkolan kaupunki	Q207891	66
+qtar airways	549300HDF99L84TF2D68	typo	train	typo_first3:delete		مجموعة الخطوط الجوية القطرية	Q208033	66
+qatra airways	549300HDF99L84TF2D68	typo	train	typo_later:transpose		مجموعة الخطوط الجوية القطرية	Q208033	66
+niversity of virginia	549300H2U5XHL1CLTN62	typo	test	typo_first3:delete		The Rector and Visitors of the University of Virginia	Q213439	66
+uniersity of virginia	549300H2U5XHL1CLTN62	typo	test	typo_later:delete		The Rector and Visitors of the University of Virginia	Q213439	66
+uinversity of manchester	213800L6WZJ6FSGIEJ60	typo	train	typo_first3:transpose		THE UNIVERSITY OF MANCHESTER	Q230899	66
+uniqersity of manchester	213800L6WZJ6FSGIEJ60	typo	train	typo_later:substitute		THE UNIVERSITY OF MANCHESTER	Q230899	66
+papsico	FJSUNZKFNQ5YPJ5OT455	typo	test	typo_first3:substitute		PepsiCo, Inc.	Q334800	66
+pepsicd	FJSUNZKFNQ5YPJ5OT455	typo	test	typo_later:substitute		PepsiCo, Inc.	Q334800	66
+ar india	335800SB4EYU1F7N9Q09	typo	train	typo_first3:delete		AIR INDIA LIMITED	Q69906	65
+air indim	335800SB4EYU1F7N9Q09	typo	train	typo_later:substitute		AIR INDIA LIMITED	Q69906	65
+henton	549300UWEY8IKYK09T27	typo	train	typo_first3:substitute		City of Denton, Texas	Q128306	65
+dentno	549300UWEY8IKYK09T27	typo	train	typo_later:transpose		City of Denton, Texas	Q128306	65
+nuilever	549300MKFYEKVRWML317	typo	train	typo_first3:transpose	549300TK7G7NZTVM1Z30	UNILEVER PLC	Q157062	65
+unirever	549300MKFYEKVRWML317	typo	train	typo_later:substitute	549300TK7G7NZTVM1Z30	UNILEVER PLC	Q157062	65
+trnnsparency international	529900UJKO26NSNK9F38	typo	train	typo_first3:substitute		Transparency International e.V.	Q174240	65
+tragsparency international	529900UJKO26NSNK9F38	typo	train	typo_later:substitute		Transparency International e.V.	Q174240	65
+tbe salvation army	5493005FGG4Y2YFTNM14	typo	train	typo_first3:substitute	549300UQ1LCLSQQ6V491|549300X1SK5BYB8TRH36	THE SALVATION ARMY	Q188307	65
+the sqlvation army	5493005FGG4Y2YFTNM14	typo	train	typo_later:substitute	549300UQ1LCLSQQ6V491|549300X1SK5BYB8TRH36	THE SALVATION ARMY	Q188307	65
+maada boleslav	315700TLLYER5YTZWX46	typo	train	typo_first3:substitute		Statutární město Mladá Boleslav	Q191805	65
+mlada bolesla	315700TLLYER5YTZWX46	typo	train	typo_later:delete		Statutární město Mladá Boleslav	Q191805	65
+eihad airways	DF0BVHAOM8TIXBR3S960	typo	train	typo_first3:delete		الاتحاد للطيران ش م ع	Q212304	65
+etihad arways	DF0BVHAOM8TIXBR3S960	typo	train	typo_later:delete		الاتحاد للطيران ش م ع	Q212304	65
+lbany	549300NK188464F4WK63	typo	train	typo_first3:delete		City of Albany	Q285599	65
+albayn	549300NK188464F4WK63	typo	train	typo_later:transpose		City of Albany	Q285599	65
+kisa inc.	549300JZ4OKEHW3DPJ59	typo	test	typo_first3:substitute		VISA INC.	Q328840	65
+visa wnc.	549300JZ4OKEHW3DPJ59	typo	test	typo_later:substitute		VISA INC.	Q328840	65
+scudi aramco	5586006WD91QHB7J4X50	typo	train	typo_first3:substitute		Saudi Arabian Oil Company	Q679322	65
+saudi aracmo	5586006WD91QHB7J4X50	typo	train	typo_later:transpose		Saudi Arabian Oil Company	Q679322	65
+nint-niklaas	54930057KZX3GJRX0F98	typo	test	typo_first3:substitute		STAD SINT-NIKLAAS	Q13127	64
+sint-niklaav	54930057KZX3GJRX0F98	typo	test	typo_later:substitute		STAD SINT-NIKLAAS	Q13127	64
+niqlo	3538001NOZ9CR8H1YZ84	typo	test	typo_first3:delete		株式会社ユニクロ	Q26070	64
+unilqo	3538001NOZ9CR8H1YZ84	typo	test	typo_later:transpose		株式会社ユニクロ	Q26070	64
+tauma	743700UT4ITWYR7QXI59	typo	train	typo_first3:substitute		Rauman kaupunki	Q37013	64
+raumw	743700UT4ITWYR7QXI59	typo	train	typo_later:substitute		Rauman kaupunki	Q37013	64
+niversal music group	724500GJBUL3D9TW9Y18	typo	test	typo_first3:delete		Universal Music Group N.V.	Q38903	64
+universal umsic group	724500GJBUL3D9TW9Y18	typo	test	typo_later:transpose		Universal Music Group N.V.	Q38903	64
+erman football association	391200RAHYN0X3A9IK29	typo	test	typo_first3:delete		Deutscher Fußball-Bund (DFB)	Q154191	64
+german football assocaition	391200RAHYN0X3A9IK29	typo	test	typo_later:transpose		Deutscher Fußball-Bund (DFB)	Q154191	64
+awvre	967600E2RGFBI9Y0DO98	typo	test	typo_first3:transpose		Ville de Wavre	Q181314	64
+wavoe	967600E2RGFBI9Y0DO98	typo	test	typo_later:substitute		Ville de Wavre	Q181314	64
+sandinavian airlines	549300ZJTLE5T4SGP021	typo	test	typo_first3:delete		SAS AB	Q187854	64
+scandinavian airlqnes	549300ZJTLE5T4SGP021	typo	test	typo_later:substitute		SAS AB	Q187854	64
+iatra	743700FAZ8CE0ETIMY46	typo	test	typo_first3:delete		Imatran kaupunki	Q211020	64
+imatr	743700FAZ8CE0ETIMY46	typo	test	typo_later:delete		Imatran kaupunki	Q211020	64
+nzojmo	31570010000000095252	typo	test	typo_first3:transpose		Město Znojmo	Q214956	64
+znozmo	31570010000000095252	typo	test	typo_later:substitute		Město Znojmo	Q214956	64
+hhanel	969500U4FNDFRFOLSW75	typo	train	typo_first3:substitute		CHANEL	Q218115	64
+chanez	969500U4FNDFRFOLSW75	typo	train	typo_later:substitute		CHANEL	Q218115	64
+oevoca	315700AOR4BK71Z1H442	typo	test	typo_first3:substitute		Mesto Levoča	Q242478	64
+levoc	315700AOR4BK71Z1H442	typo	test	typo_later:delete		Mesto Levoča	Q242478	64
+wsift	HB7FFAZI0OMZ8PP8OE26	typo	test	typo_first3:transpose		SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL TELECOMMUNICATION	Q257597	64
+switf	HB7FFAZI0OMZ8PP8OE26	typo	test	typo_later:transpose		SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL TELECOMMUNICATION	Q257597	64
+laccaster	549300BGOEKNNN4HPE68	typo	test	typo_first3:substitute		City of Lancaster	Q320514	64
+lancastvr	549300BGOEKNNN4HPE68	typo	test	typo_later:substitute		City of Lancaster	Q320514	64
+iami-dade county	549300QG0NBD9HULR263	typo	test	typo_first3:delete		Miami-Dade County, Florida	Q468557	64
+miami-eade county	549300QG0NBD9HULR263	typo	test	typo_later:substitute		Miami-Dade County, Florida	Q468557	64
+ktdak	549300P7J8F3SSMY3E81	typo	train	typo_first3:substitute		Eastman Kodak Company	Q486269	64
+kodae	549300P7J8F3SSMY3E81	typo	train	typo_later:substitute		Eastman Kodak Company	Q486269	64
+kavonlinna	743700F3PXEBUNALGP25	typo	train	typo_first3:substitute		Savonlinnan kaupunki	Q683512	64
+savonlinn	743700F3PXEBUNALGP25	typo	train	typo_later:delete		Savonlinnan kaupunki	Q683512	64
+datmouth college	JVPL1XBV6YI9538FWQ05	typo	test	typo_first3:delete		TRUSTEES OF DARTMOUTH COLLEGE	Q49116	63
+dartmouth cwllege	JVPL1XBV6YI9538FWQ05	typo	test	typo_later:substitute		TRUSTEES OF DARTMOUTH COLLEGE	Q49116	63
+liermore	549300GFYJPMDMABG210	typo	train	typo_first3:delete		City of Livermore	Q138901	63
+livermre	549300GFYJPMDMABG210	typo	train	typo_later:delete		City of Livermore	Q138901	63
+rporters without borders	969500LN5IRG2DYB1W89	typo	test	typo_first3:delete		REPORTERS SANS FRONTIERES	Q154330	63
+reporters without bordrs	969500LN5IRG2DYB1W89	typo	test	typo_later:delete		REPORTERS SANS FRONTIERES	Q154330	63
+sellantis north america	ZTC508ZLTU6TYD5R7A85	typo	test	typo_first3:delete		FCA US LLC	Q181114	63
+stellants north america	ZTC508ZLTU6TYD5R7A85	typo	test	typo_later:delete		FCA US LLC	Q181114	63
+eirdlife international	213800UJ67YZUIPXLU85	typo	test	typo_first3:substitute		BIRDLIFE INTERNATIONAL	Q210108	63
+birdlife xnternational	213800UJ67YZUIPXLU85	typo	test	typo_later:substitute		BIRDLIFE INTERNATIONAL	Q210108	63
+porcter & gamble	2572IBTT8CCZW6AU4141	typo	train	typo_first3:transpose		THE PROCTER & GAMBLE COMPANY	Q212405	63
+procser & gamble	2572IBTT8CCZW6AU4141	typo	train	typo_later:substitute		THE PROCTER & GAMBLE COMPANY	Q212405	63
+birghamton	5493006D246GNK3OOC75	typo	test	typo_first3:substitute		Binghamton, New York	Q213814	63
+binghamtos	5493006D246GNK3OOC75	typo	test	typo_later:substitute		Binghamton, New York	Q213814	63
+ivctorville	5493001GUXT5JHO1TA78	typo	train	typo_first3:transpose		City of Victorville, California	Q495353	63
+victorvmlle	5493001GUXT5JHO1TA78	typo	train	typo_later:substitute		City of Victorville, California	Q495353	63
+jaok in the box	5493002OJW26P0SUUP68	typo	test	typo_first3:substitute		JACK IN THE BOX INC.	Q1538507	63
+jack in he box	5493002OJW26P0SUUP68	typo	test	typo_later:delete		JACK IN THE BOX INC.	Q1538507	63
+deodermonde	549300LW31K07NLB7A06	typo	train	typo_first3:substitute		Stad Dendermonde	Q13122	62
+dendremonde	549300LW31K07NLB7A06	typo	train	typo_later:transpose		Stad Dendermonde	Q13122	62
+maesrati	549300SS011RI430KA43	typo	train	typo_first3:transpose		MASERATI S.P.A.	Q35962	62
+maserzti	549300SS011RI430KA43	typo	train	typo_later:substitute		MASERATI S.P.A.	Q35962	62
+lmbraer	549300EM51WYXFHUY333	typo	train	typo_first3:substitute		EMBRAER S.A.	Q105557	62
+embrker	549300EM51WYXFHUY333	typo	train	typo_later:substitute		EMBRAER S.A.	Q105557	62
+wihita falls	549300NTFETNSK7HXG80	typo	test	typo_first3:delete		City of Wichita Falls, Texas	Q128349	62
+wichita fallo	549300NTFETNSK7HXG80	typo	test	typo_later:substitute		City of Wichita Falls, Texas	Q128349	62
+imchelin	549300SOSI58J6VIW052	typo	test	typo_first3:transpose	549300U45EBW2GJV2X93	COMPAGNIE GENERALE DES ETABLISSEMENTS MICHELIN	Q151107	62
+michelni	549300SOSI58J6VIW052	typo	test	typo_later:transpose	549300U45EBW2GJV2X93	COMPAGNIE GENERALE DES ETABLISSEMENTS MICHELIN	Q151107	62
+axademy of motion picture arts and sciences	5493004JUQM74J85V756	typo	test	typo_first3:substitute		Academy of Motion Picture Arts and Sciences	Q212329	62
+academy of motion picture arts and ciences	5493004JUQM74J85V756	typo	test	typo_later:delete		Academy of Motion Picture Arts and Sciences	Q212329	62
+jpaan airlines	3538002MH5L1QZZ93477	typo	train	typo_first3:transpose		日本航空株式会社	Q213140	62
+japan ailines	3538002MH5L1QZZ93477	typo	train	typo_later:delete		日本航空株式会社	Q213140	62
+amstercard	AR5L2ODV9HN37376R084	typo	test	typo_first3:transpose		MASTERCARD INCORPORATED	Q489921	62
+masmercard	AR5L2ODV9HN37376R084	typo	test	typo_later:substitute		MASTERCARD INCORPORATED	Q489921	62
+vilmington	549300Y5IY4G3QB69428	typo	test	typo_first3:substitute		City of Wilmington, North Carolina	Q659400	62
+wilmingtno	549300Y5IY4G3QB69428	typo	test	typo_later:transpose		City of Wilmington, North Carolina	Q659400	62
+owling green	54930080VGM7PSGOKL96	typo	test	typo_first3:delete		City of Bowling Green, Kentucky	Q694545	62
+bowlign green	54930080VGM7PSGOKL96	typo	test	typo_later:transpose		City of Bowling Green, Kentucky	Q694545	62
+eony music	549300G0VTDMY8H0RM04	typo	train	typo_first3:substitute		SONY MUSIC ENTERTAINMENT	Q56760250	62
+sony munic	549300G0VTDMY8H0RM04	typo	train	typo_later:substitute		SONY MUSIC ENTERTAINMENT	Q56760250	62
+mistubishi motors	5299006ZTN6MO1N5BR16	typo	train	typo_first3:transpose		三菱自動車工業株式会社	Q36033	61
+mitsubshi motors	5299006ZTN6MO1N5BR16	typo	train	typo_later:delete		三菱自動車工業株式会社	Q36033	61
+reicsson	549300W9JLPW15XIFM52	typo	test	typo_first3:transpose		Telefonaktiebolaget LM Ericsson	Q52618	61
+erisson	549300W9JLPW15XIFM52	typo	test	typo_later:delete		Telefonaktiebolaget LM Ericsson	Q52618	61
+voadfone	213800TB53ELEUKM7Q61	typo	test	typo_first3:transpose		VODAFONE GROUP PUBLIC LIMITED COMPANY	Q122141	61
+vodafoen	213800TB53ELEUKM7Q61	typo	test	typo_later:transpose		VODAFONE GROUP PUBLIC LIMITED COMPANY	Q122141	61
+oedssa	5493009W8JN2B6ZDRY14	typo	test	typo_first3:transpose		City of Odessa, Texas	Q128361	61
+odesfa	5493009W8JN2B6ZDRY14	typo	test	typo_later:substitute		City of Odessa, Texas	Q128361	61
+hcomutov	315700DU494AM9SSDS07	typo	test	typo_first3:transpose		Statutární město Chomutov	Q146356	61
+chomunov	315700DU494AM9SSDS07	typo	test	typo_later:substitute		Statutární město Chomutov	Q146356	61
+aesyjet	2138001S47XKWIB7TH90	typo	test	typo_first3:transpose		EASYJET PLC	Q191551	61
+easyejt	2138001S47XKWIB7TH90	typo	test	typo_later:transpose		EASYJET PLC	Q191551	61
+ukusamo	743700ZLFJ0KRKHW4G13	typo	train	typo_first3:transpose		Kuusamon kaupunki	Q207999	61
+kuusaxo	743700ZLFJ0KRKHW4G13	typo	train	typo_later:substitute		Kuusamon kaupunki	Q207999	61
+eutsche bahn	52990063S23N13HU4E98	typo	train	typo_first3:delete		Deutsche Bahn Aktiengesellschaft	Q9322	60
+deutshce bahn	52990063S23N13HU4E98	typo	train	typo_later:transpose		Deutsche Bahn Aktiengesellschaft	Q9322	60
+haris county	549300G9BRP25M0W1S40	typo	train	typo_first3:delete		Harris County, Texas	Q26676	60
+harris colnty	549300G9BRP25M0W1S40	typo	train	typo_later:substitute		Harris County, Texas	Q26676	60
+bfntley	529900XV3G9LB0F1P877	typo	test	typo_first3:substitute		BENTLEY MOTORS LIMITED	Q27224	60
+benqley	529900XV3G9LB0F1P877	typo	test	typo_later:substitute		BENTLEY MOTORS LIMITED	Q27224	60
+htiachi	549300T6IPOCDWLKC615	typo	test	typo_first3:transpose		株式会社 日立製作所	Q53238	60
+hitacni	549300T6IPOCDWLKC615	typo	test	typo_later:substitute		株式会社 日立製作所	Q53238	60
+govthe-institut	984500D3CB449HB54090	typo	test	typo_first3:substitute		Goethe-Institut e.V.	Q157033	60
+goeth-institut	984500D3CB449HB54090	typo	test	typo_later:delete		Goethe-Institut e.V.	Q157033	60
+komeriz	31570019E5Z65CCNM110	typo	train	typo_first3:delete		Město Kroměříž	Q158239	60
+kromriz	31570019E5Z65CCNM110	typo	train	typo_later:delete		Město Kroměříž	Q158239	60
+rfench academy of sciences	969500GR6V0LG92UGZ66	typo	test	typo_first3:transpose		ACADEMIE DES SCIENCES	Q188771	60
+frenh academy of sciences	969500GR6V0LG92UGZ66	typo	test	typo_later:delete		ACADEMIE DES SCIENCES	Q188771	60
+inetrnational bank for reconstruction and development	ZTMSNXROF84AHWJNKQ93	typo	train	typo_first3:transpose		International Bank for Reconstruction and Development	Q191384	60
+international bank for reconstructino and development	ZTMSNXROF84AHWJNKQ93	typo	train	typo_later:transpose		International Bank for Reconstruction and Development	Q191384	60
+uba county	5493002V7TE6BY580T72	typo	test	typo_first3:delete		County of Yuba	Q196014	60
+yuba count	5493002V7TE6BY580T72	typo	test	typo_later:delete		County of Yuba	Q196014	60
+acoste	9695002KTQF3TYU8CP18	typo	test	typo_first3:delete		LACOSTE	Q309031	60
+lacosqe	9695002KTQF3TYU8CP18	typo	test	typo_later:substitute		LACOSTE	Q309031	60
+cevron corporation	VA8TZDWPEZYU430RZ444	typo	test	typo_first3:delete		Chevron U.S.A. Inc.	Q319642	60
+chevron cjrporation	VA8TZDWPEZYU430RZ444	typo	test	typo_later:substitute		Chevron U.S.A. Inc.	Q319642	60
+rzd hat	08C2IQ0VM1B2PBTVHC56	typo	train	typo_first3:substitute		RED HAT, LLC	Q485593	60
+red ht	08C2IQ0VM1B2PBTVHC56	typo	train	typo_later:delete		RED HAT, LLC	Q485593	60
+ank of america	9DJT3UXIJIZJI4WXO774	typo	test	typo_first3:delete		BANK OF AMERICA CORPORATION	Q487907	60
+bank of amrica	9DJT3UXIJIZJI4WXO774	typo	test	typo_later:delete		BANK OF AMERICA CORPORATION	Q487907	60
+eb monte	549300079T82S1QZWG33	typo	test	typo_first3:substitute		City of El Monte	Q595550	60
+el monet	549300079T82S1QZWG33	typo	test	typo_later:transpose		City of El Monte	Q595550	60
+vesace	815600B71B502C1D2488	typo	train	typo_first3:delete		GIANNI VERSACE S.R.L.	Q696376	60
+verscae	815600B71B502C1D2488	typo	train	typo_later:transpose		GIANNI VERSACE S.R.L.	Q696376	60
+sanyang technological university	549300NYFBZNS57ZX444	typo	test	typo_first3:substitute		NANYANG TECHNOLOGICAL UNIVERSITY	Q721064	60
+nanyang technological uniersity	549300NYFBZNS57ZX444	typo	test	typo_later:delete		NANYANG TECHNOLOGICAL UNIVERSITY	Q721064	60
+jkobstad	743700OBIKTL9F58FF89	typo	test	typo_first3:delete		Jakobstads stad	Q1679567	60
+jakobsta	743700OBIKTL9F58FF89	typo	test	typo_later:delete		Jakobstads stad	Q1679567	60
+ka gent	549300E0STT1BVBD6W11	typo	train	typo_first3:delete		KONINKLIJKE ATHLETIEK ASSOCIATIE GENT CVBA	Q18232	59
+kaa gpnt	549300E0STT1BVBD6W11	typo	train	typo_later:substitute		KONINKLIJKE ATHLETIEK ASSOCIATIE GENT CVBA	Q18232	59
+slmsung electronics	9884007ER46L6N7EI764	typo	test	typo_first3:substitute		삼성전자(주)	Q20718	59
+samsug electronics	9884007ER46L6N7EI764	typo	test	typo_later:delete		삼성전자(주)	Q20718	59
+aim china	213800I9TWC9K22N4502	typo	test	typo_first3:substitute		中国国际航空股份有限公司	Q51747	59
+air ihina	213800I9TWC9K22N4502	typo	test	typo_later:substitute		中国国际航空股份有限公司	Q51747	59
+lorence	549300U6PDJOR04RQM47	typo	train	typo_first3:delete		City of Florence, Alabama	Q79743	59
+florenc	549300U6PDJOR04RQM47	typo	train	typo_later:delete		City of Florence, Alabama	Q79743	59
+fzeie universitat berlin	391200IH5QZH0N8QDI30	typo	test	typo_first3:substitute		Freie Universität Berlin	Q153006	59
+freie universitat brlin	391200IH5QZH0N8QDI30	typo	test	typo_later:delete		Freie Universität Berlin	Q153006	59
+l'real	529900JI1GG6F7RKVI53	typo	test	typo_first3:delete		L'OREAL	Q156077	59
+l'orel	529900JI1GG6F7RKVI53	typo	test	typo_later:delete		L'OREAL	Q156077	59
+wrnermedia	5493004RSX004WU3UT62	typo	test	typo_first3:delete	KNG3XRAA0RHN9H62OK76	WARNER MEDIA, LLC	Q191715	59
+warnemedia	5493004RSX004WU3UT62	typo	test	typo_later:delete	KNG3XRAA0RHN9H62OK76	WARNER MEDIA, LLC	Q191715	59
+glodman sachs	784F5XWPLTWKTBV3E584	typo	train	typo_first3:transpose		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+goldman sacs	784F5XWPLTWKTBV3E584	typo	train	typo_later:delete		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+atbor	3157002GKG4P58VK7Z86	typo	test	typo_first3:transpose		Město Tábor	Q193721	59
+tabqr	3157002GKG4P58VK7Z86	typo	test	typo_later:substitute		Město Tábor	Q193721	59
+esraing	894500ZHTICMVT1APD53	typo	test	typo_first3:transpose		Ville de Seraing	Q194037	59
+seraign	894500ZHTICMVT1APD53	typo	test	typo_later:transpose		Ville de Seraing	Q194037	59
+vinnair	213800SB6EOB8SSK9W63	typo	train	typo_first3:substitute		FINNAIR OYJ	Q201821	59
+finniar	213800SB6EOB8SSK9W63	typo	train	typo_later:transpose		FINNAIR OYJ	Q201821	59
+amrican museum of natural history	549300B053XB1DI40R02	typo	train	typo_first3:delete		The American Museum of Natural History	Q217717	59
+american museum of naqural history	549300B053XB1DI40R02	typo	train	typo_later:substitute		The American Museum of Natural History	Q217717	59
+nw york public library	549300UUPLEIDLHTTI88	typo	train	typo_first3:delete		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+new york public libarry	549300UUPLEIDLHTTI88	typo	train	typo_later:transpose		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+ictoria’s secret	5493006T3O70U3UWVF17	typo	test	typo_first3:delete		VICTORIA'S SECRET & CO.	Q332477	59
+victorai’s secret	5493006T3O70U3UWVF17	typo	test	typo_later:transpose		VICTORIA'S SECRET & CO.	Q332477	59
+hormes	969500Y4IJGHJE2MTJ13	typo	train	typo_first3:substitute		HERMES INTERNATIONAL	Q843887	59
+hermse	969500Y4IJGHJE2MTJ13	typo	train	typo_later:transpose		HERMES INTERNATIONAL	Q843887	59
+etncent	254900N4SLUMW4XUYY11	typo	test	typo_first3:transpose		騰訊控股有限公司	Q860580	59
+tencnt	254900N4SLUMW4XUYY11	typo	test	typo_later:delete		騰訊控股有限公司	Q860580	59
+oknami	353800FC4A5QCMIZFV94	typo	test	typo_first3:transpose		コナミグループ株式会社	Q45700	58
+konmai	353800FC4A5QCMIZFV94	typo	test	typo_later:transpose		コナミグループ株式会社	Q45700	58
+st. egorge	5493000P9OIY2JDS4K57	typo	train	typo_first3:transpose		City of St. George, Utah	Q52472	58
+st. gearge	5493000P9OIY2JDS4K57	typo	train	typo_later:substitute		City of St. George, Utah	Q52472	58
+sqarp corporation	353800YEPK9PD7QO3449	typo	train	typo_first3:substitute		シャープ株式会社	Q53227	58
+sharp corportaion	353800YEPK9PD7QO3449	typo	train	typo_later:transpose		シャープ株式会社	Q53227	58
+ngssau county	549300ICRCGQYCPS7T40	typo	train	typo_first3:substitute		County of Nassau, New York	Q54064	58
+nassau cbunty	549300ICRCGQYCPS7T40	typo	train	typo_later:substitute		County of Nassau, New York	Q54064	58
+trvais county	549300HEC6MNL5465K30	typo	train	typo_first3:transpose		Travis County, Texas	Q110426	58
+travis conty	549300HEC6MNL5465K30	typo	train	typo_later:delete		Travis County, Texas	Q110426	58
+ts 1860 munchen	3912007RN9W1VC3JW349	typo	test	typo_first3:delete		Turn- und Sportverein München von 1860 e.V.	Q131603	58
+tsv 1860 unchen	3912007RN9W1VC3JW349	typo	test	typo_later:delete		Turn- und Sportverein München von 1860 e.V.	Q131603	58
+iwlliams racing	213800H929CQNFTCJL47	typo	test	typo_first3:transpose		WILLIAMS GRAND PRIX ENGINEERING LIMITED	Q171337	58
+williams raqing	213800H929CQNFTCJL47	typo	test	typo_later:substitute		WILLIAMS GRAND PRIX ENGINEERING LIMITED	Q171337	58
+niversity of notre dame	XV74408A6JGDG5126L34	typo	train	typo_first3:delete		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+university of notre djme	XV74408A6JGDG5126L34	typo	train	typo_later:substitute		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+ycmaha	529900S5TENP3IJS7S02	typo	test	typo_first3:substitute		ヤマハ株式会社	Q188454	58
+yamama	529900S5TENP3IJS7S02	typo	test	typo_later:substitute		ヤマハ株式会社	Q188454	58
+jporgan chase	8I5DZWZKVSZI1NUHU748	typo	train	typo_first3:delete		JPMORGAN CHASE & CO.	Q192314	58
+jpmorgan hase	8I5DZWZKVSZI1NUHU748	typo	train	typo_later:delete		JPMORGAN CHASE & CO.	Q192314	58
+czceh airlines	315700DWVMDKYOLEJM60	typo	test	typo_first3:transpose		České aerolinie a.s.	Q192653	58
+czech arlines	315700DWVMDKYOLEJM60	typo	test	typo_later:delete		České aerolinie a.s.	Q192653	58
+robselare	5493001UXAV0NJFMZ784	typo	train	typo_first3:substitute		Stad Roeselare	Q211037	58
+roeselaer	5493001UXAV0NJFMZ784	typo	train	typo_later:transpose		Stad Roeselare	Q211037	58
+tonrio	7437004S2D1KK5LKO953	typo	test	typo_first3:transpose		Tornion kaupunki	Q214021	58
+torio	7437004S2D1KK5LKO953	typo	test	typo_later:delete		Tornion kaupunki	Q214021	58
+ohja	743700ODOY69ZNUHQZ85	typo	train	typo_first3:delete		Lohjan kaupunki	Q214777	58
+lohaj	743700ODOY69ZNUHQZ85	typo	train	typo_later:transpose		Lohjan kaupunki	Q214777	58
+uuiversity of birmingham	213800WF1GQRWZJL1J53	typo	test	typo_first3:substitute		THE UNIVERSITY OF BIRMINGHAM	Q223429	58
+universiyt of birmingham	213800WF1GQRWZJL1J53	typo	test	typo_later:transpose		THE UNIVERSITY OF BIRMINGHAM	Q223429	58
+jniversity of pittsburgh	5493002C83QSGL8ETT42	typo	test	typo_first3:substitute		UNIVERSITY OF PITTSBURGH-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUCATION	Q235034	58
+university of pettsburgh	5493002C83QSGL8ETT42	typo	test	typo_later:substitute		UNIVERSITY OF PITTSBURGH-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUCATION	Q235034	58
+abredeen	549300LHNF1SW0BKRS05	typo	train	typo_first3:transpose		City of Aberdeen, South Dakota	Q236713	58
+aberdecn	549300LHNF1SW0BKRS05	typo	train	typo_later:substitute		City of Aberdeen, South Dakota	Q236713	58
+beorgetown university	549300GCL3B0KVXSX752	typo	test	typo_first3:substitute		GEORGETOWN UNIVERSITY (THE)	Q333886	58
+georcetown university	549300GCL3B0KVXSX752	typo	test	typo_later:substitute		GEORGETOWN UNIVERSITY (THE)	Q333886	58
+rdeamworks animation	549300UU8WEFIA03J487	typo	train	typo_first3:transpose		DreamWorks Animation SKG, Inc.	Q500088	58
+dreamworks anmation	549300UU8WEFIA03J487	typo	train	typo_later:delete		DreamWorks Animation SKG, Inc.	Q500088	58
+naitonal library of the czech republic	315700XYK5270GOLF955	typo	train	typo_first3:transpose		Národní knihovna České republiky	Q1967876	58
+national library rf the czech republic	315700XYK5270GOLF955	typo	train	typo_later:substitute		Národní knihovna České republiky	Q1967876	58
+lapcom	529900JJWQKXS3TC8744	typo	test	typo_first3:substitute		株式会社カプコン	Q14428	57
+capco	529900JJWQKXS3TC8744	typo	test	typo_later:delete		株式会社カプコン	Q14428	57
+cthay pacific	EQNZNT235RBOJ6LJQZ02	typo	train	typo_first3:delete		CATHAY PACIFIC AIRWAYS LIMITED	Q32141	57
+cathay paciic	EQNZNT235RBOJ6LJQZ02	typo	train	typo_later:delete		CATHAY PACIFIC AIRWAYS LIMITED	Q32141	57
+jalonec nad nisou	315700BPNRGLJ2NPW978	typo	train	typo_first3:delete		Statutární město Jablonec nad Nisou	Q147607	57
+jabloaec nad nisou	315700BPNRGLJ2NPW978	typo	train	typo_later:substitute		Statutární město Jablonec nad Nisou	Q147607	57
+al nippon airways	5493006HTHC5ZN0POY11	typo	train	typo_first3:delete		全日本空輸株式会社	Q204284	57
+all nippon airzays	5493006HTHC5ZN0POY11	typo	train	typo_later:substitute		全日本空輸株式会社	Q204284	57
+lurfreesboro	5493004HW7N2IUAQK610	typo	test	typo_first3:substitute		City of Murfreesboro, Tennessee	Q501766	57
+murfresboro	5493004HW7N2IUAQK610	typo	test	typo_later:delete		City of Murfreesboro, Tennessee	Q501766	57
+odmino's pizza	25490005ZWM1IF9UXU57	typo	train	typo_first3:transpose		Domino's Pizza, Inc.	Q839466	57
+dominz's pizza	25490005ZWM1IF9UXU57	typo	train	typo_later:substitute		Domino's Pizza, Inc.	Q839466	57
+uarren	54930023GSEZ3M8MHE57	typo	test	typo_first3:substitute		City of Warren, Ohio	Q862733	57
+warrn	54930023GSEZ3M8MHE57	typo	test	typo_later:delete		City of Warren, Ohio	Q862733	57
+rcihardson	549300YMK2Z7UGNHHQ13	typo	train	typo_first3:transpose		City of Richardson	Q128375	56
+ricahrdson	549300YMK2Z7UGNHHQ13	typo	train	typo_later:transpose		City of Richardson	Q128375	56
+llncaster county	549300W9YR5FSCHLO756	typo	test	typo_first3:substitute		County of Lancaster, Pennsylvania	Q142369	56
+lancastre county	549300W9YR5FSCHLO756	typo	test	typo_later:transpose		County of Lancaster, Pennsylvania	Q142369	56
+tngeren	9676009GV2J8XQTZ5T60	typo	train	typo_first3:delete		stad Tongeren-Borgloon	Q190113	56
+tongeern	9676009GV2J8XQTZ5T60	typo	train	typo_later:transpose		stad Tongeren-Borgloon	Q190113	56
+bayne county	549300CSQIJYQ8CCLN32	typo	test	typo_first3:substitute		Charter County of Wayne, Michigan	Q195664	56
+wayne sounty	549300CSQIJYQ8CCLN32	typo	test	typo_later:substitute		Charter County of Wayne, Michigan	Q195664	56
+utsikaupunki	743700NTXMBNWCJEPK54	typo	test	typo_first3:substitute		Uudenkaupungin kaupunki	Q207295	56
+uusiknupunki	743700NTXMBNWCJEPK54	typo	test	typo_later:substitute		Uudenkaupungin kaupunki	Q207295	56
+cagio	353800JRMIABSXKHV344	typo	test	typo_first3:substitute		カシオ計算機株式会社	Q217338	56
+casfo	353800JRMIABSXKHV344	typo	test	typo_later:substitute		カシオ計算機株式会社	Q217338	56
+blckrock	549300LRIF3NWCU26A80	typo	train	typo_first3:delete		BlackRock Finance, Inc.	Q219635	56
+blackock	549300LRIF3NWCU26A80	typo	train	typo_later:delete		BlackRock Finance, Inc.	Q219635	56
+scnaia	52990000AKKX75BMWB43	typo	train	typo_first3:transpose		SCANIA Aktiebolag	Q219960	56
+scauia	52990000AKKX75BMWB43	typo	train	typo_later:substitute		SCANIA Aktiebolag	Q219960	56
+oio state university	JFC10ZULKO4X2E3HBY86	typo	test	typo_first3:delete		The Ohio State University	Q309331	56
+ohio state univerity	JFC10ZULKO4X2E3HBY86	typo	test	typo_later:delete		The Ohio State University	Q309331	56
+notrhwestern university	OBWWNZE695DUK77DTI34	typo	test	typo_first3:transpose		Northwestern University	Q309350	56
+northwestern univesrity	OBWWNZE695DUK77DTI34	typo	test	typo_later:transpose		Northwestern University	Q309350	56
+hnaford	5493006US0WIKA2ZFR72	typo	test	typo_first3:transpose		City of Hanford, California	Q375185	56
+hanfnrd	5493006US0WIKA2ZFR72	typo	test	typo_later:substitute		City of Hanford, California	Q375185	56
+unviersity of bristol	213800WYJCQNAQ57Y563	typo	test	typo_first3:transpose		UNIVERSITY OF BRISTOL	Q459506	56
+university of brisol	213800WYJCQNAQ57Y563	typo	test	typo_later:delete		UNIVERSITY OF BRISTOL	Q459506	56
+teco	2138002P5RNKC5W2JZ46	typo	test	typo_first3:delete		TESCO PLC	Q487494	56
+tesbo	2138002P5RNKC5W2JZ46	typo	test	typo_later:substitute		TESCO PLC	Q487494	56
+chirstian dior	969500WESYQMQ1F2C272	typo	train	typo_first3:transpose		CHRISTIAN DIOR	Q542767	56
+chritian dior	969500WESYQMQ1F2C272	typo	train	typo_later:delete		CHRISTIAN DIOR	Q542767	56
+bualcomm	H1J8DDZKZP6H7RWC0H53	typo	train	typo_first3:substitute		QUALCOMM INCORPORATED	Q544847	56
+qualcbmm	H1J8DDZKZP6H7RWC0H53	typo	train	typo_later:substitute		QUALCOMM INCORPORATED	Q544847	56
+cllege station	549300WXG8KHQYZVXU58	typo	test	typo_first3:delete		The City of College Station, Texas, a home-rule municipal corporation	Q695511	56
+collgee station	549300WXG8KHQYZVXU58	typo	test	typo_later:transpose		The City of College Station, Texas, a home-rule municipal corporation	Q695511	56
+rdeondo beach	549300NTFQYBTO0BEL32	typo	test	typo_first3:transpose		City of Redondo Beach	Q840678	56
+redodo beach	549300NTFQYBTO0BEL32	typo	test	typo_later:delete		City of Redondo Beach	Q840678	56
+hmailton	549300NCXYTNZWHRP508	typo	train	typo_first3:transpose		City of Hamilton, Ohio	Q852673	56
+hamiltxn	549300NCXYTNZWHRP508	typo	train	typo_later:substitute		City of Hamilton, Ohio	Q852673	56
+ewton	5493002K4RYNFEPKGB67	typo	train	typo_first3:delete		City of Newton	Q49196	55
+newtom	5493002K4RYNFEPKGB67	typo	train	typo_later:substitute		City of Newton	Q49196	55
+cahoun county	5493007SRFJCLEW66362	typo	test	typo_first3:delete		Calhoun County, Alabama	Q108856	55
+calhouc county	5493007SRFJCLEW66362	typo	test	typo_later:substitute		Calhoun County, Alabama	Q108856	55
+rtoary international	549300WT0WF1MQJYEH75	typo	train	typo_first3:transpose		ROTARY INTERNATIONAL	Q109179	55
+rotary intqrnational	549300WT0WF1MQJYEH75	typo	train	typo_later:substitute		ROTARY INTERNATIONAL	Q109179	55
+birgen county	549300SC7R4EFIYK0S67	typo	test	typo_first3:substitute		County of Bergen	Q112915	55
+bergen countg	549300SC7R4EFIYK0S67	typo	test	typo_later:substitute		County of Bergen	Q112915	55
+duglas county	549300JO4PQGD5ZFAB64	typo	train	typo_first3:delete		Douglas County, Colorado	Q115556	55
+douglas cunty	549300JO4PQGD5ZFAB64	typo	train	typo_later:delete		Douglas County, Colorado	Q115556	55
+alktalia	815600DF4A51BF6EF729	typo	test	typo_first3:substitute		ALITALIA - SOCIETA' AEREA ITALIANA S.P.A.	Q153975	55
+alitala	815600DF4A51BF6EF729	typo	test	typo_later:delete		ALITALIA - SOCIETA' AEREA ITALIANA S.P.A.	Q153975	55
+nmtional institute of statistics and economic studies	969500Q2MA9VBQ8BG884	typo	train	typo_first3:substitute		INSTITUT NATIONAL DE LA STATISTIQUE ET DES ETUDES ECONOMIQUES	Q156616	55
+national institute of statistics and economci studies	969500Q2MA9VBQ8BG884	typo	train	typo_later:transpose		INSTITUT NATIONAL DE LA STATISTIQUE ET DES ETUDES ECONOMIQUES	Q156616	55
+aemrican national standards institute	54930080VVD2WJR53S85	typo	test	typo_first3:transpose		American National Standards Institute, Incorporated	Q180003	55
+american national standards instiuute	54930080VVD2WJR53S85	typo	test	typo_later:substitute		American National Standards Institute, Incorporated	Q180003	55
+crnegie mellon university	549300HFNIY8E46TMN72	typo	test	typo_first3:delete		Carnegie Mellon University	Q190080	55
+carneiie mellon university	549300HFNIY8E46TMN72	typo	test	typo_later:substitute		Carnegie Mellon University	Q190080	55
+borwegian broadcasting corporation	5493007PY0G5L3Q8W540	typo	test	typo_first3:substitute		NORSK RIKSKRINGKASTING AS	Q190238	55
+norweigan broadcasting corporation	5493007PY0G5L3Q8W540	typo	test	typo_later:transpose		NORSK RIKSKRINGKASTING AS	Q190238	55
+aemrican express	R4PP93JZOLY261QX3811	typo	train	typo_first3:transpose		AMERICAN EXPRESS COMPANY	Q194360	55
+american xepress	R4PP93JZOLY261QX3811	typo	train	typo_later:transpose		AMERICAN EXPRESS COMPANY	Q194360	55
+anko	743700IZ5TZGRYICKS79	typo	test	typo_first3:delete		Hangon kaupunki	Q216790	55
+hank	743700IZ5TZGRYICKS79	typo	test	typo_later:delete		Hangon kaupunki	Q216790	55
+whina eastern airlines	3003000KIOQE39Q7Y685	typo	train	typo_first3:substitute		中国东方航空股份有限公司	Q291796	55
+china easter airlines	3003000KIOQE39Q7Y685	typo	train	typo_later:delete		中国东方航空股份有限公司	Q291796	55
+mlnik	315700R7MR03VJOXIG68	typo	train	typo_first3:delete		Město Mělník	Q320939	55
+melnki	315700R7MR03VJOXIG68	typo	train	typo_later:transpose		Město Mělník	Q320939	55
+avlkeakoski	7437008D85CVVHSQNA35	typo	train	typo_first3:transpose		Valkeakosken kaupunki	Q322126	55
+valkakoski	7437008D85CVVHSQNA35	typo	train	typo_later:delete		Valkeakosken kaupunki	Q322126	55
+dir liquide	969500MMPQVHK671GT54	typo	train	typo_first3:substitute		L'AIR LIQUIDE SOCIETE ANONYME POUR L'ETUDE ET L'EXPLOITATION DES PROCEDES GEORGES CLAUDE	Q407448	55
+air liquite	969500MMPQVHK671GT54	typo	train	typo_later:substitute		L'AIR LIQUIDE SOCIETE ANONYME POUR L'ETUDE ET L'EXPLOITATION DES PROCEDES GEORGES CLAUDE	Q407448	55
+erks county	549300IPNC1J7IUNQB95	typo	train	typo_first3:delete		COUNTY OF BERKS, PENNSYLVANIA	Q490920	55
+berks ounty	549300IPNC1J7IUNQB95	typo	train	typo_later:delete		COUNTY OF BERKS, PENNSYLVANIA	Q490920	55
+kvtee	743700ZLZABSLJNNGS96	typo	train	typo_first3:substitute		Kiteen kaupunki	Q491603	55
+kite	743700ZLZABSLJNNGS96	typo	train	typo_later:delete		Kiteen kaupunki	Q491603	55
+ashington county	54930082U8LWBDMHXX31	typo	test	typo_first3:delete		Washington County, Maryland	Q511164	55
+washington aounty	54930082U8LWBDMHXX31	typo	test	typo_later:substitute		Washington County, Maryland	Q511164	55
+nrmijarvi	743700STRLZUD2DX3I49	typo	test	typo_first3:delete		Nurmijärven kunta	Q597156	55
+nurmijajvi	743700STRLZUD2DX3I49	typo	test	typo_later:substitute		Nurmijärven kunta	Q597156	55
+satrazeneca	PY6ZZQWO2IZFZC3IOL08	typo	train	typo_first3:transpose		ASTRAZENECA PLC	Q731938	55
+astrazneeca	PY6ZZQWO2IZFZC3IOL08	typo	train	typo_later:transpose		ASTRAZENECA PLC	Q731938	55
+yisalmi	743700NUJS8IZFKSPU60	typo	test	typo_first3:substitute		Iisalmen kaupunki	Q748533	55
+iisawmi	743700NUJS8IZFKSPU60	typo	test	typo_later:substitute		Iisalmen kaupunki	Q748533	55
+wlmira	5493006ZFXLMU5H8ZE65	typo	test	typo_first3:substitute		City of Elmira	Q934135	55
+elmra	5493006ZFXLMU5H8ZE65	typo	test	typo_later:delete		City of Elmira	Q934135	55
+sqciete nationale des chemins de fer francais	969500A4MXJ3ESPHK698	typo	test	typo_first3:substitute		SOCIETE NATIONALE SNCF	Q13646	54
+societe naionale des chemins de fer francais	969500A4MXJ3ESPHK698	typo	test	typo_later:delete		SOCIETE NATIONALE SNCF	Q13646	54
+abany county	549300GBQON0LOLHN826	typo	train	typo_first3:delete		County of Albany, New York	Q108408	54
+albany caunty	549300GBQON0LOLHN826	typo	train	typo_later:substitute		County of Albany, New York	Q108408	54
+ongsberg	5967007LIEEXZXI31S67	typo	train	typo_first3:delete		KONGSBERG KOMMUNE	Q108988	54
+kongeberg	5967007LIEEXZXI31S67	typo	train	typo_later:substitute		KONGSBERG KOMMUNE	Q108988	54
+crlsberg group	5299001O0WJQYB5GYZ19	typo	test	typo_first3:delete		CARLSBERG A/S	Q113215	54
+carlsberv group	5299001O0WJQYB5GYZ19	typo	test	typo_later:substitute		CARLSBERG A/S	Q113215	54
+exrox	4KF48RN45X1OO8UBLY20	typo	test	typo_first3:transpose		XEROX CORPORATION	Q152433	54
+xerx	4KF48RN45X1OO8UBLY20	typo	test	typo_later:delete		XEROX CORPORATION	Q152433	54
+1. cf heidenheim 1846	52990026RCKUMY3BKU91	typo	train	typo_first3:transpose		1. Fußballclub Heidenheim 1846 e.V.	Q162251	54
+1. fc heidenhem 1846	52990026RCKUMY3BKU91	typo	train	typo_later:delete		1. Fußballclub Heidenheim 1846 e.V.	Q162251	54
+yexas instruments	WDJNR2L6D8RWOEB8T652	typo	train	typo_first3:substitute		TEXAS INSTRUMENTS INCORPORATED	Q193412	54
+texas inswruments	WDJNR2L6D8RWOEB8T652	typo	train	typo_later:substitute		TEXAS INSTRUMENTS INCORPORATED	Q193412	54
+golvo cars	5299000EAMGGBEYP7J33	typo	train	typo_first3:substitute		Volvo Car AB	Q215293	54
+volo cars	5299000EAMGGBEYP7J33	typo	train	typo_later:delete		Volvo Car AB	Q215293	54
+toyo stock exchange	353800279ADEFGKNTV65	typo	test	typo_first3:delete		株式会社東京証券取引所	Q217475	54
+tokyo stock exchanve	353800279ADEFGKNTV65	typo	test	typo_later:substitute		株式会社東京証券取引所	Q217475	54
+benkshire hathaway	5493000C01ZX7D35SD85	typo	test	typo_first3:substitute		BERKSHIRE HATHAWAY INC.	Q217583	54
+berkshire hathawqy	5493000C01ZX7D35SD85	typo	test	typo_later:substitute		BERKSHIRE HATHAWAY INC.	Q217583	54
+arclays	213800LBQA1Y9L22JB70	typo	train	typo_first3:delete	G5GSEF7VJP5I7OUK5573	BARCLAYS PLC	Q245343	54
+barcalys	213800LBQA1Y9L22JB70	typo	train	typo_later:transpose	G5GSEF7VJP5I7OUK5573	BARCLAYS PLC	Q245343	54
+prrov	315700FEMK0RBL443B74	typo	test	typo_first3:delete		Statutární město Přerov	Q470380	54
+preov	315700FEMK0RBL443B74	typo	test	typo_later:delete		Statutární město Přerov	Q470380	54
+brkndby municipality	213800ALYXAQYSX2KG52	typo	train	typo_first3:substitute		BRØNDBY KOMMUNE	Q484038	54
+brodby municipality	213800ALYXAQYSX2KG52	typo	train	typo_later:delete		BRØNDBY KOMMUNE	Q484038	54
+dealb county	54930077BXREPE6WKC96	typo	test	typo_first3:delete		DeKalb County, Georgia	Q486398	54
+dekalb counjy	54930077BXREPE6WKC96	typo	test	typo_later:substitute		DeKalb County, Georgia	Q486398	54
+ork county	549300PBUZSC8WBS4164	typo	test	typo_first3:delete		County of York	Q490914	54
+york coukty	549300PBUZSC8WBS4164	typo	test	typo_later:substitute		County of York	Q490914	54
+afyette county	549300JJO5KFS7O78098	typo	test	typo_first3:transpose		Fayette County, Georgia	Q501115	54
+fayetge county	549300JJO5KFS7O78098	typo	test	typo_later:substitute		Fayette County, Georgia	Q501115	54
+fniversity of florida	5493005A0XI30EPYKX76	typo	test	typo_first3:substitute		University of Florida Foundation, Inc.	Q501758	54
+university of florid	5493005A0XI30EPYKX76	typo	test	typo_later:delete		University of Florida Foundation, Inc.	Q501758	54
+stuthwest airlines	UDTZ87G0STFETI6HGH41	typo	test	typo_first3:substitute		SOUTHWEST AIRLINES CO.	Q503308	54
+southwest adrlines	UDTZ87G0STFETI6HGH41	typo	test	typo_later:substitute		SOUTHWEST AIRLINES CO.	Q503308	54
+aktholieke universiteit leuven	5299001MN2MYAHLGXD65	typo	train	typo_first3:transpose		Katholieke Universiteit te Leuven	Q833670	54
+katholieke uinversiteit leuven	5299001MN2MYAHLGXD65	typo	train	typo_later:transpose		Katholieke Universiteit te Leuven	Q833670	54
+unviersity of paris 1 pantheon-sorbonne	969500A7SV2ND7GGAP42	typo	train	typo_first3:transpose		UNIVERSITE PARIS 1 PANTHEON-SORBONNE	Q999763	54
+university of paris  pantheon-sorbonne	969500A7SV2ND7GGAP42	typo	train	typo_later:delete		UNIVERSITE PARIS 1 PANTHEON-SORBONNE	Q999763	54
+hloyoke	549300I9GWXX4SYOE358	typo	test	typo_first3:transpose		City of Holyoke, Massachusetts	Q1637790	54
+holoyke	549300I9GWXX4SYOE358	typo	test	typo_later:transpose		City of Holyoke, Massachusetts	Q1637790	54
+kokke-heist	529900SL062RDVQ0KP03	typo	train	typo_first3:delete		Gemeente Knokke-Heist	Q12988	53
+knokoe-heist	529900SL062RDVQ0KP03	typo	train	typo_later:substitute		Gemeente Knokke-Heist	Q12988	53
+idustrial and commercial bank of china	5493002ERZU2K9PZDL40	typo	train	typo_first3:delete		中国工商银行股份有限公司	Q26463	53
+industrial and commercial bank of cina	5493002ERZU2K9PZDL40	typo	train	typo_later:delete		中国工商银行股份有限公司	Q26463	53
+iszu	529900C0QSXVCC7AR494	typo	test	typo_first3:delete		いすゞ自動車株式会社	Q29803	53
+isuuz	529900C0QSXVCC7AR494	typo	test	typo_later:transpose		いすゞ自動車株式会社	Q29803	53
+arbnb	549300HMUDNO0RY56D37	typo	test	typo_first3:delete		AIRBNB, INC.	Q63327	53
+airnb	549300HMUDNO0RY56D37	typo	test	typo_later:delete		AIRBNB, INC.	Q63327	53
+ckncho county	549300EI6TJXMJISJV71	typo	test	typo_first3:substitute		Concho County, Texas	Q109795	53
+concho counyt	549300EI6TJXMJISJV71	typo	test	typo_later:transpose		Concho County, Texas	Q109795	53
+rcokwall county	549300EBIHXYCV58YR59	typo	train	typo_first3:transpose		Rockwall County, Texas	Q111391	53
+rockawll county	549300EBIHXYCV58YR59	typo	train	typo_later:transpose		Rockwall County, Texas	Q111391	53
+ypvgg greuther furth	529900ZGSY3JMJDPKA97	typo	train	typo_first3:substitute		Spielvereinigung Greuther Fürth e.V.	Q153539	53
+spvgg greuther vurth	529900ZGSY3JMJDPKA97	typo	train	typo_later:substitute		Spielvereinigung Greuther Fürth e.V.	Q153539	53
+befferson county	549300Q3WP6ILG7B4137	typo	test	typo_first3:substitute		Jefferson County, Texas	Q156471	53
+jefverson county	549300Q3WP6ILG7B4137	typo	test	typo_later:substitute		Jefferson County, Texas	Q156471	53
+psiek	315700KMFDTRRSRG9T22	typo	test	typo_first3:transpose		Město Písek	Q158245	53
+pise	315700KMFDTRRSRG9T22	typo	test	typo_later:delete		Město Písek	Q158245	53
+lg lectronics	988400RMQFTGZIOG0609	typo	train	typo_first3:delete		LG전자(주)	Q162345	53
+lg electroncs	988400RMQFTGZIOG0609	typo	train	typo_later:delete		LG전자(주)	Q162345	53
+waegem	549300I3BTLHH5L7FG14	typo	test	typo_first3:delete		STAD WAREGEM	Q204547	53
+warpgem	549300I3BTLHH5L7FG14	typo	test	typo_later:substitute		STAD WAREGEM	Q204547	53
+pgrelli	815600A0C9AFC1F2A709	typo	test	typo_first3:substitute		PIRELLI & C. S.P.A.	Q207770	53
+pirell	815600A0C9AFC1F2A709	typo	test	typo_later:delete		PIRELLI & C. S.P.A.	Q207770	53
+javenpaa	743700KFTU3YOAAO6X91	typo	train	typo_first3:delete		Järvenpään kaupunki	Q208293	53
+jarvepnaa	743700KFTU3YOAAO6X91	typo	train	typo_later:transpose		Järvenpään kaupunki	Q208293	53
+rbondby if	213800DAZ89VABJPBD93	typo	test	typo_first3:transpose		BRØNDBYERNES I.F. FODBOLD A/S	Q211906	53
+brondby i	213800DAZ89VABJPBD93	typo	test	typo_later:delete		BRØNDBYERNES I.F. FODBOLD A/S	Q211906	53
+cuoahoga county	549300GHDK9DGLUNJU89	typo	test	typo_first3:substitute		County of Cuyahoga, Ohio	Q251267	53
+cuyahoga ocunty	549300GHDK9DGLUNJU89	typo	test	typo_later:transpose		County of Cuyahoga, Ohio	Q251267	53
+mcntgomery county	549300H278P9DGB7L217	typo	test	typo_first3:substitute		County Of Montgomery, Pennsylvania	Q378527	53
+montgomery countc	549300H278P9DGB7L217	typo	test	typo_later:substitute		County Of Montgomery, Pennsylvania	Q378527	53
+kelin	31570046MDI2EIUHEO49	typo	test	typo_first3:substitute		Město Kolín	Q470369	53
+kolsn	31570046MDI2EIUHEO49	typo	test	typo_later:substitute		Město Kolín	Q470369	53
+prsotejov	3157003LEHOJO4ZSVH42	typo	train	typo_first3:transpose		Statutární město Prostějov	Q470445	53
+prostnjov	3157003LEHOJO4ZSVH42	typo	train	typo_later:substitute		Statutární město Prostějov	Q470445	53
+rpicewaterhousecoopers	5493002GVO7EO8RNNS37	typo	test	typo_first3:transpose		PRICEWATERHOUSECOOPERS LLP	Q488048	53
+pricewaterhouecoopers	5493002GVO7EO8RNNS37	typo	test	typo_later:delete		PRICEWATERHOUSECOOPERS LLP	Q488048	53
+kaknakee	549300Z3ZVLSXELVAS52	typo	test	typo_first3:transpose		City of Kankakee, Kankakee County, Illinois	Q578351	53
+kankaeke	549300Z3ZVLSXELVAS52	typo	test	typo_later:transpose		City of Kankakee, Kankakee County, Illinois	Q578351	53
+n women	213800G4F5Z8TG82Y222	typo	test	typo_first3:delete		UNITED NATIONS ENTITY FOR GENDER EQUALITY AND THE EMPOWERMENT OF WOMEN	Q641576	53
+un womem	213800G4F5Z8TG82Y222	typo	test	typo_later:substitute		UNITED NATIONS ENTITY FOR GENDER EQUALITY AND THE EMPOWERMENT OF WOMEN	Q641576	53
+uyion city	549300Y6CPHG6CN8ME20	typo	train	typo_first3:substitute		City of Union City, California	Q846402	53
+union icty	549300Y6CPHG6CN8ME20	typo	train	typo_later:transpose		City of Union City, California	Q846402	53
+lambridge university press	9845008ED9D56E38A424	typo	train	typo_first3:substitute		CAMBRIDGE UNIVERSITY PRESS & ASSESSMENT INDIA PRIVATE LIMITED	Q912887	53
+cambridge iniversity press	9845008ED9D56E38A424	typo	train	typo_later:substitute		CAMBRIDGE UNIVERSITY PRESS & ASSESSMENT INDIA PRIVATE LIMITED	Q912887	53
+maknato	5493003B18DJ507ZEG20	typo	train	typo_first3:transpose		City of Mankato, Minnesota	Q913243	53
+mankayo	5493003B18DJ507ZEG20	typo	train	typo_later:substitute		City of Mankato, Minnesota	Q913243	53
+pxrterville	5493006MPGKLBQQMCF76	typo	train	typo_first3:substitute		City of Porterville, California	Q927173	53
+portervlle	5493006MPGKLBQQMCF76	typo	train	typo_later:delete		City of Porterville, California	Q927173	53
+gomcast	51M0QTTNCGUN7KFCFZ59	typo	train	typo_first3:substitute		COMCAST CORPORATION	Q1113804	53
+comcaso	51M0QTTNCGUN7KFCFZ59	typo	train	typo_later:substitute		COMCAST CORPORATION	Q1113804	53
+maserick county	549300DC715RVTNKOV07	typo	test	typo_first3:substitute		Maverick County, Texas	Q113984	52
+mavrrick county	549300DC715RVTNKOV07	typo	test	typo_later:substitute		Maverick County, Texas	Q113984	52
+brssels airlines	549300VSM2RG55U2QU15	typo	test	typo_first3:delete		BRUSSELS AIRLINES	Q153571	52
+brussels arlines	549300VSM2RG55U2QU15	typo	test	typo_later:delete		BRUSSELS AIRLINES	Q153571	52
+eridgestone	549300DHPOF90OYYD780	typo	test	typo_first3:substitute		BRIDGESTONE CORPORATION	Q179433	52
+bridgeston	549300DHPOF90OYYD780	typo	test	typo_later:delete		BRIDGESTONE CORPORATION	Q179433	52
+ehineken international	724500K5PTPSST86UQ23	typo	train	typo_first3:transpose		Heineken N.V.	Q180855	52
+heineken qnternational	724500K5PTPSST86UQ23	typo	train	typo_later:substitute		Heineken N.V.	Q180855	52
+fueitsu	3538000246DHJLRTUZ24	typo	test	typo_first3:substitute		富士通株式会社	Q186394	52
+fujitsy	3538000246DHJLRTUZ24	typo	test	typo_later:substitute		富士通株式会社	Q186394	52
+halrey-davidson	ZDNAWZWXIKMWI51R2A08	typo	train	typo_first3:transpose		HARLEY-DAVIDSON, INC.	Q192814	52
+harley-davidosn	ZDNAWZWXIKMWI51R2A08	typo	train	typo_later:transpose		HARLEY-DAVIDSON, INC.	Q192814	52
+yhvinkaa	743700LVBZZJYHASNF45	typo	test	typo_first3:transpose		Hyvinkään kaupunki	Q207753	52
+hyviknaa	743700LVBZZJYHASNF45	typo	test	typo_later:transpose		Hyvinkään kaupunki	Q207753	52
+xenate	969500DV55FC0KFPXG87	typo	test	typo_first3:substitute		SENAT	Q215987	52
+sennte	969500DV55FC0KFPXG87	typo	test	typo_later:substitute		SENAT	Q215987	52
+scoiete generale	O2RNE8IBXP4R0TD8PU41	typo	test	typo_first3:transpose		SOCIETE GENERALE	Q270363	52
+societe enerale	O2RNE8IBXP4R0TD8PU41	typo	test	typo_later:delete		SOCIETE GENERALE	Q270363	52
+urnhout	54930073S3BWVHJ4F302	typo	train	typo_first3:delete		STAD TURNHOUT	Q271783	52
+turnhou	54930073S3BWVHJ4F302	typo	train	typo_later:delete		STAD TURNHOUT	Q271783	52
+aibaltic	213800JVURXEAA48FV35	typo	train	typo_first3:delete		Air Baltic Corporation	Q300924	52
+airblatic	213800JVURXEAA48FV35	typo	train	typo_later:transpose		Air Baltic Corporation	Q300924	52
+luaoil	549300LCJ1UJXHYBWI24	typo	train	typo_first3:substitute		Публичное акционерное общество "Нефтяная компания "ЛУКОЙЛ"	Q329347	52
+lukiol	549300LCJ1UJXHYBWI24	typo	train	typo_later:transpose		Публичное акционерное общество "Нефтяная компания "ЛУКОЙЛ"	Q329347	52
+amina	7437001UKK3SMHX8U833	typo	train	typo_first3:delete		Haminan kaupunki	Q367780	52
+hamin	7437001UKK3SMHX8U833	typo	train	typo_later:delete		Haminan kaupunki	Q367780	52
+buberry	213800PE1KEFCNFR1R50	typo	test	typo_first3:delete		BURBERRY GROUP PLC	Q390107	52
+burberrt	213800PE1KEFCNFR1R50	typo	test	typo_later:substitute		BURBERRY GROUP PLC	Q390107	52
+adinomoto	353800UT0TLROREPIC92	typo	train	typo_first3:substitute		味の素株式会社	Q412826	52
+ajinooto	353800UT0TLROREPIC92	typo	train	typo_later:delete		味の素株式会社	Q412826	52
+dajphin county	549300E86X2H9JIHEX42	typo	train	typo_first3:substitute		County of Dauphin	Q488690	52
+dauhin county	549300E86X2H9JIHEX42	typo	train	typo_later:delete		County of Dauphin	Q488690	52
+orsyth county	5493006RK7PNBYRRD925	typo	train	typo_first3:delete		Forsyth County, Georgia	Q493092	52
+forsath county	5493006RK7PNBYRRD925	typo	train	typo_later:substitute		Forsyth County, Georgia	Q493092	52
+ruggers university	549300BOYDHNW8J60112	typo	train	typo_first3:substitute		RUTGERS, THE STATE UNIVERSITY	Q499451	52
+rutgers universivy	549300BOYDHNW8J60112	typo	train	typo_later:substitute		RUTGERS, THE STATE UNIVERSITY	Q499451	52
+waek county	5493007XQJHO082P1H29	typo	test	typo_first3:transpose		County of Wake, North Carolina	Q506215	52
+wake couny	5493007XQJHO082P1H29	typo	test	typo_later:delete		County of Wake, North Carolina	Q506215	52
+shlton	5493008YOQL2642DBV39	typo	train	typo_first3:delete		City of Shelton, Connecticut	Q594109	52
+sheltn	5493008YOQL2642DBV39	typo	train	typo_later:delete		City of Shelton, Connecticut	Q594109	52
+girogio armani	81560063BF9718867E90	typo	train	typo_first3:transpose		GIORGIO ARMANI S.P.A.	Q635484	52
+giorgio armini	81560063BF9718867E90	typo	train	typo_later:substitute		GIORGIO ARMANI S.P.A.	Q635484	52
+gaonesville	5493006Y11XKB3GQIF20	typo	test	typo_first3:substitute		City of Gainesville, Georgia	Q651051	52
+gaineville	5493006Y11XKB3GQIF20	typo	test	typo_later:delete		City of Gainesville, Georgia	Q651051	52
+gaqthersburg	549300UFHDHDCHDE0F65	typo	train	typo_first3:substitute		City of Gaithersburg, Maryland	Q752719	52
+gaithersbur	549300UFHDHDCHDE0F65	typo	train	typo_later:delete		City of Gaithersburg, Maryland	Q752719	52
+iternational development association	P41R60HC414IWQA1XW02	typo	test	typo_first3:delete		International Development Association	Q827525	52
+international developmen association	P41R60HC414IWQA1XW02	typo	test	typo_later:delete		International Development Association	Q827525	52
+hienola	74370030S82YVPAF5P59	typo	test	typo_first3:transpose		Heinolan kaupunki	Q849934	52
+heinzla	74370030S82YVPAF5P59	typo	test	typo_later:substitute		Heinolan kaupunki	Q849934	52
+logmont	549300E7S8EY1IWPW223	typo	test	typo_first3:delete		City of Longmont, Colorado	Q988283	52
+longmodt	549300E7S8EY1IWPW223	typo	test	typo_later:substitute		City of Longmont, Colorado	Q988283	52
+ojang studios	5493001FEY266NB4VE91	typo	train	typo_first3:delete		Mojang AB	Q1129295	52
+mojang sudios	5493001FEY266NB4VE91	typo	train	typo_later:delete		Mojang AB	Q1129295	52
+uspercell	743700MSCHABJ4XW2532	typo	train	typo_first3:transpose		Supercell Oy	Q1438774	52
+supercesl	743700MSCHABJ4XW2532	typo	train	typo_later:substitute		Supercell Oy	Q1438774	52
+bitish council	213800S8DFQ6UFES2T83	typo	train	typo_first3:delete		BRITISH COUNCIL(THE)	Q45433	51
+british counciu	213800S8DFQ6UFES2T83	typo	train	typo_later:substitute		BRITISH COUNCIL(THE)	Q45433	51
+tlchnische universitat berlin	9676002MWW08VRXSKF03	typo	train	typo_first3:substitute		Technische Universität Berlin	Q51985	51
+technische univesritat berlin	9676002MWW08VRXSKF03	typo	train	typo_later:transpose		Technische Universität Berlin	Q51985	51
+lei strauss & co.	MB0UERO0RDFKU8258G77	typo	test	typo_first3:delete		Levi Strauss & Co.	Q127962	51
+levi struass & co.	MB0UERO0RDFKU8258G77	typo	test	typo_later:transpose		Levi Strauss & Co.	Q127962	51
+hanofi	549300E9PC51EN656011	typo	test	typo_first3:substitute		SANOFI	Q158205	51
+sanoi	549300E9PC51EN656011	typo	test	typo_later:delete		SANOFI	Q158205	51
+mlnsanto	NONUZEX43GHIPSVDD938	typo	test	typo_first3:substitute		MONSANTO COMPANY	Q207983	51
+monsnto	NONUZEX43GHIPSVDD938	typo	test	typo_later:delete		MONSANTO COMPANY	Q207983	51
+perobras	5493000J801JZRCMFE49	typo	test	typo_first3:delete		PETROLEO BRASILEIRO S A PETROBRAS	Q210047	51
+petrobra	5493000J801JZRCMFE49	typo	test	typo_later:delete		PETROLEO BRASILEIRO S A PETROBRAS	Q210047	51
+iaab group	549300ZHO4JCQQI13M69	typo	train	typo_first3:substitute		SAAB Aktiebolag	Q219501	51
+saab grou	549300ZHO4JCQQI13M69	typo	train	typo_later:delete		SAAB Aktiebolag	Q219501	51
+frnech football federation	969500GT0NEQZD7INR92	typo	test	typo_first3:transpose		FEDERATION FRANCAISE FOOTBALL - FFF	Q244750	51
+french football fedration	969500GT0NEQZD7INR92	typo	test	typo_later:delete		FEDERATION FRANCAISE FOOTBALL - FFF	Q244750	51
+araschot	967600BTH4LSV37TCQ04	typo	test	typo_first3:transpose		Stad Aarschot	Q273442	51
+aarschto	967600BTH4LSV37TCQ04	typo	test	typo_later:transpose		Stad Aarschot	Q273442	51
+chbna southern airlines	529900AJQ1Q18ABYVX84	typo	train	typo_first3:substitute		中国南方航空股份有限公司	Q291090	51
+china souther airlines	529900AJQ1Q18ABYVX84	typo	train	typo_later:delete		中国南方航空股份有限公司	Q291090	51
+bohnson & johnson	549300G0CFPGEF6X2043	typo	train	typo_first3:substitute		Johnson & Johnson	Q333718	51
+johnsan & johnson	549300G0CFPGEF6X2043	typo	train	typo_later:substitute		Johnson & Johnson	Q333718	51
+aczenture	5493000EWHDSR3MZWH98	typo	train	typo_first3:substitute		ACCENTURE PUBLIC LIMITED COMPANY	Q338825	51
+accentrue	5493000EWHDSR3MZWH98	typo	train	typo_later:transpose		ACCENTURE PUBLIC LIMITED COMPANY	Q338825	51
+ageean airlines	213800VI8OH5EJM18L21	typo	train	typo_first3:transpose		ΑΕΡΟΠΟΡΙΑ ΑΙΓΑΙΟΥ ΑΝΩΝΥΜΗ ΑΕΡΟΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ	Q380580	51
+aegean ailrines	213800VI8OH5EJM18L21	typo	train	typo_later:transpose		ΑΕΡΟΠΟΡΙΑ ΑΙΓΑΙΟΥ ΑΝΩΝΥΜΗ ΑΕΡΟΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ	Q380580	51
+caetrpillar inc.	WRJR7GS4GTRECRRTVX92	typo	test	typo_first3:transpose		CATERPILLAR INC.	Q459965	51
+caterpillar nic.	WRJR7GS4GTRECRRTVX92	typo	test	typo_later:transpose		CATERPILLAR INC.	Q459965	51
+ibbb county	549300S2O017G8TB7209	typo	train	typo_first3:transpose		Bibb County	Q488171	51
+bibb count	549300S2O017G8TB7209	typo	train	typo_later:delete		Bibb County	Q488171	51
+knxo county	549300WT27UFXOLT2D56	typo	train	typo_first3:transpose		Knox County, Tennessee	Q495003	51
+kno county	549300WT27UFXOLT2D56	typo	train	typo_later:delete		Knox County, Tennessee	Q495003	51
+lbcoming county	549300TCAO8EBJY0O782	typo	test	typo_first3:substitute		Lycoming County Authority	Q495633	51
+lychming county	549300TCAO8EBJY0O782	typo	test	typo_later:substitute		Lycoming County Authority	Q495633	51
+sokankyla	743700XXZT9DLC546Q13	typo	train	typo_first3:substitute		Sodankylän kunta	Q502175	51
+sodankya	743700XXZT9DLC546Q13	typo	train	typo_later:delete		Sodankylän kunta	Q502175	51
+necklenburg county	5493006G3IC5PBHB7A65	typo	train	typo_first3:substitute		County of Mecklenburg, North Carolina	Q507770	51
+mecklenburg couny	5493006G3IC5PBHB7A65	typo	train	typo_later:delete		County of Mecklenburg, North Carolina	Q507770	51
+inetrnational finance corporation	QKL54NQY28TCDAI75F60	typo	test	typo_first3:transpose		INTERNATIONAL FINANCE CORPORATION	Q656801	51
+internationtl finance corporation	QKL54NQY28TCDAI75F60	typo	test	typo_later:substitute		INTERNATIONAL FINANCE CORPORATION	Q656801	51
+vaskaus	7437004GBTWPPCW8S749	typo	test	typo_first3:substitute		Varkauden kaupunki	Q683525	51
+varwaus	7437004GBTWPPCW8S749	typo	test	typo_later:substitute		Varkauden kaupunki	Q683525	51
+rkce university	549300QPVG49ONTSJJ20	typo	test	typo_first3:substitute		WILLIAM MARSH RICE UNIVERSITY	Q842909	51
+rice univesrity	549300QPVG49ONTSJJ20	typo	test	typo_later:transpose		WILLIAM MARSH RICE UNIVERSITY	Q842909	51
+rooklyn park	549300SRSB2KMQNYBB75	typo	train	typo_first3:delete		City of Brooklyn Park, Minnesota	Q864128	51
+brookyn park	549300SRSB2KMQNYBB75	typo	train	typo_later:delete		City of Brooklyn Park, Minnesota	Q864128	51
+hvalickuv brod	315700GJHSETBCBWXZ66	typo	train	typo_first3:transpose		Město Havlíčkův Brod	Q954596	51
+havlickv brod	315700GJHSETBCBWXZ66	typo	train	typo_later:delete		Město Havlíčkův Brod	Q954596	51
+lj verne	54930008TF3OJRBUIJ91	typo	test	typo_first3:substitute		City of La Verne	Q985347	51
+la vern	54930008TF3OJRBUIJ91	typo	test	typo_later:delete		City of La Verne	Q985347	51
+byfedance	300300NIFA1100061063	typo	train	typo_first3:substitute		北京字节跳动科技有限公司	Q55606242	51
+bytdance	300300NIFA1100061063	typo	train	typo_later:delete		北京字节跳动科技有限公司	Q55606242	51
+detusche telekom	549300V9QSIG4WX4GJ96	typo	test	typo_first3:transpose		DEUTSCHE TELEKOM AG	Q9396	50
+deutsche telfkom	549300V9QSIG4WX4GJ96	typo	test	typo_later:substitute		DEUTSCHE TELEKOM AG	Q9396	50
+veco	549300Y48YRN3IH38V13	typo	test	typo_first3:delete		IVECO S.P.A.	Q29913	50
+iveo	549300Y48YRN3IH38V13	typo	test	typo_later:delete		IVECO S.P.A.	Q29913	50
+bsesemer	549300C6NB1J5LL6EP48	typo	test	typo_first3:transpose		City of Bessemer, Alabama	Q79973	50
+besseemr	549300C6NB1J5LL6EP48	typo	test	typo_later:transpose		City of Bessemer, Alabama	Q79973	50
+clrke county	5493001N4P5TQ2L9ZO30	typo	test	typo_first3:delete		Unified Government of Athens-Clarke County, Georgia	Q112061	50
+clarke cunty	5493001N4P5TQ2L9ZO30	typo	test	typo_later:delete		Unified Government of Athens-Clarke County, Georgia	Q112061	50
+ari berlin	529900AJLXERVU6GEY09	typo	test	typo_first3:transpose	529900RGKUYZ5JEP9791	Air Berlin PLC & Co. Luftverkehrs KG	Q156829	50
+air berrin	529900AJLXERVU6GEY09	typo	test	typo_later:substitute	529900RGKUYZ5JEP9791	Air Berlin PLC & Co. Luftverkehrs KG	Q156829	50
+dogherty county	549300ZQ0JRR9C0M8I96	typo	test	typo_first3:delete		Dougherty County, Georgia	Q176480	50
+doughety county	549300ZQ0JRR9C0M8I96	typo	test	typo_later:delete		Dougherty County, Georgia	Q176480	50
+quare enix	529900KCRNRDF8DIA489	typo	train	typo_first3:delete		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+square eni	529900KCRNRDF8DIA489	typo	train	typo_later:delete		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+zsiana airlines	2138001V1YWXYBSZX565	typo	test	typo_first3:substitute		아시아나항공 (주)	Q211165	50
+asiana arlines	2138001V1YWXYBSZX565	typo	test	typo_later:delete		아시아나항공 (주)	Q211165	50
+pehman brothers	549300FDK6ZP3YIHRJ47	typo	test	typo_first3:substitute		LEHMAN BROTHERS HOLDINGS INC.	Q212900	50
+lehman broters	549300FDK6ZP3YIHRJ47	typo	test	typo_later:delete		LEHMAN BROTHERS HOLDINGS INC.	Q212900	50
+roayl dutch football association	724500XV6THMFXZWON05	typo	test	typo_first3:transpose		Koninklijke Nederlandse Voetbalbond	Q213116	50
+royal dutch football assocation	724500XV6THMFXZWON05	typo	test	typo_later:delete		Koninklijke Nederlandse Voetbalbond	Q213116	50
+krava	743700B4LTKYINZS2A81	typo	train	typo_first3:delete		Keravan kaupunki	Q216900	50
+kerav	743700B4LTKYINZS2A81	typo	train	typo_later:delete		Keravan kaupunki	Q216900	50
+mitigroup	6SHGI4ZSSLCXXQSBB395	typo	train	typo_first3:substitute		CITIGROUP INC.	Q219508	50
+citgiroup	6SHGI4ZSSLCXXQSBB395	typo	train	typo_later:transpose		CITIGROUP INC.	Q219508	50
+mihigan state university	5493000C7JLSR3TV6F07	typo	train	typo_first3:delete		Board of Trustees of Michigan State University	Q270222	50
+michigan state niversity	5493000C7JLSR3TV6F07	typo	train	typo_later:delete		Board of Trustees of Michigan State University	Q270222	50
+datone	969500KMUQ2B6CBAF162	typo	test	typo_first3:substitute		DANONE	Q329426	50
+danoe	969500KMUQ2B6CBAF162	typo	test	typo_later:delete		DANONE	Q329426	50
+rihiimaki	743700PCPZJBCX6MX045	typo	test	typo_first3:transpose		Riihimäen kaupunki	Q429864	50
+riihimak	743700PCPZJBCX6MX045	typo	test	typo_later:delete		Riihimäen kaupunki	Q429864	50
+vzrizon	2S72QS2UO2OESLG6Y829	typo	test	typo_first3:substitute		VERIZON COMMUNICATIONS INC.	Q467752	50
+verzon	2S72QS2UO2OESLG6Y829	typo	test	typo_later:delete		VERIZON COMMUNICATIONS INC.	Q467752	50
+swhenectady county	5493006EHBI7PZDNN537	typo	test	typo_first3:substitute		County of Schenectady, New York	Q487599	50
+schenectday county	5493006EHBI7PZDNN537	typo	test	typo_later:transpose		County of Schenectady, New York	Q487599	50
+way county	549300B3J43WKYUSHO26	typo	test	typo_first3:substitute		Bay County, Florida	Q488865	50
+bay counts	549300B3J43WKYUSHO26	typo	test	typo_later:substitute		Bay County, Florida	Q488865	50
+rfanklin county	549300OQ3HLT4CBBK749	typo	train	typo_first3:transpose		County of Franklin, Pennsylvania	Q494121	50
+franklin oounty	549300OQ3HLT4CBBK749	typo	train	typo_later:substitute		County of Franklin, Pennsylvania	Q494121	50

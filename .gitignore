@@ -1,0 +1,9 @@
+# research/ranking
+research/data/
+research/ranking/cache/
+research/ranking/logs/
+research/ranking/port/cases.json
+__pycache__/
+*.pyc
+*.pkl
+*.jsonl

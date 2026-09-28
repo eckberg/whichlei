@@ -1,0 +1,1138 @@
+query	target_lei	stratum	split	qtype	alt_leis	entity_name	qid	sitelinks
+Latvia	25490002QDEB2KTLNK39	head	train	label		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+Republic of Latvia	25490002QDEB2KTLNK39	head	train	alias		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+Latvijas Republika	25490002QDEB2KTLNK39	head	train	alias		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+Latvija	25490002QDEB2KTLNK39	head	train	alias		Latvijas Republika, ko pārstāv Latvijas Republikas Valsts kase	Q211	336
+United Nations	549300HYGYJKXU2J8X74	head	test	label		United Nations	Q1065	336
+Berlin	529900Y6Q7R44JF7XX56	head	train	label		Land Berlin	Q64	334
+New York City	549300ABYZD2SFD5JB29	head	train	label		City of New York	Q60	325
+city of New York	549300ABYZD2SFD5JB29	head	train	alias		City of New York	Q60	325
+New York City, New York	549300ABYZD2SFD5JB29	head	train	alias		City of New York	Q60	325
+Helsinki	7437005GCN3H6F2GOW62	head	test	label		Helsingin kaupunki	Q1757	293
+Helsingin kaupunki	7437005GCN3H6F2GOW62	head	test	alias		Helsingin kaupunki	Q1757	293
+Los Angeles	549300E7TO710PTXPJ65	head	test	label		City of Los Angeles	Q65	280
+City of Los Angeles	549300E7TO710PTXPJ65	head	test	alias		City of Los Angeles	Q65	280
+Prague	31570010000000033463	head	test	label		HLAVNÍ MĚSTO PRAHA	Q1085	268
+Hlavní město Praha	31570010000000033463	head	test	alias		HLAVNÍ MĚSTO PRAHA	Q1085	268
+Florida	5493004G5XFOOUT0LQ57	head	train	label		State of Florida	Q812	260
+State of Florida	5493004G5XFOOUT0LQ57	head	train	alias		State of Florida	Q812	260
+Texas	549300X9CH74QB747L76	head	test	label		State of Texas	Q1439	259
+State of Texas	549300X9CH74QB747L76	head	test	alias		State of Texas	Q1439	259
+Alabama	549300TKZX0YNENZC895	head	train	label		State of Alabama	Q173	241
+State of Alabama	549300TKZX0YNENZC895	head	train	alias		State of Alabama	Q173	241
+Brussels	549300W772UG3LSKUE60	head	train	label		VILLE DE BRUXELLES	Q239	240
+San Francisco	549300RA28ZEFOB6M782	head	train	label		City and County of San Francisco	Q62	238
+San Fran	549300RA28ZEFOB6M782	head	train	alias		City and County of San Francisco	Q62	238
+City and County of San Francisco	549300RA28ZEFOB6M782	head	train	alias		City and County of San Francisco	Q62	238
+San Francisco County	549300RA28ZEFOB6M782	head	train	alias		City and County of San Francisco	Q62	238
+Illinois	54930048FV8RWPR02D67	head	train	label		State of Illinois	Q1204	238
+State of Illinois	54930048FV8RWPR02D67	head	train	alias		State of Illinois	Q1204	238
+Ohio	5493005LEB5E170OMX59	head	test	label		State of Ohio	Q1397	235
+State of Ohio	5493005LEB5E170OMX59	head	test	alias		State of Ohio	Q1397	235
+Massachusetts	5493001N1YCXNI1O7K10	head	train	label		The Commonwealth of Massachusetts	Q771	229
+The Commonwealth of Massachusetts	5493001N1YCXNI1O7K10	head	train	alias		The Commonwealth of Massachusetts	Q771	229
+Commonwealth of MA	5493001N1YCXNI1O7K10	head	train	alias		The Commonwealth of Massachusetts	Q771	229
+Commonwealth of Massachusetts	5493001N1YCXNI1O7K10	head	train	alias		The Commonwealth of Massachusetts	Q771	229
+Michigan	CADMV8WVNQO7XM117W54	head	train	label		State of Michigan Retirement System	Q1166	225
+State of Michigan	CADMV8WVNQO7XM117W54	head	train	alias		State of Michigan Retirement System	Q1166	225
+Indiana	Q8JDSMXPZ6YQWY5J7W63	head	test	label		State of Indiana	Q1415	225
+State of Indiana	Q8JDSMXPZ6YQWY5J7W63	head	test	alias		State of Indiana	Q1415	225
+Wisconsin	549300VTAT608CNZ5827	head	train	label		State of Wisconsin	Q1537	225
+State of Wisconsin	549300VTAT608CNZ5827	head	train	alias		State of Wisconsin	Q1537	225
+New Mexico	549300H4YLM23QKOGK29	head	train	label		State of New Mexico	Q1522	223
+State of New Mexico	549300H4YLM23QKOGK29	head	train	alias		State of New Mexico	Q1522	223
+N. Mex.	549300H4YLM23QKOGK29	head	train	alias		State of New Mexico	Q1522	223
+Connecticut	5493007GRO6CU0IKP741	head	train	label		The State of Connecticut, acting through its Treasurer	Q779	222
+State of Connecticut	5493007GRO6CU0IKP741	head	train	alias		The State of Connecticut, acting through its Treasurer	Q779	222
+Connecticut (state)	5493007GRO6CU0IKP741	head	train	alias		The State of Connecticut, acting through its Treasurer	Q779	222
+Mississippi	549300JRWW5RFQUB7P94	head	test	label		State of Mississippi	Q1494	220
+State of Mississippi	549300JRWW5RFQUB7P94	head	test	alias		State of Mississippi	Q1494	220
+Mississippi (state)	549300JRWW5RFQUB7P94	head	test	alias		State of Mississippi	Q1494	220
+Wyoming	HZT38E4FBDF4XOBCMR95	head	train	label		State of Wyoming	Q1214	217
+State of Wyoming	HZT38E4FBDF4XOBCMR95	head	train	alias		State of Wyoming	Q1214	217
+Rhode Island	549300TK0QTLW5HQGC62	head	test	label		State of Rhode Island and Providence Plantations	Q1387	214
+Providence Plantations	549300TK0QTLW5HQGC62	head	test	alias		State of Rhode Island and Providence Plantations	Q1387	214
+Rhode Island State	549300TK0QTLW5HQGC62	head	test	alias		State of Rhode Island and Providence Plantations	Q1387	214
+Rhode Island and Providence Plantations	549300TK0QTLW5HQGC62	head	test	alias		State of Rhode Island and Providence Plantations	Q1387	214
+Google	7ZW8QJWVPR4P1J1KQY45	head	train	label		GOOGLE LLC	Q95	211
+Houston	549300C64URYS0WQQY42	head	test	label		City of Houston, Texas	Q16555	192
+City of Houston	549300C64URYS0WQQY42	head	test	alias		City of Houston, Texas	Q16555	192
+Denver	MMTY7HA2MSCBUO4F7J71	head	test	label		City and County of Denver	Q16554	185
+City and County of Denver	MMTY7HA2MSCBUO4F7J71	head	test	alias		City and County of Denver	Q16554	185
+Denver, CO	MMTY7HA2MSCBUO4F7J71	head	test	alias		City and County of Denver	Q16554	185
+Apple Inc.	HWUPKR0MPOU8FGXBT394	head	train	label		Apple Inc.	Q312	183
+Guadalajara	4469000001CON7X1U240	head	test	label		MUNICIPIO DE GUADALAJARA	Q9022	183
+Microsoft	INR2EJN1ERAN0W5ZP974	head	test	label		MICROSOFT CORPORATION	Q2283	178
+Detroit	549300BQRJP7MKKHOY28	head	test	label		City of Detroit, Michigan	Q12439	175
+Austin	IW10PQVTU7HKS3JMW253	head	train	label		City of Austin	Q16559	169
+Tampere	743700PZKMCR95473V34	head	train	label		Tampereen kaupunki	Q40840	169
+Antwerp	967600JP2P61UFGUMJ66	head	test	label		STAD ANTWERPEN	Q12892	162
+Antwerpen	967600JP2P61UFGUMJ66	head	test	alias		STAD ANTWERPEN	Q12892	162
+International Monetary Fund	E7EXN6FJGRUTJYNZ3Z71	head	train	label		International Monetary Fund	Q7804	160
+International Monetary Fund, IMF	E7EXN6FJGRUTJYNZ3Z71	head	train	alias		International Monetary Fund	Q7804	160
+IMF	E7EXN6FJGRUTJYNZ3Z71	head	train	alias		International Monetary Fund	Q7804	160
+Baltimore	5493006QYFB72E0IOO54	head	train	label		Mayor and City Council of Baltimore	Q5092	158
+City of Baltimore	5493006QYFB72E0IOO54	head	train	alias		Mayor and City Council of Baltimore	Q5092	158
+BAL	5493006QYFB72E0IOO54	head	train	alias		Mayor and City Council of Baltimore	Q5092	158
+Baltimore City	5493006QYFB72E0IOO54	head	train	alias		Mayor and City Council of Baltimore	Q5092	158
+FC Barcelona	95980020140005871781	head	train	label		FUTBOL CLUB BARCELONA	Q7156	153
+Fútbol Club Barcelona	95980020140005871781	head	train	alias		FUTBOL CLUB BARCELONA	Q7156	153
+British Broadcasting Corporation	5493000IBP32UQZ0KL24	head	test	label		BRITISH BROADCASTING CORPORATION	Q9531	149
+Toyota	5493006W3QUS5LMH6R84	head	train	label		トヨタ自動車株式会社	Q53268	149
+Toyota Motor Corporation	5493006W3QUS5LMH6R84	head	train	alias		トヨタ自動車株式会社	Q53268	149
+Toyota Motor	5493006W3QUS5LMH6R84	head	train	alias		トヨタ自動車株式会社	Q53268	149
+Manchester United F.C.	213800CNW6K7XWOTB808	head	train	label		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+Manchester United Football Club	213800CNW6K7XWOTB808	head	train	alias		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+Manchester United	213800CNW6K7XWOTB808	head	train	alias		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+Man U	213800CNW6K7XWOTB808	head	train	alias		MANCHESTER UNITED FOOTBALL CLUB LIMITED	Q18656	148
+University of Oxford	5493009OEHU6YS545T65	head	test	label		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+Oxford University	5493009OEHU6YS545T65	head	test	alias		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+Oxf	5493009OEHU6YS545T65	head	test	alias		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+Oxford	5493009OEHU6YS545T65	head	test	alias		THE CHANCELLOR MASTERS AND SCHOLARS OF THE UNIVERSITY OF OXFORD	Q34433	148
+Turku	743700NV4PWQPQI6U405	head	train	label		Turun kaupunki	Q38511	148
+Ghent	549300HJ1DDDKEOO9B33	head	train	label		Stad Gent	Q1296	146
+Brno	31570010000000116301	head	test	label		Statutární město Brno	Q14960	146
+Statutory City of Brno	31570010000000116301	head	test	alias		Statutární město Brno	Q14960	146
+Minneapolis	54930069TEI1INHRHS55	head	train	label		City of Minneapolis, Minnesota	Q36091	146
+Minneapolis, Minnesota	54930069TEI1INHRHS55	head	train	alias		City of Minneapolis, Minnesota	Q36091	146
+The Walt Disney Company	549300GZKULIZ0WOW665	head	train	label		THE WALT DISNEY COMPANY	Q7414	142
+Albuquerque	549300MV7H0GASZUCG39	head	train	label		City of Albuquerque	Q34804	138
+St. Louis	5493004O38W8EYGEZ656	head	test	label		The City of St. Louis, Missouri	Q38022	138
+St. Louis, Missouri	5493004O38W8EYGEZ656	head	test	alias		The City of St. Louis, Missouri	Q38022	138
+St. Louis City	5493004O38W8EYGEZ656	head	test	alias		The City of St. Louis, Missouri	Q38022	138
+City of St. Louis	5493004O38W8EYGEZ656	head	test	alias		The City of St. Louis, Missouri	Q38022	138
+McDonald's	UE2136O97NLB5BYP9H04	head	test	label		MCDONALD'S CORPORATION	Q38076	136
+McDo	UE2136O97NLB5BYP9H04	head	test	alias		MCDONALD'S CORPORATION	Q38076	136
+Juventus FC	815600A253A0AF58C166	head	test	label		JUVENTUS F.C. - S.P.A. O JUVENTUS FOOTBALL CLUB S.P.A.	Q1422	132
+Orlando	G8GZFWRIKS3AFD6AWU52	head	test	label		City of Orlando	Q49233	132
+City of Orlando	G8GZFWRIKS3AFD6AWU52	head	test	alias		City of Orlando	Q49233	132
+Nintendo	353800FEEXU6I9M0ZF27	head	test	label		任天堂株式会社	Q8093	131
+Dover	HOGTPH9YOZG642NQXS47	head	test	label		The City of Dover, Delaware	Q33518	129
+Dover, Delaware	HOGTPH9YOZG642NQXS47	head	test	alias		The City of Dover, Delaware	Q33518	129
+Dover, DE	HOGTPH9YOZG642NQXS47	head	test	alias		The City of Dover, Delaware	Q33518	129
+Bismarck	5493004YS3DDNIKCWV33	head	test	label		City of Bismarck, North Dakota	Q37066	129
+Bismarck, North Dakota	5493004YS3DDNIKCWV33	head	test	alias		City of Bismarck, North Dakota	Q37066	129
+Liège	549300FIVF63QBHEZ887	head	train	label		Ville de Liège	Q3992	127
+Charlotte	5493001QNY6JJFWHQ568	head	test	label		City of Charlotte	Q16565	127
+Kuopio	743700JLIWJ0EXR8D809	head	train	label		Kuopion kaupunki	Q162279	127
+Amazon	ZXTILKJKG63JELOEG630	head	train	label		AMAZON.COM, INC.	Q3884	124
+Amazon.com, Inc.	ZXTILKJKG63JELOEG630	head	train	alias		AMAZON.COM, INC.	Q3884	124
+Kansas City	549300EGAE3I3XU7XE19	head	train	label		City of Kansas City, Missouri	Q41819	123
+Kansas City, Missouri	549300EGAE3I3XU7XE19	head	train	alias		City of Kansas City, Missouri	Q41819	123
+Bruges	549300DLQQV8DKLFGG51	head	train	label		Stad Brugge	Q12994	119
+Plzeň	315700FETWHC4X2ET516	head	test	label		Statutární město Plzeň	Q43453	119
+Oulu	743700LA8LI4K8D6RT86	head	train	label		Oulun kaupunki	Q47048	119
+BMW	YEH5ZCD6E441RHVHD759	head	train	label		Bayerische Motoren Werke Aktiengesellschaft	Q26678	118
+UNICEF	5493003PODH0BS5ZOF16	head	test	label		United Nations Children's Fund	Q740308	118
+United Nations Children's Fund	5493003PODH0BS5ZOF16	head	test	alias		United Nations Children's Fund	Q740308	118
+Ostrava	31570010000000025994	head	train	label		Statutární město Ostrava	Q8385	116
+Newark	5493008RBPM01QHRYX34	head	test	label		City of Newark	Q25395	116
+City of Newark	5493008RBPM01QHRYX34	head	test	alias		City of Newark	Q25395	116
+SpaceX	549300B9WLO96RQCXP87	head	test	label		SPACE EXPLORATION TECHNOLOGIES CORP.	Q193701	116
+Audi AG	529900J1PXYSZJVZ3Z09	head	train	label		AUDI Aktiengesellschaft	Q23317	115
+Audi	529900J1PXYSZJVZ3Z09	head	train	alias		AUDI Aktiengesellschaft	Q23317	115
+Tromsø Municipality	5967007LIEEXZXHVC053	head	train	label		TROMSØ KOMMUNE	Q26087	114
+Tromsø	5967007LIEEXZXHVC053	head	train	alias		TROMSØ KOMMUNE	Q26087	114
+Sony Group	529900R5WX9N2OI2N910	head	test	label		ソニーグループ株式会社	Q41187	114
+Ford Motor Company	20S05OYHG0MQM4VUIC57	head	train	label		FORD MOTOR COMPANY	Q44294	114
+Ford	20S05OYHG0MQM4VUIC57	head	train	alias		FORD MOTOR COMPANY	Q44294	114
+Jalisco	25490036KQCCNCIJ1O24	head	train	label		Jalisco	Q13160	113
+JAL	25490036KQCCNCIJ1O24	head	train	alias		Jalisco	Q13160	113
+Long Beach	549300XH3OUOL3JO1O51	head	train	label		City of Long Beach, California	Q16739	113
+Long Beach, California	549300XH3OUOL3JO1O51	head	train	alias		City of Long Beach, California	Q16739	113
+Long Beach, CA	549300XH3OUOL3JO1O51	head	train	alias		City of Long Beach, California	Q16739	113
+IBM	VGRQXHF3J8VDLUA7XE92	head	train	label		INTERNATIONAL BUSINESS MACHINES CORPORATION	Q37156	113
+Rovaniemi	743700IOME3XMJLVNM06	head	train	label		Rovaniemen kaupunki	Q103717	113
+Nokia	549300A0JPRWG1KI7U06	head	train	label		Nokia Oyj	Q1418	112
+Oy Nokia Ab	549300A0JPRWG1KI7U06	head	train	alias		Nokia Oyj	Q1418	112
+Massachusetts Institute of Technology	DLZO3A31IADZ27B62557	head	train	label		MASSACHUSETTS INSTITUTE OF TECHNOLOGY	Q49108	112
+Mass Tech	DLZO3A31IADZ27B62557	head	train	alias		MASSACHUSETTS INSTITUTE OF TECHNOLOGY	Q49108	112
+Burger King	549300EA6A3Z2G47TI15	head	test	label		BURGER KING WORLDWIDE, INC.	Q177054	112
+Stanford University	JIUV0DC2REIJXQ26CR37	head	train	label		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+Leland Stanford University	JIUV0DC2REIJXQ26CR37	head	train	alias		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+Leland Stanford Junior University	JIUV0DC2REIJXQ26CR37	head	train	alias		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+Stanford	JIUV0DC2REIJXQ26CR37	head	train	alias		THE LELAND STANFORD JUNIOR UNIVERSITY	Q41506	111
+HEC Paris	969500EA7ZKCS3W9KL36	head	test	label		ETABLISSEMENT D ENSEIGNEMENT SUPERIEUR CONSULAIRE HAUTES ETUDES COMMERCIALES DE PARIS	Q273535	111
+Hautes études commerciales de Paris	969500EA7ZKCS3W9KL36	head	test	alias		ETABLISSEMENT D ENSEIGNEMENT SUPERIEUR CONSULAIRE HAUTES ETUDES COMMERCIALES DE PARIS	Q273535	111
+Hautes études commerciales (Paris)	969500EA7ZKCS3W9KL36	head	test	alias		ETABLISSEMENT D ENSEIGNEMENT SUPERIEUR CONSULAIRE HAUTES ETUDES COMMERCIALES DE PARIS	Q273535	111
+Renault	969500F7JLTX36OUI695	head	test	label		RENAULT	Q6686	110
+Atlético Madrid	959800PEZFMBKHG8NZ30	head	test	label		CLUB ATLETICO DE MADRID SAD	Q8701	109
+Club Atlético de Madrid	959800PEZFMBKHG8NZ30	head	test	alias		CLUB ATLETICO DE MADRID SAD	Q8701	109
+Atleti de Madrid	959800PEZFMBKHG8NZ30	head	test	alias		CLUB ATLETICO DE MADRID SAD	Q8701	109
+Club Atlético de Madrid, SAD	959800PEZFMBKHG8NZ30	head	test	alias		CLUB ATLETICO DE MADRID SAD	Q8701	109
+Tesla	54930043XZGB27CTOV49	head	train	label		TESLA, INC.	Q478214	109
+Espoo	743700JQ02JPWS874D16	head	train	label		Espoon kaupunki	Q47034	108
+Espoon kaupunki	743700JQ02JPWS874D16	head	train	alias		Espoon kaupunki	Q47034	108
+New Haven	549300U4OHEAZ124LQ06	head	test	label		City of New Haven	Q49145	108
+City of New Haven	549300U4OHEAZ124LQ06	head	test	alias		City of New Haven	Q49145	108
+Boeing	RVHJWBXLJ1RFUBSY1F30	head	test	label		THE BOEING COMPANY	Q66	106
+Yale University	9SFB6DIM0FRWV0EV8S84	head	train	label		YALE UNIVERSITY	Q49112	106
+Yale	9SFB6DIM0FRWV0EV8S84	head	train	alias		YALE UNIVERSITY	Q49112	106
+Adidas AG	549300JSX0Z4CW0V5023	head	test	label		adidas AG	Q3895	105
+Honda	549300P7ZYCQJ36CCS16	head	test	label		本田技研工業株式会社	Q9584	105
+Honda Motor Co., Ltd.	549300P7ZYCQJ36CCS16	head	test	alias		本田技研工業株式会社	Q9584	105
+Organization for Economic Cooperation and Development	969500Y2NFIMDP5MO798	head	test	label		ORGANIS COOPERATION DEVELOPP ECONOMIQUE	Q41550	105
+Grupo Televisa	549300O4AF0C816ILN62	head	train	label		GRUPO TELEVISA S A B	Q47099	105
+Mariehamn	743700IIRAGPDQR4LG96	head	test	label		Mariehamns stad	Q48329	105
+Namur	549300G4756BWTGGD551	head	test	label		VILLE DE NAMUR	Q134121	105
+Sint-Truiden	549300O6FXMQWBJJNN75	head	test	label		Stad Sint-Truiden	Q37792	104
+Library of Congress	549300X91O5FQA359330	head	train	label		Library of Congress - FP	Q131454	103
+Paris Saint-Germain FC	96950021OGUOTYRUC719	head	test	label		PARIS SAINT GERMAIN FOOTBALL	Q483020	103
+Paris	96950021OGUOTYRUC719	head	test	alias		PARIS SAINT GERMAIN FOOTBALL	Q483020	103
+Intel	KNX4USFCNGPY45LOCE31	head	train	label		INTEL CORPORATION	Q248	101
+Intel Corp.	KNX4USFCNGPY45LOCE31	head	train	alias		INTEL CORPORATION	Q248	101
+Intel Corporation	KNX4USFCNGPY45LOCE31	head	train	alias		INTEL CORPORATION	Q248	101
+Lufthansa	529900PH63HYJ86ASW55	head	test	label		Deutsche Lufthansa Aktiengesellschaft	Q9325	101
+Deutsche Lufthansa Aktiengesellschaft	529900PH63HYJ86ASW55	head	test	alias		Deutsche Lufthansa Aktiengesellschaft	Q9325	101
+Deutsche Lufthansa	529900PH63HYJ86ASW55	head	test	alias		Deutsche Lufthansa Aktiengesellschaft	Q9325	101
+Jyväskylä	743700PJ485U3PKFEE08	head	test	label		Jyväskylän kaupunki	Q134620	100
+Borussia Dortmund	5299007FATCKT9465814	head	train	label	529900XO0YTOOKCLQB44	Ballspielverein Borussia 09 e.V. Dortmund	Q41420	99
+Ballspielverein Borussia 09 e.V. Dortmund	5299007FATCKT9465814	head	train	alias	529900XO0YTOOKCLQB44	Ballspielverein Borussia 09 e.V. Dortmund	Q41420	99
+Dortmund	5299007FATCKT9465814	head	train	alias	529900XO0YTOOKCLQB44	Ballspielverein Borussia 09 e.V. Dortmund	Q41420	99
+Warner Bros. Entertainment	549300U1JWW9SCOH3W56	head	train	label		Warner Bros. Entertainment Inc.	Q126399	99
+Warner Bros. Entertainment, Inc.	549300U1JWW9SCOH3W56	head	train	alias		Warner Bros. Entertainment Inc.	Q126399	99
+Vantaa	743700TC1V4TPW6YRP73	head	train	label		Vantaan kaupunki	Q127623	99
+Karlovy Vary	315700PN3J57ZUNF1V00	head	train	label		Statutární město Karlovy Vary	Q384544	99
+Airbus Commercial Aircraft	529900FCMZ4LKXFD0R69	head	test	label		AIRBUS	Q67	98
+Airbus	529900FCMZ4LKXFD0R69	head	test	alias		AIRBUS	Q67	98
+Lahti	743700MUKX0ZHN7HX889	head	test	label		Lahden kaupunki	Q28911	98
+Zapopan	4469000001CZK6SXIY24	head	train	label		MUNICIPIO DE ZAPOPAN JALISCO	Q147402	98
+Joensuu	7437000BH90YQVLNR854	head	test	label		Joensuun kaupunki	Q186237	98
+Tacoma	549300R2ZDWKQB6DIV86	head	train	label		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+Tacoma, Washington	549300R2ZDWKQB6DIV86	head	train	alias		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+Tacoma, WA	549300R2ZDWKQB6DIV86	head	train	alias		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+City of Tacoma	549300R2ZDWKQB6DIV86	head	train	alias		City of Tacoma Washington - Consolidated Local Improvement District No. 65	Q199797	98
+Ferrari	5493002AZWJSSO4XME42	head	test	label		FERRARI S.P.A.	Q27586	97
+Cornell University	549300ZZIJPNT0RZWP17	head	test	label		Cornell University	Q49115	97
+Cornell Univ.	549300ZZIJPNT0RZWP17	head	test	alias		Cornell University	Q49115	97
+Cornell	549300ZZIJPNT0RZWP17	head	test	alias		Cornell University	Q49115	97
+Reno	549300M4R5WWSUWY8D52	head	train	label		City of Reno	Q49225	97
+Reno, Nevada	549300M4R5WWSUWY8D52	head	train	alias		City of Reno	Q49225	97
+Mesa	549300L1QYAKFHSIGE94	head	train	label		City Of Mesa	Q49261	97
+Mesa City	549300L1QYAKFHSIGE94	head	train	alias		City Of Mesa	Q49261	97
+Columbia University	54930058W39DHS3GTG15	head	test	label		The Trustees of Columbia University in the City of New York	Q49088	96
+Columbia U	54930058W39DHS3GTG15	head	test	alias		The Trustees of Columbia University in the City of New York	Q49088	96
+Columbia University in the City of New York	54930058W39DHS3GTG15	head	test	alias		The Trustees of Columbia University in the City of New York	Q49088	96
+Columbia Univ.	54930058W39DHS3GTG15	head	test	alias		The Trustees of Columbia University in the City of New York	Q49088	96
+České Budějovice	315700BH7PHQLBKS1J24	head	train	label		Statutární město České Budějovice	Q16506	95
+Huawei	300300G4NLFHF8PDPY52	head	train	label		华为技术有限公司	Q160120	95
+Huawei Technologies Co., Ltd.	300300G4NLFHF8PDPY52	head	train	alias		华为技术有限公司	Q160120	95
+Huawei Technologies	300300G4NLFHF8PDPY52	head	train	alias		华为技术有限公司	Q160120	95
+Pori	743700FLLAW4A61OK956	head	train	label		Porin kaupunki	Q180233	95
+Porin kaupunki	743700FLLAW4A61OK956	head	train	alias		Porin kaupunki	Q180233	95
+WWF International	5067009T3573P9JA7765	head	test	label		WWF - WORLD WIDE FUND FOR NATURE (formerly World Wildlife Fund)	Q117892	94
+World Wildlife Fund	5067009T3573P9JA7765	head	test	alias		WWF - WORLD WIDE FUND FOR NATURE (formerly World Wildlife Fund)	Q117892	94
+World Wide Fund For Nature	5067009T3573P9JA7765	head	test	alias		WWF - WORLD WIDE FUND FOR NATURE (formerly World Wildlife Fund)	Q117892	94
+Toledo	549300I365GIDPR4BM68	head	train	label		City of Toledo	Q49239	93
+Toledo city	549300I365GIDPR4BM68	head	train	alias		City of Toledo	Q49239	93
+City of Toledo	549300I365GIDPR4BM68	head	train	alias		City of Toledo	Q49239	93
+Yamaha Motor Company	3538004LR5NXILJDHY88	head	test	label		ヤマハ発動機株式会社	Q158888	93
+Yamaha Motor	3538004LR5NXILJDHY88	head	test	alias		ヤマハ発動機株式会社	Q158888	93
+West Flanders	894500JUQNA1CVAQUP40	head	test	label		Provincie West-Vlaanderen	Q1113	92
+West-Vlaanderen	894500JUQNA1CVAQUP40	head	test	alias		Provincie West-Vlaanderen	Q1113	92
+Hainaut	5493004YC3W2JPOGB832	head	test	label		PROVINCE DU HAINAUT	Q1129	92
+Hainaut Province	5493004YC3W2JPOGB832	head	test	alias		PROVINCE DU HAINAUT	Q1129	92
+Starbucks	OQSJ1DU9TAOC51A47K68	head	train	label		STARBUCKS CORPORATION	Q37158	92
+Burbank	549300ZM3JZEC5HV6I83	head	test	label		City of Burbank	Q39561	92
+Mons	967600MACK66GIA6LX45	head	test	label		Ville de Mons	Q83407	92
+Leuven	894500GZKI6NTONKVM87	head	train	label		Stad Leuven	Q118958	92
+Vaasa	743700VE07JAOHXTGB26	head	test	label		Vaasan kaupunki	Q125080	92
+WWE	549300WZVLSCS3L4L698	head	test	label		WORLD WRESTLING ENTERTAINMENT, LLC	Q35339	91
+Porsche	529900EWEX125AULXI58	head	train	label		Dr. Ing. h.c. F. Porsche Aktiengesellschaft	Q40993	91
+Liberec	315700XAMVXR3HJGMN61	head	test	label		STATUTÁRNÍ MĚSTO LIBEREC	Q146351	91
+Nestlé	KY37LUS27QQX7BB93L28	head	test	label		NESTLÉ S.A.	Q160746	91
+Nestlé S.A.	KY37LUS27QQX7BB93L28	head	test	alias		NESTLÉ S.A.	Q160746	91
+Knoxville	5493002KM0TCCHHCDT47	head	test	label		City of Knoxville, Tennessee	Q185582	91
+Knoxville, Tennessee	5493002KM0TCCHHCDT47	head	test	alias		City of Knoxville, Tennessee	Q185582	91
+East Flanders	875500JOJWI5MN6DAR95	head	test	label		Provincie Oost-Vlaanderen	Q1114	90
+Oost-Vlaanderen	875500JOJWI5MN6DAR95	head	test	alias		Provincie Oost-Vlaanderen	Q1114	90
+Nissan	353800DRBDH1LUTNAY26	head	train	label		日産自動車株式会社	Q20165	90
+Nissan Motor Co.	353800DRBDH1LUTNAY26	head	train	alias		日産自動車株式会社	Q20165	90
+Nissan Motor Co., Ltd.	353800DRBDH1LUTNAY26	head	train	alias		日産自動車株式会社	Q20165	90
+General Motors	54930070NSV60J38I987	head	test	label		GENERAL MOTORS COMPANY	Q81965	90
+Sosnowiec	25940024HPNLK5JRXD58	head	train	label		SOSNOWIEC - MIASTO NA PRAWACH POWIATU	Q105060	90
+Kristiansand Municipality	254900BNRTDMSXRSG549	head	train	label		Kristiansand Kommune	Q2415	89
+Turkish Airlines	789000EV8M3BL7ZPFB03	head	test	label		Türk Hava Yolları Anonim Ortaklığı	Q4548	89
+Türk Hava Yolları	789000EV8M3BL7ZPFB03	head	test	alias		Türk Hava Yolları Anonim Ortaklığı	Q4548	89
+Nike, Inc.	787RXPR0UX0O0XUXPZ81	head	train	label		NIKE, INC.	Q483915	89
+NIKE	787RXPR0UX0O0XUXPZ81	head	train	alias		NIKE, INC.	Q483915	89
+Schalke 04	391200ALDJEBKNZFZ849	head	test	label		Fußballclub Gelsenkirchen-Schalke 04 e.V.	Q32494	88
+Schalke 0	391200ALDJEBKNZFZ849	head	test	alias		Fußballclub Gelsenkirchen-Schalke 04 e.V.	Q32494	88
+Metropolitan Museum of Art	549300LS1O4XQ1SY7T11	head	train	label		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+The Met	549300LS1O4XQ1SY7T11	head	train	alias		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+The Met Museum	549300LS1O4XQ1SY7T11	head	train	alias		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+Met Museum	549300LS1O4XQ1SY7T11	head	train	alias		THE METROPOLITAN MUSEUM OF ART	Q160236	88
+Kotka	7437001PQQSMIWTQB678	head	train	label		Kotkan kaupunki	Q192155	88
+Boulder	549300XPX2TFRF3HOE79	head	test	label		City of Boulder, Colorado	Q192517	88
+Boulder, Colorado	549300XPX2TFRF3HOE79	head	test	alias		City of Boulder, Colorado	Q192517	88
+Boulder, CO	549300XPX2TFRF3HOE79	head	test	alias		City of Boulder, Colorado	Q192517	88
+20th Century Studios	549300W3HBISRNJS8308	head	test	label		Twentieth Century Fox Film Corporation	Q434841	88
+Glendale	5493005GIMHE00RK2Z80	head	test	label		City of Glendale	Q485716	88
+Xiaomi	2549001ACVFAZRNMKL32	head	test	label		Xiaomi Corporation	Q1636958	88
+Meta Platforms	BQ4BKCS1HXDV9HN80Z93	head	train	label		META PLATFORMS, INC.	Q380	87
+Adobe	FU4LY2G4933NH2E1CP29	head	train	label		ADOBE INC.	Q11463	87
+Adobe Systems, Inc.	FU4LY2G4933NH2E1CP29	head	train	alias		ADOBE INC.	Q11463	87
+Adobe Systems	FU4LY2G4933NH2E1CP29	head	train	alias		ADOBE INC.	Q11463	87
+University of Chicago	54930099Y7GU6182V326	head	train	label		THE UNIVERSITY OF CHICAGO	Q131252	87
+U of C	54930099Y7GU6182V326	head	train	alias		THE UNIVERSITY OF CHICAGO	Q131252	87
+Chicago University	54930099Y7GU6182V326	head	train	alias		THE UNIVERSITY OF CHICAGO	Q131252	87
+Univ. of Chicago	54930099Y7GU6182V326	head	train	alias		THE UNIVERSITY OF CHICAGO	Q131252	87
+Paramount Pictures	549300OJ7WHJ5FFDOQ11	head	train	label		PARAMOUNT PICTURES CORPORATION	Q159846	87
+Paramount Pictures Corporation	549300OJ7WHJ5FFDOQ11	head	train	alias		PARAMOUNT PICTURES CORPORATION	Q159846	87
+HBO	549300TMFIX6P4TRT588	head	train	label		Home Box Office, Inc.	Q23633	86
+Air France	969500TQO0037942GI28	head	test	label	969500YFR8LV8JTEUI91	SOCIETE AIR FRANCE	Q131005	86
+University of Tübingen	391200AUF1RMTMZLE883	head	test	label		Eberhard Karls Universität Tübingen	Q153978	86
+Paul Allen	549300BLLKNST2MBEX87	head	test	label		Paul G. Allen	Q162005	86
+Paul G. Allen	549300BLLKNST2MBEX87	head	test	alias		Paul G. Allen	Q162005	86
+Duluth	54930056ACOJTRDUDE38	head	test	label		City of Duluth, Minnesota	Q485708	86
+Duluth, Minnesota	54930056ACOJTRDUDE38	head	test	alias		City of Duluth, Minnesota	Q485708	86
+Kortrijk	699400OBMKSEDNGFR779	head	train	label		Stad Kortrijk	Q12995	85
+University of Pennsylvania	549300FG60YK9HZ7DS75	head	test	label		The Trustees of the University of Pennsylvania	Q49117	85
+Univ. of Pennsylvania	549300FG60YK9HZ7DS75	head	test	alias		The Trustees of the University of Pennsylvania	Q49117	85
+Penn	549300FG60YK9HZ7DS75	head	test	alias		The Trustees of the University of Pennsylvania	Q49117	85
+Univ. of Penn.	549300FG60YK9HZ7DS75	head	test	alias		The Trustees of the University of Pennsylvania	Q49117	85
+Hewlett-Packard	WHKXQACZ14C5XRO8LW03	head	train	label		HP INC.	Q80978	85
+Olympique de Marseille	969500P3L8EMQV5F5S02	head	test	label		OLYMPIQUE DE MARSEILLE	Q132885	85
+Marseille	969500P3L8EMQV5F5S02	head	test	alias		OLYMPIQUE DE MARSEILLE	Q132885	85
+Olympique Marseille	969500P3L8EMQV5F5S02	head	test	alias		OLYMPIQUE DE MARSEILLE	Q132885	85
+O Marseille	969500P3L8EMQV5F5S02	head	test	alias		OLYMPIQUE DE MARSEILLE	Q132885	85
+California Institute of Technology	549300CITPNHOTVPHC04	head	train	label		CALIFORNIA INSTITUTE OF TECHNOLOGY	Q161562	85
+Cal Tech	549300CITPNHOTVPHC04	head	train	alias		CALIFORNIA INSTITUTE OF TECHNOLOGY	Q161562	85
+Augusta	5493003SV3MDU2RCAW31	head	test	label		Augusta, Georgia	Q181962	85
+Augusta, Georgia	5493003SV3MDU2RCAW31	head	test	alias		Augusta, Georgia	Q181962	85
+Porvoo	743700UG9Q46HSIVLZ24	head	test	label		Porvoon kaupunki	Q193367	85
+Scranton	549300L3VEEX7ZRPMU24	head	test	label		City of Scranton, Pennsylvania	Q271395	85
+Scranton, Pennsylvania	549300L3VEEX7ZRPMU24	head	test	alias		City of Scranton, Pennsylvania	Q271395	85
+TV Azteca	549300H2ZXE4KL0NUV88	head	train	label		TV AZTECA S A B DE C V	Q1281055	85
+TV Azteca, S.A.B. de C.V.	549300H2ZXE4KL0NUV88	head	train	alias		TV AZTECA S A B DE C V	Q1281055	85
+Glendale	5493002BC35ZY7XRQ949	head	test	label		City of Glendale, Arizona	Q51682	84
+Glendale, Arizona	5493002BC35ZY7XRQ949	head	test	alias		City of Glendale, Arizona	Q51682	84
+Lillehammer	5967007LIEEXZXHHG029	head	test	label		LILLEHAMMER KOMMUNE	Q101341	84
+Ypres	875500BVTCRM49X8PC30	head	train	label		Stad Ieper	Q102728	84
+Santa Clara	5493006XV9S6LSLH1666	head	train	label		City of Santa Clara, California	Q159260	84
+Santa Clara, California	5493006XV9S6LSLH1666	head	train	alias		City of Santa Clara, California	Q159260	84
+Santa Clara, CA	5493006XV9S6LSLH1666	head	train	alias		City of Santa Clara, California	Q159260	84
+World Economic Forum	5067004M7JGX8HX78O39	head	test	label		FORUM MONDIAL DE L'ECONOMIE	Q170418	84
+British Airways	375X9PSJLLOV7F21O626	head	train	label		BRITISH AIRWAYS PLC	Q8766	83
+British Airways plc	375X9PSJLLOV7F21O626	head	train	alias		BRITISH AIRWAYS PLC	Q8766	83
+Charles University	31570010000000135022	head	train	label		Univerzita Karlova	Q31519	83
+Univerzita Karlova	31570010000000135022	head	train	alias		Univerzita Karlova	Q31519	83
+Associated Press	549300JTLJBPW24WC760	head	test	label		The Associated Press	Q40469	83
+The Associated Press	549300JTLJBPW24WC760	head	test	alias		The Associated Press	Q40469	83
+Amarillo	549300PA08RG2E5SSJ56	head	train	label		City of Amarillo, Texas	Q51691	83
+Amarillo, Texas	549300PA08RG2E5SSJ56	head	train	alias		City of Amarillo, Texas	Q51691	83
+Suzuki Motor Corporation	353800D83H0V3ZV1SV24	head	train	label		スズキ株式会社	Q181642	83
+Lappeenranta	743700IYFBEBRQLD6D87	head	train	label		Lappeenrannan kaupunki	Q181854	83
+Sovereign Military Order of Malta	549300FCAO9VQ1IF2590	head	test	label		Sovereign Military Hospitaller Order of St. John of Jerusalem of Rhodes and of Malta, Federal Association, U.S.A.	Q190353	83
+Sovereign Order of Malta	549300FCAO9VQ1IF2590	head	test	alias		Sovereign Military Hospitaller Order of St. John of Jerusalem of Rhodes and of Malta, Federal Association, U.S.A.	Q190353	83
+Order of Malta	549300FCAO9VQ1IF2590	head	test	alias		Sovereign Military Hospitaller Order of St. John of Jerusalem of Rhodes and of Malta, Federal Association, U.S.A.	Q190353	83
+University of Michigan	549300MFOB21PM9P9H72	head	train	label		Regents of the University of Michigan	Q230492	83
+Univ. of Michigan	549300MFOB21PM9P9H72	head	train	alias		Regents of the University of Michigan	Q230492	83
+U of M	549300MFOB21PM9P9H72	head	train	alias		Regents of the University of Michigan	Q230492	83
+U of Michigan	549300MFOB21PM9P9H72	head	train	alias		Regents of the University of Michigan	Q230492	83
+Mazda	52990044YZJLICDQKK92	head	train	label		マツダ株式会社	Q35996	82
+Mazda Motor Corporation	52990044YZJLICDQKK92	head	train	alias		マツダ株式会社	Q35996	82
+Mazda Motor	52990044YZJLICDQKK92	head	train	alias		マツダ株式会社	Q35996	82
+Hasselt	549300BNOL003YS08X98	head	test	label		Stad Hasselt	Q58780	82
+University of Göttingen	967600E4XFSV4W93SC89	head	train	label		Georg-August-Universität Göttingen	Q152838	82
+Universität Göttingen	967600E4XFSV4W93SC89	head	train	alias		Georg-August-Universität Göttingen	Q152838	82
+uni-goettingen	967600E4XFSV4W93SC89	head	train	alias		Georg-August-Universität Göttingen	Q152838	82
+Georg-August-Universität Göttingen	967600E4XFSV4W93SC89	head	train	alias		Georg-August-Universität Göttingen	Q152838	82
+Evansville	5493004FNKVUBIYGJO12	head	train	label		City of Evansville, Indiana	Q486459	82
+Evansville, Indiana	5493004FNKVUBIYGJO12	head	train	alias		City of Evansville, Indiana	Q486459	82
+Evansville, IN	5493004FNKVUBIYGJO12	head	train	alias		City of Evansville, Indiana	Q486459	82
+Olympique Lyonnais	969500QCBXQ8TVYB0P26	head	train	label		OLYMPIQUE LYONNAIS	Q704	81
+O. Lyonnais	969500QCBXQ8TVYB0P26	head	train	alias		OLYMPIQUE LYONNAIS	Q704	81
+O. Lyon	969500QCBXQ8TVYB0P26	head	train	alias		OLYMPIQUE LYONNAIS	Q704	81
+Lyon	969500QCBXQ8TVYB0P26	head	train	alias		OLYMPIQUE LYONNAIS	Q704	81
+Celtic F.C.	2138004FBHLJQ1EAGI88	head	train	label		CELTIC PLC	Q19593	81
+Celtic plc	2138004FBHLJQ1EAGI88	head	train	alias		CELTIC PLC	Q19593	81
+Celtic	2138004FBHLJQ1EAGI88	head	train	alias		CELTIC PLC	Q19593	81
+Dell	3E70L4WYANTIWWIPHC81	head	train	label		DELL INC.	Q30873	81
+Lowell	549300GXJ4CE6FSCJA35	head	test	label		City of Lowell, Massachusetts	Q49162	81
+Lowell, Massachusetts	549300GXJ4CE6FSCJA35	head	test	alias		City of Lowell, Massachusetts	Q49162	81
+Lowell, MA	549300GXJ4CE6FSCJA35	head	test	alias		City of Lowell, Massachusetts	Q49162	81
+Humboldt-Universität zu Berlin	391200JKTIHRTUIJB380	head	test	label		Humboldt-Universität zu Berlin	Q152087	81
+Universität zu Berlin	391200JKTIHRTUIJB380	head	test	alias		Humboldt-Universität zu Berlin	Q152087	81
+HU Berlin	391200JKTIHRTUIJB380	head	test	alias		Humboldt-Universität zu Berlin	Q152087	81
+Mechelen	549300PG6J548GL1XY22	head	train	label		STAD MECHELEN	Q162022	81
+Hradec Králové	315700PQR4XGC6UXNL26	head	test	label		Statutární město Hradec Králové	Q180139	81
+Nvidia	549300S4KLFTLO7GSQ80	head	test	label		NVIDIA CORPORATION	Q182477	81
+Peugeot	969500LWIVUNQM3TGI58	head	train	label		AUTOMOBILES PEUGEOT	Q6742	80
+Peugeot Automobiles	969500LWIVUNQM3TGI58	head	train	alias		AUTOMOBILES PEUGEOT	Q6742	80
+Škoda Auto	529900I8XOZDM4ZQSQ21	head	train	label		ŠKODA AUTO a.s.	Q29637	80
+ŠKODA AUTO a.s.	529900I8XOZDM4ZQSQ21	head	train	alias		ŠKODA AUTO a.s.	Q29637	80
+SKODA	529900I8XOZDM4ZQSQ21	head	train	alias		ŠKODA AUTO a.s.	Q29637	80
+Johns Hopkins University	549300Z1XKWYKTIOM958	head	train	label		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+The Johns Hopkins University	549300Z1XKWYKTIOM958	head	train	alias		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+Johns Hopkins	549300Z1XKWYKTIOM958	head	train	alias		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+Hopkins	549300Z1XKWYKTIOM958	head	train	alias		THE JOHNS HOPKINS UNIVERSITY	Q193727	80
+Panasonic Holdings Corporation	254900GE1G59KGWPHX32	head	test	label		パナソニックホールディングス株式会社	Q53247	79
+Panasonic Holdings	254900GE1G59KGWPHX32	head	test	alias		パナソニックホールディングス株式会社	Q53247	79
+Panasonic	254900GE1G59KGWPHX32	head	test	alias		パナソニックホールディングス株式会社	Q53247	79
+Siemens	529900ZZVLZ93I1AW009	head	test	label	W38RGI023J3WT1HWRP32	SIEMENS PLC	Q81230	79
+Siemens Aktiengesellschaft	529900ZZVLZ93I1AW009	head	test	alias	W38RGI023J3WT1HWRP32	SIEMENS PLC	Q81230	79
+Zlín	315700EV8U6SD6MFTG35	head	train	label		Statutární město Zlín	Q171018	79
+United Airlines	K1OQBWM7XEOO08LDNP29	head	train	label		UNITED AIRLINES, INC.	Q174769	79
+United Airlines, Inc.	K1OQBWM7XEOO08LDNP29	head	train	alias		UNITED AIRLINES, INC.	Q174769	79
+Continental	K1OQBWM7XEOO08LDNP29	head	train	alias		UNITED AIRLINES, INC.	Q174769	79
+United	K1OQBWM7XEOO08LDNP29	head	train	alias		UNITED AIRLINES, INC.	Q174769	79
+Hämeenlinna	74370038WST7JVM1ZT45	head	train	label		Hämeenlinnan kaupunki	Q202158	79
+Oracle Corporation	1Z4GXXU7ZHVWFCD8TV52	head	test	label		ORACLE CORPORATION	Q19900	78
+Oracle	1Z4GXXU7ZHVWFCD8TV52	head	test	alias		ORACLE CORPORATION	Q19900	78
+Capital Region of Denmark	2138006O2IWB2JU16484	head	test	label		REGION HOVEDSTADEN	Q26073	78
+Central Denmark	213800GBFOFCCXDVIA19	head	test	label		Region Midtjylland	Q26586	78
+Region Midtjylland	213800GBFOFCCXDVIA19	head	test	alias		Region Midtjylland	Q26586	78
+New York University	R2G7YMC4K0KXSX0BGX71	head	train	label		New York University	Q49210	78
+New York Univ.	R2G7YMC4K0KXSX0BGX71	head	train	alias		New York University	Q49210	78
+Winston-Salem	549300AUJB2WE4FMLE24	head	train	label		City of Winston-Salem	Q49227	78
+Winston	549300AUJB2WE4FMLE24	head	train	alias		City of Winston-Salem	Q49227	78
+Gazprom	213800FD9J2IHTA7YX78	head	test	label		ПУБЛИЧНОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО "ГАЗПРОМ"	Q102673	78
+Public Joint Stock Company Gazprom	213800FD9J2IHTA7YX78	head	test	alias		ПУБЛИЧНОЕ АКЦИОНЕРНОЕ ОБЩЕСТВО "ГАЗПРОМ"	Q102673	78
+AMD	R2I72C950HOYXII45366	head	test	label		ADVANCED MICRO DEVICES, INC.	Q128896	78
+Advanced Micro Devices	R2I72C950HOYXII45366	head	test	alias		ADVANCED MICRO DEVICES, INC.	Q128896	78
+United Nations Development Programme	213800HHKG1TKV8LMW56	head	train	label		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+UN Development Programme	213800HHKG1TKV8LMW56	head	train	alias		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+United Nations Development Programme (UNDP)	213800HHKG1TKV8LMW56	head	train	alias		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+UNDP	213800HHKG1TKV8LMW56	head	train	alias		UNITED NATIONS DEVELOPMENT PROGRAMME	Q161718	78
+Mikkeli	743700PSI19TAX2K9Y77	head	test	label		Mikkelin kaupunki	Q190583	78
+South Moravian Region	31570010000000026091	head	train	label		Jihomoravský kraj	Q192697	78
+South Moravia	31570010000000026091	head	train	alias		Jihomoravský kraj	Q192697	78
+Citroën	9695008DZ9VGHKZUYG11	head	train	label		AUTOMOBILES CITROEN	Q6746	77
+Southern Denmark	549300GTXJV6WPVBZN64	head	train	label		Region Syddanmark	Q26061	77
+Koninklijke Philips NV	H1FJE8H61JGM1JSGM897	head	test	label		Koninklijke Philips N.V.	Q170416	77
+PHILIPS	H1FJE8H61JGM1JSGM897	head	test	alias		Koninklijke Philips N.V.	Q170416	77
+Metro-Goldwyn-Mayer	8JA4NT75BITP5LG6P072	head	train	label		METRO-GOLDWYN-MAYER INC.	Q179200	77
+Metro-Goldwyn-Mayer Studios	8JA4NT75BITP5LG6P072	head	train	alias		METRO-GOLDWYN-MAYER INC.	Q179200	77
+Aalst	5493004J7J1W2I7RV807	head	test	label		STAD AALST	Q13121	76
+North Denmark Region	549300L5KYQI8JEG3329	head	train	label		Region Nordjylland	Q26067	76
+Hyundai Motor Company	9884004RQX8PRBXQ8S60	head	train	label		현대자동차 (주)	Q55931	76
+Hyundai Motor	9884004RQX8PRBXQ8S60	head	train	alias		현대자동차 (주)	Q55931	76
+Hyundai	9884004RQX8PRBXQ8S60	head	train	alias		현대자동차 (주)	Q55931	76
+Shell	21380068P1DRHMJ8KU70	head	train	label		SHELL PLC	Q154950	76
+Royal Dutch Shell	21380068P1DRHMJ8KU70	head	train	alias		SHELL PLC	Q154950	76
+KLM	724500LQC3HN5O30LK18	head	train	label		Koninklijke Luchtvaart Maatschappij N.V.	Q181912	76
+Koninklijke Luchtvaart Maatschappij N.V.	724500LQC3HN5O30LK18	head	train	alias		Koninklijke Luchtvaart Maatschappij N.V.	Q181912	76
+Koninklijke Luchtvaart Maatschappij	724500LQC3HN5O30LK18	head	train	alias		Koninklijke Luchtvaart Maatschappij N.V.	Q181912	76
+University of Copenhagen	549300W1BYDE7TQT8448	head	train	label		Københavns Universitet	Q186285	76
+Københavns Universitet	549300W1BYDE7TQT8448	head	train	alias		Københavns Universitet	Q186285	76
+Pfizer	765LHXWGK1KXCLTFYQ30	head	test	label		PFIZER INC.	Q206921	76
+Pfizer Inc.	765LHXWGK1KXCLTFYQ30	head	test	alias		PFIZER INC.	Q206921	76
+Pensacola	549300Y7HMDKHDFTZ042	head	test	label		City of Pensacola, Florida	Q486306	76
+Pensacola, Florida	549300Y7HMDKHDFTZ042	head	test	alias		City of Pensacola, Florida	Q486306	76
+Pensacola, FL	549300Y7HMDKHDFTZ042	head	test	alias		City of Pensacola, Florida	Q486306	76
+Toshiba	549300LBHTST91VKHO68	head	train	label		株式会社東芝	Q49125	75
+Toshiba Corporation	549300LBHTST91VKHO68	head	train	alias		株式会社東芝	Q49125	75
+Aeroflot	253400MSLG0NS4C3NB96	head	test	label		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+PJSC Aeroflot – Russian Airlines	253400MSLG0NS4C3NB96	head	test	alias		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+PJSC Aeroflot	253400MSLG0NS4C3NB96	head	test	alias		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+Aeroflot - Russian Airlines	253400MSLG0NS4C3NB96	head	test	alias		публичное акционерное общество "Аэрофлот - российские авиалинии"	Q58707	75
+Benedictines	549300T5ENN23FXHVW63	head	test	label		Order of St. Benedict	Q131132	75
+Ryanair	635400BR2ROC1FVEBQ56	head	train	label		Ryanair Holdings Public Limited Company	Q170614	75
+Gucci	5493005M8G26W9LE2608	head	test	label		GUCCIO GUCCI S.P.A.	Q178516	75
+Guccio Gucci S.p.A.	5493005M8G26W9LE2608	head	test	alias		GUCCIO GUCCI S.P.A.	Q178516	75
+Seinäjoki	74370096NR9VM7Z2CV59	head	train	label		Seinäjoen kaupunki	Q6157	74
+Region Zealand	213800MIHXQJFJUAWV35	head	test	label		Region Sjælland	Q26589	74
+Region Sjælland	213800MIHXQJFJUAWV35	head	test	alias		Region Sjælland	Q26589	74
+Brown University	9M13ULPHBPDR83N6CB89	head	test	label		Brown University	Q49114	74
+Brown U	9M13ULPHBPDR83N6CB89	head	test	alias		Brown University	Q49114	74
+Brown	9M13ULPHBPDR83N6CB89	head	test	alias		Brown University	Q49114	74
+Kutná Hora	315700ZMTCM8U4TTV847	head	test	label		Město Kutná Hora	Q155975	74
+Kladno	315700KYZ0CZDWXZI529	head	train	label		Statutární město Kladno	Q155993	74
+Duke University	FY5ICUIRRDCHN4HHL592	head	train	label		DUKE UNIVERSITY	Q168751	74
+Delta Air Lines	Q2CCMS6R0AS67HJMBN42	head	test	label		Delta Air Lines, Inc.	Q188920	74
+Delta	Q2CCMS6R0AS67HJMBN42	head	test	alias		Delta Air Lines, Inc.	Q188920	74
+Delta Air Lines, Inc.	Q2CCMS6R0AS67HJMBN42	head	test	alias		Delta Air Lines, Inc.	Q188920	74
+Vysočina Region	315700Y5DZLBAPT7XZ15	head	test	label		Kraj Vysočina	Q190930	74
+Kraj Vysočina	315700Y5DZLBAPT7XZ15	head	test	alias		Kraj Vysočina	Q190930	74
+Alphabet Inc.	5493006MHB84DD0ZWV18	head	test	label		ALPHABET INC.	Q20800404	74
+Alphabet	5493006MHB84DD0ZWV18	head	test	alias		ALPHABET INC.	Q20800404	74
+Mercedes-Benz Group	529900R27DL06UVNT076	head	test	label		Mercedes-Benz Group AG	Q27530	73
+Daimler AG	529900R27DL06UVNT076	head	test	alias		Mercedes-Benz Group AG	Q27530	73
+Daimler-Benz	529900R27DL06UVNT076	head	test	alias		Mercedes-Benz Group AG	Q27530	73
+DaimlerChrysler	529900R27DL06UVNT076	head	test	alias		Mercedes-Benz Group AG	Q27530	73
+Asian Development Bank	549300X0MVH42CY8Q105	head	train	label		ASIAN DEVELOPMENT BANK	Q188822	73
+Norwegian Air Shuttle	549300IEUH2FEM2Y6B51	head	train	label		NORWEGIAN AIR SHUTTLE ASA	Q215392	73
+Norwegian Air Shuttle ASA	549300IEUH2FEM2Y6B51	head	train	alias		NORWEGIAN AIR SHUTTLE ASA	Q215392	73
+Norwegian	549300IEUH2FEM2Y6B51	head	train	alias		NORWEGIAN AIR SHUTTLE ASA	Q215392	73
+Uber	549300B2FTG34FILDR98	head	train	label		UBER TECHNOLOGIES, INC.	Q780442	73
+UberCab	549300B2FTG34FILDR98	head	train	alias		UBER TECHNOLOGIES, INC.	Q780442	73
+The Coca-Cola Company	UWJKFUJFZ02DKWI3RY53	head	train	label		THE COCA-COLA COMPANY	Q3295867	73
+Coca-Cola	UWJKFUJFZ02DKWI3RY53	head	train	alias		THE COCA-COLA COMPANY	Q3295867	73
+Yandex	253400QS6NB20B1EVG74	head	test	label		Общество с ограниченной ответственностью "ЯНДЕКС"	Q5281	72
+Yandex LLC	253400QS6NB20B1EVG74	head	test	alias		Общество с ограниченной ответственностью "ЯНДЕКС"	Q5281	72
+AT&T	549300Z40J86GGSTL398	head	train	label		AT&T INC.	Q35476	72
+SC Freiburg	39120045YTKQBVB0ON31	head	train	label		Sport-Club Freiburg e. V.	Q106394	72
+Sport-Club Freiburg e.V.	39120045YTKQBVB0ON31	head	train	alias		Sport-Club Freiburg e. V.	Q106394	72
+Sport Club Freiburg	39120045YTKQBVB0ON31	head	train	alias		Sport-Club Freiburg e. V.	Q106394	72
+AB Volvo	549300HGV012CNC8JD22	head	train	label		Aktiebolaget Volvo	Q163810	72
+Aktiebolaget Volvo	549300HGV012CNC8JD22	head	train	alias		Aktiebolaget Volvo	Q163810	72
+London Stock Exchange	213800D1EI4B9WTWWD28	head	test	label		LONDON STOCK EXCHANGE PLC	Q171240	72
+Moravian-Silesian Region	315700JQ4GLOLYCHUD80	head	test	label		Moravskoslezský kraj	Q190550	72
+Moravskoslezský kraj	315700JQ4GLOLYCHUD80	head	test	alias		Moravskoslezský kraj	Q190550	72
+Rochester	549300006EX3INSHXA95	head	train	label		City of Rochester, Minnesota	Q486479	72
+Rochester, Minnesota	549300006EX3INSHXA95	head	train	alias		City of Rochester, Minnesota	Q486479	72
+Baidu	254900AL64IANZYI1E02	head	train	label		BAIDU, INC.	Q14772	71
+baidu.com	254900AL64IANZYI1E02	head	train	alias		BAIDU, INC.	Q14772	71
+Baidu, Inc.	254900AL64IANZYI1E02	head	train	alias		BAIDU, INC.	Q14772	71
+Major League Soccer	5493005Z1VSYZZ2JED42	head	train	label		MAJOR LEAGUE SOCCER, L.L.C.	Q18543	71
+American Airlines	IWUQB36BXD6OWD6X4T14	head	test	label		American Airlines Group Inc.	Q32396	71
+American Airlines, Inc.	IWUQB36BXD6OWD6X4T14	head	test	alias		American Airlines Group Inc.	Q32396	71
+American Airlines Group	IWUQB36BXD6OWD6X4T14	head	test	alias		American Airlines Group Inc.	Q32396	71
+Canon Inc.	529900JH1GSC035SSP77	head	test	label		キヤノン株式会社	Q62621	71
+Canon	529900JH1GSC035SSP77	head	test	alias		キヤノン株式会社	Q62621	71
+ExxonMobil	J3WHBG0MTS7O8ZVMDC91	head	train	label		EXXON MOBIL CORPORATION	Q156238	71
+Exxon Mobil Corp.	J3WHBG0MTS7O8ZVMDC91	head	train	alias		EXXON MOBIL CORPORATION	Q156238	71
+Electronic Arts	549300O7A67PUEYKDL45	head	train	label		ELECTRONIC ARTS INC.	Q173941	71
+Electronic Arts, Inc.	549300O7A67PUEYKDL45	head	train	alias		ELECTRONIC ARTS INC.	Q173941	71
+Liberec Region	315700GUWWWSHORZNH06	head	train	label		Liberecký kraj	Q193266	71
+Liberecký kraj	315700GUWWWSHORZNH06	head	train	alias		Liberecký kraj	Q193266	71
+Clarksville	5493000GGEJLABLR8E68	head	train	label		City of Clarksville, Tennessee	Q328941	71
+Clarksville, Tennessee	5493000GGEJLABLR8E68	head	train	alias		City of Clarksville, Tennessee	Q328941	71
+Lockheed Martin	DPRBOZP0K5RM2YE8UU08	head	train	label		LOCKHEED MARTIN CORPORATION	Q7240	70
+Lockheed	DPRBOZP0K5RM2YE8UU08	head	train	alias		LOCKHEED MARTIN CORPORATION	Q7240	70
+Qantas Airways	YLXNW6TI6QSK1H8H0N82	head	test	label		QANTAS AIRWAYS LIMITED	Q32491	70
+QANTAS AIRWAYS LIMITED	YLXNW6TI6QSK1H8H0N82	head	test	alias		QANTAS AIRWAYS LIMITED	Q32491	70
+Boston University	549300M1CR2B2GU2ZU17	head	test	label		TRUSTEES OF BOSTON UNIVERSITY	Q49110	70
+Boston U	549300M1CR2B2GU2ZU17	head	test	alias		TRUSTEES OF BOSTON UNIVERSITY	Q49110	70
+Christian Social Union of Bavaria	3912009JG3JSITYOGP33	head	test	label		Christlich-Soziale Union in Bayern eingetragener Verein	Q49763	70
+Christlich-Soziale Union	3912009JG3JSITYOGP33	head	test	alias		Christlich-Soziale Union in Bayern eingetragener Verein	Q49763	70
+Deutsche Bank	7LTWFZYICNSX8D621K86	head	test	label		DEUTSCHE BANK AKTIENGESELLSCHAFT	Q66048	70
+Smithsonian Institution	549300ZJ87IUCDSX4306	head	test	label		SMITHSONIAN INSTITUTION	Q131626	70
+Most	315700IX9F0GZUJO2P21	head	test	label		Statutární město Most	Q146363	70
+ASUS	549300E2OSYSGUTTFT68	head	test	label		Asus Computer International	Q152864	70
+Jihlava	315700NRO1VQB9V8VS04	head	test	label		Statutární město Jihlava	Q183111	70
+H&M	529900O5RR7R39FRDM42	head	test	label		H & M Hennes & Mauritz AB	Q188326	70
+Hennes & Mauritz	529900O5RR7R39FRDM42	head	test	alias		H & M Hennes & Mauritz AB	Q188326	70
+H & M Hennes & Mauritz AB	529900O5RR7R39FRDM42	head	test	alias		H & M Hennes & Mauritz AB	Q188326	70
+Kouvola	743700KM515NKCCZ2D33	head	test	label		Kouvolan kaupunki	Q204382	70
+Alibaba Group	5493001NTNQJDH60PM02	head	train	label		Alibaba Group Holding Limited	Q1359568	70
+Alibaba Group Holding Limited	5493001NTNQJDH60PM02	head	train	alias		Alibaba Group Holding Limited	Q1359568	70
+ALIBABA GROUP HOLDING	5493001NTNQJDH60PM02	head	train	alias		Alibaba Group Holding Limited	Q1359568	70
+Alibaba	5493001NTNQJDH60PM02	head	train	alias		Alibaba Group Holding Limited	Q1359568	70
+Volkswagen Group	529900NNUPAGGOMPXZ31	head	train	label		VOLKSWAGEN AKTIENGESELLSCHAFT	Q156578	69
+VOLKSWAGEN AKTIENGESELLSCHAFT	529900NNUPAGGOMPXZ31	head	train	alias		VOLKSWAGEN AKTIENGESELLSCHAFT	Q156578	69
+Volkswagen	529900NNUPAGGOMPXZ31	head	train	alias		VOLKSWAGEN AKTIENGESELLSCHAFT	Q156578	69
+Puma	529900GRZ2BQY5ZM9N49	head	test	label		PUMA SE	Q157064	69
+Cisco	549300LKFJ962MZ46593	head	train	label		CISCO SYSTEMS, INC.	Q173395	69
+Cisco Systems	549300LKFJ962MZ46593	head	train	alias		CISCO SYSTEMS, INC.	Q173395	69
+Air Canada	4B4HI3CGXMBDC0G6BM51	head	train	label		AIR CANADA	Q185339	69
+Louis Vuitton	969500UCUCRLUC0YBF90	head	test	label		LOUIS VUITTON MALLETIER	Q191485	69
+Olomouc Region	315700B4P4IJX7N9QQ20	head	test	label		Olomoucký kraj	Q193307	69
+Olomoucký kraj	315700B4P4IJX7N9QQ20	head	test	alias		Olomoucký kraj	Q193307	69
+Fresno County	549300JJ6NWR5CVGI705	head	test	label		County of Fresno, California	Q271915	69
+Fresno County, California	549300JJ6NWR5CVGI705	head	test	alias		County of Fresno, California	Q271915	69
+Fresno County, CA	549300JJ6NWR5CVGI705	head	test	alias		County of Fresno, California	Q271915	69
+Neu-Ulm	391200FUHZU0RKB6SI13	head	test	label		Stadt Neu-Ulm	Q4120	68
+Anderlecht	549300Q9L8F1Y3B5W484	head	test	label		Gemeente Anderlecht	Q12886	68
+Aston Martin Lagonda	213800167WOVOK5ZC776	head	test	label		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+Aston Martin Holdings	213800167WOVOK5ZC776	head	test	alias		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+Aston Martin Lagonda Holdings plc	213800167WOVOK5ZC776	head	test	alias		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+Aston Martin	213800167WOVOK5ZC776	head	test	alias		ASTON MARTIN LAGONDA GLOBAL HOLDINGS PLC	Q27074	68
+Columbia	549300VPLMZFZSZPNV09	head	test	label		City of Columbia, Missouri	Q59670	68
+Columbia, Missouri	549300VPLMZFZSZPNV09	head	test	alias		City of Columbia, Missouri	Q59670	68
+Club Brugge K.V.	9676008V5Q1U1S8JSX89	head	train	label		CLUB BRUGGE	Q190916	68
+Club Brugge	9676008V5Q1U1S8JSX89	head	train	alias		CLUB BRUGGE	Q190916	68
+Zlín Region	315700EXYLQ9BNJ21D92	head	train	label		Zlínský kraj	Q192536	68
+Fayetteville	5493005PJCLNCCO7GU16	head	train	label		City of Fayetteville, Arkansas	Q219526	68
+Fayetteville, Arkansas	5493005PJCLNCCO7GU16	head	train	alias		City of Fayetteville, Arkansas	Q219526	68
+Fayetteville, Ark.	5493005PJCLNCCO7GU16	head	train	alias		City of Fayetteville, Arkansas	Q219526	68
+Fayetteville, AR	5493005PJCLNCCO7GU16	head	train	alias		City of Fayetteville, Arkansas	Q219526	68
+Macon	549300ZKSJB5TY1OAJ37	head	train	label		City of Macon, Georgia	Q219656	68
+Macon, Georgia	549300ZKSJB5TY1OAJ37	head	train	alias		City of Macon, Georgia	Q219656	68
+Malaysia Airlines	254900OXA1QQLTW68560	head	test	label		Malaysia Airlines Berhad	Q308952	68
+Malaysia Airlines Berhad	254900OXA1QQLTW68560	head	test	alias		Malaysia Airlines Berhad	Q308952	68
+Compton	5493008IGOHB0IDNPZ86	head	train	label		City of Compton, California	Q487119	68
+Compton, California	5493008IGOHB0IDNPZ86	head	train	alias		City of Compton, California	Q487119	68
+Compton, CA	5493008IGOHB0IDNPZ86	head	train	alias		City of Compton, California	Q487119	68
+City of Compton	5493008IGOHB0IDNPZ86	head	train	alias		City of Compton, California	Q487119	68
+University of Southern California	0GMCSQ6M60R4T46U5511	head	train	label		UNIVERSITY OF SOUTHERN CALIFORNIA	Q4614	67
+University of Southern CA	0GMCSQ6M60R4T46U5511	head	train	alias		UNIVERSITY OF SOUTHERN CALIFORNIA	Q4614	67
+Univ. of Southern California	0GMCSQ6M60R4T46U5511	head	train	alias		UNIVERSITY OF SOUTHERN CALIFORNIA	Q4614	67
+Zvolen	097900BICU0000138519	head	train	label		Mesto Zvolen	Q11874	67
+1. FSV Mainz 05	529900XP8P80S4TI7511	head	train	label		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+Mainz 05	529900XP8P80S4TI7511	head	train	alias		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+1. Fußball- und Sportverein Mainz 05 e. V.	529900XP8P80S4TI7511	head	train	alias		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+Mainz	529900XP8P80S4TI7511	head	train	alias		1. Fußball- und Sportverein Mainz 05 e.V.	Q105254	67
+National Geographic Society	549300Y716V0TJC41G95	head	test	label		NATIONAL GEOGRAPHIC SOCIETY	Q167186	67
+Prada	8156000FE0A2DC5B7852	head	train	label		PRADA S.P.A.	Q193136	67
+Prada SpA	8156000FE0A2DC5B7852	head	train	alias		PRADA S.P.A.	Q193136	67
+Kajaani	7437006XYZLOSYXUS057	head	train	label		Kajaanin kaupunki	Q193180	67
+Robert Bosch	529900F0LT5OP4SV6122	head	train	label		Robert Bosch Gesellschaft mit beschränkter Haftung	Q234021	67
+Bosch	529900F0LT5OP4SV6122	head	train	alias		Robert Bosch Gesellschaft mit beschränkter Haftung	Q234021	67
+Bloomington	5493005Q4CKD9B975C61	head	train	label		City of Bloomington, Indiana	Q490385	67
+Bloomington, Indiana	5493005Q4CKD9B975C61	head	train	alias		City of Bloomington, Indiana	Q490385	67
+Bloomington, IN	5493005Q4CKD9B975C61	head	train	alias		City of Bloomington, Indiana	Q490385	67
+Lawrence	5493004LLF0HG6XS2E46	head	train	label		City of Lawrence, Kansas	Q493840	67
+Lawrence, Kansas	5493004LLF0HG6XS2E46	head	train	alias		City of Lawrence, Kansas	Q493840	67
+Coursera	984500573CA1QB7DAC30	head	train	label		COURSERA, INC.	Q499962	67
+Nikon	549300X7LIS9RFELXJ98	head	train	label		NIKON CORPORATION	Q1218180	67
+Nikon Corporation	549300X7LIS9RFELXJ98	head	train	alias		NIKON CORPORATION	Q1218180	67
+1. FC Kaiserslautern	529900WV51JLO1QEAQ95	head	test	label		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+1. FCK	529900WV51JLO1QEAQ95	head	test	alias		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+FCK	529900WV51JLO1QEAQ95	head	test	alias		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+Kaiserslautern	529900WV51JLO1QEAQ95	head	test	alias		1. Fußball-Club Kaiserslautern e.V. (1.FCK)	Q8466	66
+Singapore Airlines	549300ZG62N2599PWR15	head	train	label		SINGAPORE AIRLINES LIMITED	Q32245	66
+Singapore Airlines Limited	549300ZG62N2599PWR15	head	train	alias		SINGAPORE AIRLINES LIMITED	Q32245	66
+Rolex	506700KOZ1A1V0IY7741	head	train	label		ROLEX SA	Q62288	66
+Rolex SA	506700KOZ1A1V0IY7741	head	train	alias		ROLEX SA	Q62288	66
+Bayer	549300J4U55H3WP1XT59	head	train	label		Bayer Aktiengesellschaft	Q152051	66
+BP	213800LH1BZH3DI6G760	head	test	label		BP P.L.C.	Q152057	66
+BP P.L.C.	213800LH1BZH3DI6G760	head	test	alias		BP P.L.C.	Q152057	66
+Kalamazoo	549300HLUQ75FKMC2544	head	train	label		City of Kalamazoo	Q167155	66
+Kokkola	743700XMLJ2M409G7C91	head	train	label		Kokkolan kaupunki	Q207891	66
+Qatar Airways	549300HDF99L84TF2D68	head	train	label		مجموعة الخطوط الجوية القطرية	Q208033	66
+University of Virginia	549300H2U5XHL1CLTN62	head	test	label		The Rector and Visitors of the University of Virginia	Q213439	66
+University of Manchester	213800L6WZJ6FSGIEJ60	head	train	label		THE UNIVERSITY OF MANCHESTER	Q230899	66
+Univ. of Manchester	213800L6WZJ6FSGIEJ60	head	train	alias		THE UNIVERSITY OF MANCHESTER	Q230899	66
+The University of Manchester	213800L6WZJ6FSGIEJ60	head	train	alias		THE UNIVERSITY OF MANCHESTER	Q230899	66
+Manchester University	213800L6WZJ6FSGIEJ60	head	train	alias		THE UNIVERSITY OF MANCHESTER	Q230899	66
+PepsiCo	FJSUNZKFNQ5YPJ5OT455	head	test	label		PepsiCo, Inc.	Q334800	66
+PepsiCo Inc.	FJSUNZKFNQ5YPJ5OT455	head	test	alias		PepsiCo, Inc.	Q334800	66
+Pepsi	FJSUNZKFNQ5YPJ5OT455	head	test	alias		PepsiCo, Inc.	Q334800	66
+Air India	335800SB4EYU1F7N9Q09	head	train	label		AIR INDIA LIMITED	Q69906	65
+Denton	549300UWEY8IKYK09T27	head	train	label		City of Denton, Texas	Q128306	65
+Denton, Texas	549300UWEY8IKYK09T27	head	train	alias		City of Denton, Texas	Q128306	65
+Unilever	549300MKFYEKVRWML317	head	train	label	549300TK7G7NZTVM1Z30	UNILEVER PLC	Q157062	65
+Transparency International	529900UJKO26NSNK9F38	head	train	label		Transparency International e.V.	Q174240	65
+The Salvation Army	5493005FGG4Y2YFTNM14	head	train	label	549300UQ1LCLSQQ6V491|549300X1SK5BYB8TRH36	THE SALVATION ARMY	Q188307	65
+Salvation Army	5493005FGG4Y2YFTNM14	head	train	alias	549300UQ1LCLSQQ6V491|549300X1SK5BYB8TRH36	THE SALVATION ARMY	Q188307	65
+Mladá Boleslav	315700TLLYER5YTZWX46	head	train	label		Statutární město Mladá Boleslav	Q191805	65
+Cheb	31570010000000119696	head	train	label		Město Cheb	Q193719	65
+Etihad Airways	DF0BVHAOM8TIXBR3S960	head	train	label		الاتحاد للطيران ش م ع	Q212304	65
+Etihad	DF0BVHAOM8TIXBR3S960	head	train	alias		الاتحاد للطيران ش م ع	Q212304	65
+Albany	549300NK188464F4WK63	head	train	label		City of Albany	Q285599	65
+Visa Inc.	549300JZ4OKEHW3DPJ59	head	test	label		VISA INC.	Q328840	65
+Visa	549300JZ4OKEHW3DPJ59	head	test	alias		VISA INC.	Q328840	65
+Saudi Aramco	5586006WD91QHB7J4X50	head	train	label		Saudi Arabian Oil Company	Q679322	65
+Saudi Arabian Oil Company	5586006WD91QHB7J4X50	head	train	alias		Saudi Arabian Oil Company	Q679322	65
+Sint-Niklaas	54930057KZX3GJRX0F98	head	test	label		STAD SINT-NIKLAAS	Q13127	64
+Uniqlo	3538001NOZ9CR8H1YZ84	head	test	label		株式会社ユニクロ	Q26070	64
+Uniqlo Co., Ltd.	3538001NOZ9CR8H1YZ84	head	test	alias		株式会社ユニクロ	Q26070	64
+Rauma	743700UT4ITWYR7QXI59	head	train	label		Rauman kaupunki	Q37013	64
+Universal Music Group	724500GJBUL3D9TW9Y18	head	test	label		Universal Music Group N.V.	Q38903	64
+Universal Music	724500GJBUL3D9TW9Y18	head	test	alias		Universal Music Group N.V.	Q38903	64
+German Football Association	391200RAHYN0X3A9IK29	head	test	label		Deutscher Fußball-Bund (DFB)	Q154191	64
+Deutscher Fußballbund	391200RAHYN0X3A9IK29	head	test	alias		Deutscher Fußball-Bund (DFB)	Q154191	64
+Deutscher Fußball-Bund	391200RAHYN0X3A9IK29	head	test	alias		Deutscher Fußball-Bund (DFB)	Q154191	64
+DFB	391200RAHYN0X3A9IK29	head	test	alias		Deutscher Fußball-Bund (DFB)	Q154191	64
+Wavre	967600E2RGFBI9Y0DO98	head	test	label		Ville de Wavre	Q181314	64
+Scandinavian Airlines	549300ZJTLE5T4SGP021	head	test	label		SAS AB	Q187854	64
+SAS	549300ZJTLE5T4SGP021	head	test	alias		SAS AB	Q187854	64
+Kemi	743700ZOH1UXDNHUPM47	head	train	label		Kemin kaupunki	Q203619	64
+Imatra	743700FAZ8CE0ETIMY46	head	test	label		Imatran kaupunki	Q211020	64
+Znojmo	31570010000000095252	head	test	label		Město Znojmo	Q214956	64
+Chanel	969500U4FNDFRFOLSW75	head	train	label		CHANEL	Q218115	64
+Levoča	315700AOR4BK71Z1H442	head	test	label		Mesto Levoča	Q242478	64
+SWIFT	HB7FFAZI0OMZ8PP8OE26	head	test	label		SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL TELECOMMUNICATION	Q257597	64
+Society for Worldwide Interbank Financial Telecommunication	HB7FFAZI0OMZ8PP8OE26	head	test	alias		SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL TELECOMMUNICATION	Q257597	64
+Lancaster	549300BGOEKNNN4HPE68	head	test	label		City of Lancaster	Q320514	64
+Miami-Dade County	549300QG0NBD9HULR263	head	test	label		Miami-Dade County, Florida	Q468557	64
+Miami-Dade County, FL	549300QG0NBD9HULR263	head	test	alias		Miami-Dade County, Florida	Q468557	64
+Miami-Dade County, Florida	549300QG0NBD9HULR263	head	test	alias		Miami-Dade County, Florida	Q468557	64
+Dade County, Florida	549300QG0NBD9HULR263	head	test	alias		Miami-Dade County, Florida	Q468557	64
+Kodak	549300P7J8F3SSMY3E81	head	train	label		Eastman Kodak Company	Q486269	64
+Savonlinna	743700F3PXEBUNALGP25	head	train	label		Savonlinnan kaupunki	Q683512	64
+RAI	815600C62B51478A5144	head	train	label		RAI - RADIOTELEVISIONE ITALIANA S.P.A.	Q19616	63
+RAI Radiotelevisione Italiana	815600C62B51478A5144	head	train	alias		RAI - RADIOTELEVISIONE ITALIANA S.P.A.	Q19616	63
+Radiotelevisione Italiana	815600C62B51478A5144	head	train	alias		RAI - RADIOTELEVISIONE ITALIANA S.P.A.	Q19616	63
+Dartmouth College	JVPL1XBV6YI9538FWQ05	head	test	label		TRUSTEES OF DARTMOUTH COLLEGE	Q49116	63
+Dartmouth	JVPL1XBV6YI9538FWQ05	head	test	alias		TRUSTEES OF DARTMOUTH COLLEGE	Q49116	63
+Livermore	549300GFYJPMDMABG210	head	train	label		City of Livermore	Q138901	63
+Reporters Without Borders	969500LN5IRG2DYB1W89	head	test	label		REPORTERS SANS FRONTIERES	Q154330	63
+Reporters sans frontieres	969500LN5IRG2DYB1W89	head	test	alias		REPORTERS SANS FRONTIERES	Q154330	63
+Stellantis North America	ZTC508ZLTU6TYD5R7A85	head	test	label		FCA US LLC	Q181114	63
+Genk	549300H700RIN1P2UJ85	head	test	label		Stad Genk	Q189692	63
+BirdLife International	213800UJ67YZUIPXLU85	head	test	label		BIRDLIFE INTERNATIONAL	Q210108	63
+Salo	7437006BVKJU6WU3BQ82	head	train	label		Salon kaupunki	Q210987	63
+Procter & Gamble	2572IBTT8CCZW6AU4141	head	train	label		THE PROCTER & GAMBLE COMPANY	Q212405	63
+Procter & Gamble Co.	2572IBTT8CCZW6AU4141	head	train	alias		THE PROCTER & GAMBLE COMPANY	Q212405	63
+Binghamton	5493006D246GNK3OOC75	head	test	label		Binghamton, New York	Q213814	63
+Binghamton, New York	5493006D246GNK3OOC75	head	test	alias		Binghamton, New York	Q213814	63
+Victorville	5493001GUXT5JHO1TA78	head	train	label		City of Victorville, California	Q495353	63
+Victorville, California	5493001GUXT5JHO1TA78	head	train	alias		City of Victorville, California	Q495353	63
+Victorville, CA	5493001GUXT5JHO1TA78	head	train	alias		City of Victorville, California	Q495353	63
+SAP	529900D6BF99LW9R2E68	head	train	label		SAP SE	Q552581	63
+SAP SE	529900D6BF99LW9R2E68	head	train	alias		SAP SE	Q552581	63
+Jack in the Box	5493002OJW26P0SUUP68	head	test	label		JACK IN THE BOX INC.	Q1538507	63
+Dendermonde	549300LW31K07NLB7A06	head	train	label		Stad Dendermonde	Q13122	62
+Maserati	549300SS011RI430KA43	head	train	label		MASERATI S.P.A.	Q35962	62
+Embraer	549300EM51WYXFHUY333	head	train	label		EMBRAER S.A.	Q105557	62
+Embraer S.A.	549300EM51WYXFHUY333	head	train	alias		EMBRAER S.A.	Q105557	62
+Wichita Falls	549300NTFETNSK7HXG80	head	test	label		City of Wichita Falls, Texas	Q128349	62
+Wichita Falls, Texas	549300NTFETNSK7HXG80	head	test	alias		City of Wichita Falls, Texas	Q128349	62
+Michelin	549300SOSI58J6VIW052	head	test	label	549300U45EBW2GJV2X93	COMPAGNIE GENERALE DES ETABLISSEMENTS MICHELIN	Q151107	62
+HSBC	MLU0ZO3ML4LN2LL2TL39	head	train	label		HSBC HOLDINGS PLC	Q190464	62
+HSBC Holdings plc	MLU0ZO3ML4LN2LL2TL39	head	train	alias		HSBC HOLDINGS PLC	Q190464	62
+Academy of Motion Picture Arts and Sciences	5493004JUQM74J85V756	head	test	label		Academy of Motion Picture Arts and Sciences	Q212329	62
+Japan Airlines	3538002MH5L1QZZ93477	head	train	label		日本航空株式会社	Q213140	62
+Mastercard	AR5L2ODV9HN37376R084	head	test	label		MASTERCARD INCORPORATED	Q489921	62
+MasterCard Incorporated	AR5L2ODV9HN37376R084	head	test	alias		MASTERCARD INCORPORATED	Q489921	62
+Wilmington	549300Y5IY4G3QB69428	head	test	label		City of Wilmington, North Carolina	Q659400	62
+Wilmington, North Carolina	549300Y5IY4G3QB69428	head	test	alias		City of Wilmington, North Carolina	Q659400	62
+Bowling Green	54930080VGM7PSGOKL96	head	test	label		City of Bowling Green, Kentucky	Q694545	62
+Bowling Green, Kentucky	54930080VGM7PSGOKL96	head	test	alias		City of Bowling Green, Kentucky	Q694545	62
+Sony Music	549300G0VTDMY8H0RM04	head	train	label		SONY MUSIC ENTERTAINMENT	Q56760250	62
+Sony Music Entertainment	549300G0VTDMY8H0RM04	head	train	alias		SONY MUSIC ENTERTAINMENT	Q56760250	62
+Mitsubishi Motors	5299006ZTN6MO1N5BR16	head	train	label		三菱自動車工業株式会社	Q36033	61
+Mitsubishi Motors Corporation	5299006ZTN6MO1N5BR16	head	train	alias		三菱自動車工業株式会社	Q36033	61
+Ericsson	549300W9JLPW15XIFM52	head	test	label		Telefonaktiebolaget LM Ericsson	Q52618	61
+LM Ericsson	549300W9JLPW15XIFM52	head	test	alias		Telefonaktiebolaget LM Ericsson	Q52618	61
+Telefonaktiebolaget L. M. Ericsson	549300W9JLPW15XIFM52	head	test	alias		Telefonaktiebolaget LM Ericsson	Q52618	61
+Vodafone	213800TB53ELEUKM7Q61	head	test	label		VODAFONE GROUP PUBLIC LIMITED COMPANY	Q122141	61
+Vodafone Group	213800TB53ELEUKM7Q61	head	test	alias		VODAFONE GROUP PUBLIC LIMITED COMPANY	Q122141	61
+Odessa	5493009W8JN2B6ZDRY14	head	test	label		City of Odessa, Texas	Q128361	61
+Odessa, Texas	5493009W8JN2B6ZDRY14	head	test	alias		City of Odessa, Texas	Q128361	61
+Chomutov	315700DU494AM9SSDS07	head	test	label		Statutární město Chomutov	Q146356	61
+easyJet	2138001S47XKWIB7TH90	head	test	label		EASYJET PLC	Q191551	61
+easyJet plc	2138001S47XKWIB7TH90	head	test	alias		EASYJET PLC	Q191551	61
+Kuusamo	743700ZLFJ0KRKHW4G13	head	train	label		Kuusamon kaupunki	Q207999	61
+Acer	2549006Z3IVAZIQEUM25	head	test	label		宏碁股份有限公司	Q481778	61
+Deutsche Bahn	52990063S23N13HU4E98	head	train	label		Deutsche Bahn Aktiengesellschaft	Q9322	60
+Harris County	549300G9BRP25M0W1S40	head	train	label		Harris County, Texas	Q26676	60
+Harris County, Texas	549300G9BRP25M0W1S40	head	train	alias		Harris County, Texas	Q26676	60
+Bentley	529900XV3G9LB0F1P877	head	test	label		BENTLEY MOTORS LIMITED	Q27224	60
+Bentley Motors	529900XV3G9LB0F1P877	head	test	alias		BENTLEY MOTORS LIMITED	Q27224	60
+Hitachi	549300T6IPOCDWLKC615	head	test	label		株式会社 日立製作所	Q53238	60
+Hitachi, Ltd.	549300T6IPOCDWLKC615	head	test	alias		株式会社 日立製作所	Q53238	60
+Goethe-Institut	984500D3CB449HB54090	head	test	label		Goethe-Institut e.V.	Q157033	60
+Kroměříž	31570019E5Z65CCNM110	head	train	label		Město Kroměříž	Q158239	60
+French Academy of Sciences	969500GR6V0LG92UGZ66	head	test	label		ACADEMIE DES SCIENCES	Q188771	60
+Academie des sciences	969500GR6V0LG92UGZ66	head	test	alias		ACADEMIE DES SCIENCES	Q188771	60
+International Bank for Reconstruction and Development	ZTMSNXROF84AHWJNKQ93	head	train	label		International Bank for Reconstruction and Development	Q191384	60
+Yuba County	5493002V7TE6BY580T72	head	test	label		County of Yuba	Q196014	60
+Lacoste	9695002KTQF3TYU8CP18	head	test	label		LACOSTE	Q309031	60
+Chevron Corporation	VA8TZDWPEZYU430RZ444	head	test	label		Chevron U.S.A. Inc.	Q319642	60
+Red Hat	08C2IQ0VM1B2PBTVHC56	head	train	label		RED HAT, LLC	Q485593	60
+Bank of America	9DJT3UXIJIZJI4WXO774	head	test	label		BANK OF AMERICA CORPORATION	Q487907	60
+BANK OF AMERICA CORPORATION	9DJT3UXIJIZJI4WXO774	head	test	alias		BANK OF AMERICA CORPORATION	Q487907	60
+El Monte	549300079T82S1QZWG33	head	test	label		City of El Monte	Q595550	60
+Monte	549300079T82S1QZWG33	head	test	alias		City of El Monte	Q595550	60
+Versace	815600B71B502C1D2488	head	train	label		GIANNI VERSACE S.R.L.	Q696376	60
+Gianni Versace	815600B71B502C1D2488	head	train	alias		GIANNI VERSACE S.R.L.	Q696376	60
+Nanyang Technological University	549300NYFBZNS57ZX444	head	test	label		NANYANG TECHNOLOGICAL UNIVERSITY	Q721064	60
+Jakobstad	743700OBIKTL9F58FF89	head	test	label		Jakobstads stad	Q1679567	60
+BASF	529900A9NIYR2QY8GP86	head	test	label	529900PM64WH8AF1E917	BASF PUBLIC LIMITED COMPANY	Q9401	59
+BASF SE	529900A9NIYR2QY8GP86	head	test	alias	529900PM64WH8AF1E917	BASF PUBLIC LIMITED COMPANY	Q9401	59
+KAA Gent	549300E0STT1BVBD6W11	head	train	label		KONINKLIJKE ATHLETIEK ASSOCIATIE GENT CVBA	Q18232	59
+Gent	549300E0STT1BVBD6W11	head	train	alias		KONINKLIJKE ATHLETIEK ASSOCIATIE GENT CVBA	Q18232	59
+Samsung Electronics	9884007ER46L6N7EI764	head	test	label		삼성전자(주)	Q20718	59
+Samsung Electronics Co., Ltd.	9884007ER46L6N7EI764	head	test	alias		삼성전자(주)	Q20718	59
+Samsung Electronics Co.	9884007ER46L6N7EI764	head	test	alias		삼성전자(주)	Q20718	59
+Samsung	9884007ER46L6N7EI764	head	test	alias		삼성전자(주)	Q20718	59
+Air China	213800I9TWC9K22N4502	head	test	label		中国国际航空股份有限公司	Q51747	59
+Air China Limited	213800I9TWC9K22N4502	head	test	alias		中国国际航空股份有限公司	Q51747	59
+Florence	549300U6PDJOR04RQM47	head	train	label		City of Florence, Alabama	Q79743	59
+Florence, Alabama	549300U6PDJOR04RQM47	head	train	alias		City of Florence, Alabama	Q79743	59
+Florence, AL	549300U6PDJOR04RQM47	head	train	alias		City of Florence, Alabama	Q79743	59
+Freie Universität Berlin	391200IH5QZH0N8QDI30	head	test	label		Freie Universität Berlin	Q153006	59
+L'Oréal	529900JI1GG6F7RKVI53	head	test	label		L'OREAL	Q156077	59
+WarnerMedia	5493004RSX004WU3UT62	head	test	label	KNG3XRAA0RHN9H62OK76	WARNER MEDIA, LLC	Q191715	59
+Goldman Sachs	784F5XWPLTWKTBV3E584	head	train	label		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+The Goldman Sachs Group, Inc.	784F5XWPLTWKTBV3E584	head	train	alias		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+The Goldman Sachs Group	784F5XWPLTWKTBV3E584	head	train	alias		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+Goldman	784F5XWPLTWKTBV3E584	head	train	alias		THE GOLDMAN SACHS GROUP, INC.	Q193326	59
+Tábor	3157002GKG4P58VK7Z86	head	test	label		Město Tábor	Q193721	59
+Seraing	894500ZHTICMVT1APD53	head	test	label		Ville de Seraing	Q194037	59
+Finnair	213800SB6EOB8SSK9W63	head	train	label		FINNAIR OYJ	Q201821	59
+Finnair Plc	213800SB6EOB8SSK9W63	head	train	alias		FINNAIR OYJ	Q201821	59
+Finnair Oyj	213800SB6EOB8SSK9W63	head	train	alias		FINNAIR OYJ	Q201821	59
+FIN	213800SB6EOB8SSK9W63	head	train	alias		FINNAIR OYJ	Q201821	59
+American Museum of Natural History	549300B053XB1DI40R02	head	train	label		The American Museum of Natural History	Q217717	59
+New York Public Library	549300UUPLEIDLHTTI88	head	train	label		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+The New York Public Library	549300UUPLEIDLHTTI88	head	train	alias		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+New York Public Library, Astor, Lenox and Tilden Foundations	549300UUPLEIDLHTTI88	head	train	alias		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+New York Library	549300UUPLEIDLHTTI88	head	train	alias		The New York Public Library Astor Lenox and Tilden Foundations	Q219555	59
+Victoria’s Secret	5493006T3O70U3UWVF17	head	test	label		VICTORIA'S SECRET & CO.	Q332477	59
+Hermès	969500Y4IJGHJE2MTJ13	head	train	label		HERMES INTERNATIONAL	Q843887	59
+Hermès International	969500Y4IJGHJE2MTJ13	head	train	alias		HERMES INTERNATIONAL	Q843887	59
+Tencent	254900N4SLUMW4XUYY11	head	test	label		騰訊控股有限公司	Q860580	59
+Tencent Holdings Limited	254900N4SLUMW4XUYY11	head	test	alias		騰訊控股有限公司	Q860580	59
+Tencent Holdings	254900N4SLUMW4XUYY11	head	test	alias		騰訊控股有限公司	Q860580	59
+Konami	353800FC4A5QCMIZFV94	head	test	label		コナミグループ株式会社	Q45700	58
+St. George	5493000P9OIY2JDS4K57	head	train	label		City of St. George, Utah	Q52472	58
+St. George, Utah	5493000P9OIY2JDS4K57	head	train	alias		City of St. George, Utah	Q52472	58
+St. George, UT	5493000P9OIY2JDS4K57	head	train	alias		City of St. George, Utah	Q52472	58
+Sharp Corporation	353800YEPK9PD7QO3449	head	train	label		シャープ株式会社	Q53227	58
+Sharp	353800YEPK9PD7QO3449	head	train	alias		シャープ株式会社	Q53227	58
+Nassau County	549300ICRCGQYCPS7T40	head	train	label		County of Nassau, New York	Q54064	58
+Nassau County, New York	549300ICRCGQYCPS7T40	head	train	alias		County of Nassau, New York	Q54064	58
+County of Nassau	549300ICRCGQYCPS7T40	head	train	alias		County of Nassau, New York	Q54064	58
+Travis County	549300HEC6MNL5465K30	head	train	label		Travis County, Texas	Q110426	58
+Travis County, Texas	549300HEC6MNL5465K30	head	train	alias		Travis County, Texas	Q110426	58
+TSV 1860 München	3912007RN9W1VC3JW349	head	test	label		Turn- und Sportverein München von 1860 e.V.	Q131603	58
+Williams Racing	213800H929CQNFTCJL47	head	test	label		WILLIAMS GRAND PRIX ENGINEERING LIMITED	Q171337	58
+Williams Grand Prix Engineering Limited	213800H929CQNFTCJL47	head	test	alias		WILLIAMS GRAND PRIX ENGINEERING LIMITED	Q171337	58
+Williams	213800H929CQNFTCJL47	head	test	alias		WILLIAMS GRAND PRIX ENGINEERING LIMITED	Q171337	58
+University of Notre Dame	XV74408A6JGDG5126L34	head	train	label		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+University of Notre Dame du Lac	XV74408A6JGDG5126L34	head	train	alias		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+Notre Dame University	XV74408A6JGDG5126L34	head	train	alias		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+Notre Dame	XV74408A6JGDG5126L34	head	train	alias		UNIVERSITY OF NOTRE DAME DU LAC	Q178848	58
+SEAT	529900C2P7V7P1UGVX95	head	test	label		SEAT SA	Q188217	58
+SEAT, S.A.	529900C2P7V7P1UGVX95	head	test	alias		SEAT SA	Q188217	58
+Yamaha	529900S5TENP3IJS7S02	head	test	label		ヤマハ株式会社	Q188454	58
+JPMorgan Chase	8I5DZWZKVSZI1NUHU748	head	train	label		JPMORGAN CHASE & CO.	Q192314	58
+Czech Airlines	315700DWVMDKYOLEJM60	head	test	label		České aerolinie a.s.	Q192653	58
+České aerolinie	315700DWVMDKYOLEJM60	head	test	alias		České aerolinie a.s.	Q192653	58
+Roeselare	5493001UXAV0NJFMZ784	head	train	label		Stad Roeselare	Q211037	58
+Tornio	7437004S2D1KK5LKO953	head	test	label		Tornion kaupunki	Q214021	58
+Lohja	743700ODOY69ZNUHQZ85	head	train	label		Lohjan kaupunki	Q214777	58
+University of Birmingham	213800WF1GQRWZJL1J53	head	test	label		THE UNIVERSITY OF BIRMINGHAM	Q223429	58
+University of Pittsburgh	5493002C83QSGL8ETT42	head	test	label		UNIVERSITY OF PITTSBURGH-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUCATION	Q235034	58
+Pittsburgh University	5493002C83QSGL8ETT42	head	test	alias		UNIVERSITY OF PITTSBURGH-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUCATION	Q235034	58
+pitt.edu	5493002C83QSGL8ETT42	head	test	alias		UNIVERSITY OF PITTSBURGH-OF THE COMMONWEALTH SYSTEM OF HIGHER EDUCATION	Q235034	58
+Aberdeen	549300LHNF1SW0BKRS05	head	train	label		City of Aberdeen, South Dakota	Q236713	58
+Aberdeen, South Dakota	549300LHNF1SW0BKRS05	head	train	alias		City of Aberdeen, South Dakota	Q236713	58
+Georgetown University	549300GCL3B0KVXSX752	head	test	label		GEORGETOWN UNIVERSITY (THE)	Q333886	58
+DreamWorks Animation	549300UU8WEFIA03J487	head	train	label		DreamWorks Animation SKG, Inc.	Q500088	58
+DreamWorks Animation SKG, Inc.	549300UU8WEFIA03J487	head	train	alias		DreamWorks Animation SKG, Inc.	Q500088	58
+National Library of the Czech Republic	315700XYK5270GOLF955	head	train	label		Národní knihovna České republiky	Q1967876	58
+Národní Knihovna Ceské Republiky	315700XYK5270GOLF955	head	train	alias		Národní knihovna České republiky	Q1967876	58
+Czech National Library	315700XYK5270GOLF955	head	train	alias		Národní knihovna České republiky	Q1967876	58
+Lier	549300CGC3COFYOZLO68	head	test	label		Stad Lier	Q12460	57
+Capcom	529900JJWQKXS3TC8744	head	test	label		株式会社カプコン	Q14428	57
+Capcom Co., Ltd.	529900JJWQKXS3TC8744	head	test	alias		株式会社カプコン	Q14428	57
+Cathay Pacific	EQNZNT235RBOJ6LJQZ02	head	train	label		CATHAY PACIFIC AIRWAYS LIMITED	Q32141	57
+Cathay	EQNZNT235RBOJ6LJQZ02	head	train	alias		CATHAY PACIFIC AIRWAYS LIMITED	Q32141	57
+Jablonec nad Nisou	315700BPNRGLJ2NPW978	head	train	label		Statutární město Jablonec nad Nisou	Q147607	57
+Lidl	529900EW0ZH7KAZ11H71	head	test	label	529900NLMRZXPZYU1D43	Lidl Stiftung & Co. KG	Q151954	57
+Lidl Dienstleistung GmbH & Co. KG	529900EW0ZH7KAZ11H71	head	test	alias	529900NLMRZXPZYU1D43	Lidl Stiftung & Co. KG	Q151954	57
+All Nippon Airways	5493006HTHC5ZN0POY11	head	train	label		全日本空輸株式会社	Q204284	57
+All Nippon Airways Co.	5493006HTHC5ZN0POY11	head	train	alias		全日本空輸株式会社	Q204284	57
+Murfreesboro	5493004HW7N2IUAQK610	head	test	label		City of Murfreesboro, Tennessee	Q501766	57
+Murfreesboro, Tennessee	5493004HW7N2IUAQK610	head	test	alias		City of Murfreesboro, Tennessee	Q501766	57
+Domino's Pizza	25490005ZWM1IF9UXU57	head	train	label		Domino's Pizza, Inc.	Q839466	57
+Domino's Pizza, Inc.	25490005ZWM1IF9UXU57	head	train	alias		Domino's Pizza, Inc.	Q839466	57
+Domino's	25490005ZWM1IF9UXU57	head	train	alias		Domino's Pizza, Inc.	Q839466	57
+Warren	54930023GSEZ3M8MHE57	head	test	label		City of Warren, Ohio	Q862733	57
+Warren, Ohio	54930023GSEZ3M8MHE57	head	test	alias		City of Warren, Ohio	Q862733	57
+Warren, OH	54930023GSEZ3M8MHE57	head	test	alias		City of Warren, Ohio	Q862733	57
+Aldi	5299005KDININGAXCV64	head	train	label		ALDI INC.	Q125054	56
+Richardson	549300YMK2Z7UGNHHQ13	head	train	label		City of Richardson	Q128375	56
+Lancaster County	549300W9YR5FSCHLO756	head	test	label		County of Lancaster, Pennsylvania	Q142369	56
+Lancaster County, Pennsylvania	549300W9YR5FSCHLO756	head	test	alias		County of Lancaster, Pennsylvania	Q142369	56
+Tongeren	9676009GV2J8XQTZ5T60	head	train	label		stad Tongeren-Borgloon	Q190113	56
+UBS	549300SZJ9VS8SGXAN81	head	test	label	BFM8T61CT2L1QCEMIK50	UBS Group AG	Q193199	56
+UBS Group AG	549300SZJ9VS8SGXAN81	head	test	alias	BFM8T61CT2L1QCEMIK50	UBS Group AG	Q193199	56
+UBS AG	549300SZJ9VS8SGXAN81	head	test	alias	BFM8T61CT2L1QCEMIK50	UBS Group AG	Q193199	56
+Wayne County	549300CSQIJYQ8CCLN32	head	test	label		Charter County of Wayne, Michigan	Q195664	56
+Wayne County, Michigan	549300CSQIJYQ8CCLN32	head	test	alias		Charter County of Wayne, Michigan	Q195664	56
+Wayne County, MI	549300CSQIJYQ8CCLN32	head	test	alias		Charter County of Wayne, Michigan	Q195664	56
+Uusikaupunki	743700NTXMBNWCJEPK54	head	test	label		Uudenkaupungin kaupunki	Q207295	56
+Casio	353800JRMIABSXKHV344	head	test	label		カシオ計算機株式会社	Q217338	56
+Casio Computer Co., Ltd.	353800JRMIABSXKHV344	head	test	alias		カシオ計算機株式会社	Q217338	56
+BlackRock	549300LRIF3NWCU26A80	head	train	label		BlackRock Finance, Inc.	Q219635	56
+BlackRock, Inc.	549300LRIF3NWCU26A80	head	train	alias		BlackRock Finance, Inc.	Q219635	56
+Scania	52990000AKKX75BMWB43	head	train	label		SCANIA Aktiebolag	Q219960	56
+Ohio State University	JFC10ZULKO4X2E3HBY86	head	test	label		The Ohio State University	Q309331	56
+The Ohio State University	JFC10ZULKO4X2E3HBY86	head	test	alias		The Ohio State University	Q309331	56
+Northwestern University	OBWWNZE695DUK77DTI34	head	test	label		Northwestern University	Q309350	56
+Northwestern	OBWWNZE695DUK77DTI34	head	test	alias		Northwestern University	Q309350	56
+Hanford	5493006US0WIKA2ZFR72	head	test	label		City of Hanford, California	Q375185	56
+Hanford, California	5493006US0WIKA2ZFR72	head	test	alias		City of Hanford, California	Q375185	56
+Hanford, CA	5493006US0WIKA2ZFR72	head	test	alias		City of Hanford, California	Q375185	56
+University of Bristol	213800WYJCQNAQ57Y563	head	test	label		UNIVERSITY OF BRISTOL	Q459506	56
+Univ. of Bristol	213800WYJCQNAQ57Y563	head	test	alias		UNIVERSITY OF BRISTOL	Q459506	56
+Bristol Uni	213800WYJCQNAQ57Y563	head	test	alias		UNIVERSITY OF BRISTOL	Q459506	56
+Bristol University	213800WYJCQNAQ57Y563	head	test	alias		UNIVERSITY OF BRISTOL	Q459506	56
+Tesco	2138002P5RNKC5W2JZ46	head	test	label		TESCO PLC	Q487494	56
+Tesco PLC	2138002P5RNKC5W2JZ46	head	test	alias		TESCO PLC	Q487494	56
+Christian Dior	969500WESYQMQ1F2C272	head	train	label		CHRISTIAN DIOR	Q542767	56
+Dior	969500WESYQMQ1F2C272	head	train	alias		CHRISTIAN DIOR	Q542767	56
+Qualcomm	H1J8DDZKZP6H7RWC0H53	head	train	label		QUALCOMM INCORPORATED	Q544847	56
+Qualcomm Incorporated	H1J8DDZKZP6H7RWC0H53	head	train	alias		QUALCOMM INCORPORATED	Q544847	56
+College Station	549300WXG8KHQYZVXU58	head	test	label		The City of College Station, Texas, a home-rule municipal corporation	Q695511	56
+College Station, Texas	549300WXG8KHQYZVXU58	head	test	alias		The City of College Station, Texas, a home-rule municipal corporation	Q695511	56
+Redondo Beach	549300NTFQYBTO0BEL32	head	test	label		City of Redondo Beach	Q840678	56
+Hamilton	549300NCXYTNZWHRP508	head	train	label		City of Hamilton, Ohio	Q852673	56
+Hamilton, OH	549300NCXYTNZWHRP508	head	train	alias		City of Hamilton, Ohio	Q852673	56
+Hamilton, Ohio	549300NCXYTNZWHRP508	head	train	alias		City of Hamilton, Ohio	Q852673	56
+Newton	5493002K4RYNFEPKGB67	head	train	label		City of Newton	Q49196	55
+Calhoun County	5493007SRFJCLEW66362	head	test	label		Calhoun County, Alabama	Q108856	55
+Calhoun County, Alabama	5493007SRFJCLEW66362	head	test	alias		Calhoun County, Alabama	Q108856	55
+Calhoun County, AL	5493007SRFJCLEW66362	head	test	alias		Calhoun County, Alabama	Q108856	55
+Rotary International	549300WT0WF1MQJYEH75	head	train	label		ROTARY INTERNATIONAL	Q109179	55
+Bergen County	549300SC7R4EFIYK0S67	head	test	label		County of Bergen	Q112915	55
+Douglas County	549300JO4PQGD5ZFAB64	head	train	label		Douglas County, Colorado	Q115556	55
+Douglas County, Colorado	549300JO4PQGD5ZFAB64	head	train	alias		Douglas County, Colorado	Q115556	55
+Douglas County, CO	549300JO4PQGD5ZFAB64	head	train	alias		Douglas County, Colorado	Q115556	55
+Alitalia	815600DF4A51BF6EF729	head	test	label		ALITALIA - SOCIETA' AEREA ITALIANA S.P.A.	Q153975	55
+Alitalia Società Aerea Italiana SpA	815600DF4A51BF6EF729	head	test	alias		ALITALIA - SOCIETA' AEREA ITALIANA S.P.A.	Q153975	55
+Alitalia – Società Aerea Italiana	815600DF4A51BF6EF729	head	test	alias		ALITALIA - SOCIETA' AEREA ITALIANA S.P.A.	Q153975	55
+National Institute of Statistics and Economic Studies	969500Q2MA9VBQ8BG884	head	train	label		INSTITUT NATIONAL DE LA STATISTIQUE ET DES ETUDES ECONOMIQUES	Q156616	55
+American National Standards Institute	54930080VVD2WJR53S85	head	test	label		American National Standards Institute, Incorporated	Q180003	55
+Carnegie Mellon University	549300HFNIY8E46TMN72	head	test	label		Carnegie Mellon University	Q190080	55
+Carnegie Mellon	549300HFNIY8E46TMN72	head	test	alias		Carnegie Mellon University	Q190080	55
+Norwegian Broadcasting Corporation	5493007PY0G5L3Q8W540	head	test	label		NORSK RIKSKRINGKASTING AS	Q190238	55
+Norsk Rikskringkasting	5493007PY0G5L3Q8W540	head	test	alias		NORSK RIKSKRINGKASTING AS	Q190238	55
+American Express	R4PP93JZOLY261QX3811	head	train	label		AMERICAN EXPRESS COMPANY	Q194360	55
+American Express Co	R4PP93JZOLY261QX3811	head	train	alias		AMERICAN EXPRESS COMPANY	Q194360	55
+GSK	5493000HZTVUYLO1D793	head	train	label		GSK PLC	Q212322	55
+GlaxoSmithKline plc	5493000HZTVUYLO1D793	head	train	alias		GSK PLC	Q212322	55
+GlaxoSmithKline	5493000HZTVUYLO1D793	head	train	alias		GSK PLC	Q212322	55
+GSK plc	5493000HZTVUYLO1D793	head	train	alias		GSK PLC	Q212322	55
+PBS	549300M8EIV60LUSXW05	head	train	label		Public Broadcasting Service	Q215616	55
+Public Broadcasting Service	549300M8EIV60LUSXW05	head	train	alias		Public Broadcasting Service	Q215616	55
+Hanko	743700IZ5TZGRYICKS79	head	test	label		Hangon kaupunki	Q216790	55
+Hangö	743700IZ5TZGRYICKS79	head	test	alias		Hangon kaupunki	Q216790	55
+China Eastern Airlines	3003000KIOQE39Q7Y685	head	train	label		中国东方航空股份有限公司	Q291796	55
+China Eastern	3003000KIOQE39Q7Y685	head	train	alias		中国东方航空股份有限公司	Q291796	55
+Mělník	315700R7MR03VJOXIG68	head	train	label		Město Mělník	Q320939	55
+Valkeakoski	7437008D85CVVHSQNA35	head	train	label		Valkeakosken kaupunki	Q322126	55
+Air Liquide	969500MMPQVHK671GT54	head	train	label		L'AIR LIQUIDE SOCIETE ANONYME POUR L'ETUDE ET L'EXPLOITATION DES PROCEDES GEORGES CLAUDE	Q407448	55
+Berks County	549300IPNC1J7IUNQB95	head	train	label		COUNTY OF BERKS, PENNSYLVANIA	Q490920	55
+Berks County, Pennsylvania	549300IPNC1J7IUNQB95	head	train	alias		COUNTY OF BERKS, PENNSYLVANIA	Q490920	55
+Kitee	743700ZLZABSLJNNGS96	head	train	label		Kiteen kaupunki	Q491603	55
+LVMH	IOG4E947OATN0KJYSD45	head	test	label		LVMH MOET HENNESSY LOUIS VUITTON	Q504998	55
+LVMH Moët Hennessy Louis Vuitton	IOG4E947OATN0KJYSD45	head	test	alias		LVMH MOET HENNESSY LOUIS VUITTON	Q504998	55
+Louis Vuitton Moët Hennessy	IOG4E947OATN0KJYSD45	head	test	alias		LVMH MOET HENNESSY LOUIS VUITTON	Q504998	55
+Washington County	54930082U8LWBDMHXX31	head	test	label		Washington County, Maryland	Q511164	55
+Washington County, Maryland	54930082U8LWBDMHXX31	head	test	alias		Washington County, Maryland	Q511164	55
+Nurmijärvi	743700STRLZUD2DX3I49	head	test	label		Nurmijärven kunta	Q597156	55
+AstraZeneca	PY6ZZQWO2IZFZC3IOL08	head	train	label		ASTRAZENECA PLC	Q731938	55
+AstraZeneca plc.	PY6ZZQWO2IZFZC3IOL08	head	train	alias		ASTRAZENECA PLC	Q731938	55
+Iisalmi	743700NUJS8IZFKSPU60	head	test	label		Iisalmen kaupunki	Q748533	55
+Elmira	5493006ZFXLMU5H8ZE65	head	test	label		City of Elmira	Q934135	55
+Société nationale des chemins de fer français	969500A4MXJ3ESPHK698	head	test	label		SOCIETE NATIONALE SNCF	Q13646	54
+Albany County	549300GBQON0LOLHN826	head	train	label		County of Albany, New York	Q108408	54
+Albany County, New York	549300GBQON0LOLHN826	head	train	alias		County of Albany, New York	Q108408	54
+Kongsberg	5967007LIEEXZXI31S67	head	train	label		KONGSBERG KOMMUNE	Q108988	54
+Carlsberg Group	5299001O0WJQYB5GYZ19	head	test	label		CARLSBERG A/S	Q113215	54
+Carlsberg	5299001O0WJQYB5GYZ19	head	test	alias		CARLSBERG A/S	Q113215	54
+Xerox	4KF48RN45X1OO8UBLY20	head	test	label		XEROX CORPORATION	Q152433	54
+Haloid Xerox	4KF48RN45X1OO8UBLY20	head	test	alias		XEROX CORPORATION	Q152433	54
+Haloid	4KF48RN45X1OO8UBLY20	head	test	alias		XEROX CORPORATION	Q152433	54
+1. FC Heidenheim 1846	52990026RCKUMY3BKU91	head	train	label		1. Fußballclub Heidenheim 1846 e.V.	Q162251	54
+Heidenheim	52990026RCKUMY3BKU91	head	train	alias		1. Fußballclub Heidenheim 1846 e.V.	Q162251	54
+Texas Instruments	WDJNR2L6D8RWOEB8T652	head	train	label		TEXAS INSTRUMENTS INCORPORATED	Q193412	54
+Texas Instruments Incorporated	WDJNR2L6D8RWOEB8T652	head	train	alias		TEXAS INSTRUMENTS INCORPORATED	Q193412	54
+Texas Instruments Inc.	WDJNR2L6D8RWOEB8T652	head	train	alias		TEXAS INSTRUMENTS INCORPORATED	Q193412	54
+Volvo Cars	5299000EAMGGBEYP7J33	head	train	label		Volvo Car AB	Q215293	54
+Volvo Car AB	5299000EAMGGBEYP7J33	head	train	alias		Volvo Car AB	Q215293	54
+Volvo	5299000EAMGGBEYP7J33	head	train	alias		Volvo Car AB	Q215293	54
+Tokyo Stock Exchange	353800279ADEFGKNTV65	head	test	label		株式会社東京証券取引所	Q217475	54
+Tokyo Stock Exchange, Inc.	353800279ADEFGKNTV65	head	test	alias		株式会社東京証券取引所	Q217475	54
+Berkshire Hathaway	5493000C01ZX7D35SD85	head	test	label		BERKSHIRE HATHAWAY INC.	Q217583	54
+Berkshire Hathaway Inc.	5493000C01ZX7D35SD85	head	test	alias		BERKSHIRE HATHAWAY INC.	Q217583	54
+Barclays	213800LBQA1Y9L22JB70	head	train	label	G5GSEF7VJP5I7OUK5573	BARCLAYS PLC	Q245343	54
+Barclays PLC	213800LBQA1Y9L22JB70	head	train	alias	G5GSEF7VJP5I7OUK5573	BARCLAYS PLC	Q245343	54
+Barclays Bank	213800LBQA1Y9L22JB70	head	train	alias	G5GSEF7VJP5I7OUK5573	BARCLAYS PLC	Q245343	54
+Přerov	315700FEMK0RBL443B74	head	test	label		Statutární město Přerov	Q470380	54
+Brøndby Municipality	213800ALYXAQYSX2KG52	head	train	label		BRØNDBY KOMMUNE	Q484038	54
+Brøndby	213800ALYXAQYSX2KG52	head	train	alias		BRØNDBY KOMMUNE	Q484038	54
+DeKalb County	54930077BXREPE6WKC96	head	test	label		DeKalb County, Georgia	Q486398	54
+DeKalb County, Georgia	54930077BXREPE6WKC96	head	test	alias		DeKalb County, Georgia	Q486398	54
+York County	549300PBUZSC8WBS4164	head	test	label		County of York	Q490914	54
+Fayette County	549300JJO5KFS7O78098	head	test	label		Fayette County, Georgia	Q501115	54
+Fayette County, Georgia	549300JJO5KFS7O78098	head	test	alias		Fayette County, Georgia	Q501115	54
+University of Florida	5493005A0XI30EPYKX76	head	test	label		University of Florida Foundation, Inc.	Q501758	54
+Southwest Airlines	UDTZ87G0STFETI6HGH41	head	test	label		SOUTHWEST AIRLINES CO.	Q503308	54
+Southwest Airlines Co.	UDTZ87G0STFETI6HGH41	head	test	alias		SOUTHWEST AIRLINES CO.	Q503308	54
+Southwest	UDTZ87G0STFETI6HGH41	head	test	alias		SOUTHWEST AIRLINES CO.	Q503308	54
+TSMC	549300KB6NK5SBD14S87	head	train	label		台灣積體電路製造股份有限公司	Q713418	54
+Taiwan Semiconductor	549300KB6NK5SBD14S87	head	train	alias		台灣積體電路製造股份有限公司	Q713418	54
+Katholieke Universiteit Leuven	5299001MN2MYAHLGXD65	head	train	label		Katholieke Universiteit te Leuven	Q833670	54
+Katholieke Universiteit te Leuven	5299001MN2MYAHLGXD65	head	train	alias		Katholieke Universiteit te Leuven	Q833670	54
+Cary	5493005EXXSJNCUZX878	head	test	label		Town of Cary, North Carolina	Q852665	54
+Cary, North Carolina	5493005EXXSJNCUZX878	head	test	alias		Town of Cary, North Carolina	Q852665	54
+University of Paris 1 Pantheon-Sorbonne	969500A7SV2ND7GGAP42	head	train	label		UNIVERSITE PARIS 1 PANTHEON-SORBONNE	Q999763	54
+Université Panthéon-Sorbonne	969500A7SV2ND7GGAP42	head	train	alias		UNIVERSITE PARIS 1 PANTHEON-SORBONNE	Q999763	54
+Paris 1	969500A7SV2ND7GGAP42	head	train	alias		UNIVERSITE PARIS 1 PANTHEON-SORBONNE	Q999763	54
+Holyoke	549300I9GWXX4SYOE358	head	test	label		City of Holyoke, Massachusetts	Q1637790	54
+Holyoke, Massachusetts	549300I9GWXX4SYOE358	head	test	alias		City of Holyoke, Massachusetts	Q1637790	54
+Holyoke, MA	549300I9GWXX4SYOE358	head	test	alias		City of Holyoke, Massachusetts	Q1637790	54
+Knokke-Heist	529900SL062RDVQ0KP03	head	train	label		Gemeente Knokke-Heist	Q12988	53
+Knokke	529900SL062RDVQ0KP03	head	train	alias		Gemeente Knokke-Heist	Q12988	53
+Industrial and Commercial Bank of China	5493002ERZU2K9PZDL40	head	train	label		中国工商银行股份有限公司	Q26463	53
+Industrial and Commercial Bank of China Limited	5493002ERZU2K9PZDL40	head	train	alias		中国工商银行股份有限公司	Q26463	53
+Isuzu	529900C0QSXVCC7AR494	head	test	label		いすゞ自動車株式会社	Q29803	53
+Isuzu Motors	529900C0QSXVCC7AR494	head	test	alias		いすゞ自動車株式会社	Q29803	53
+Airbnb	549300HMUDNO0RY56D37	head	test	label		AIRBNB, INC.	Q63327	53
+Concho County	549300EI6TJXMJISJV71	head	test	label		Concho County, Texas	Q109795	53
+Concho County, Texas	549300EI6TJXMJISJV71	head	test	alias		Concho County, Texas	Q109795	53
+Rockwall County	549300EBIHXYCV58YR59	head	train	label		Rockwall County, Texas	Q111391	53
+Rockwall County, Texas	549300EBIHXYCV58YR59	head	train	alias		Rockwall County, Texas	Q111391	53
+SpVgg Greuther Fürth	529900ZGSY3JMJDPKA97	head	train	label		Spielvereinigung Greuther Fürth e.V.	Q153539	53
+Greuther Fürth	529900ZGSY3JMJDPKA97	head	train	alias		Spielvereinigung Greuther Fürth e.V.	Q153539	53
+Greuther	529900ZGSY3JMJDPKA97	head	train	alias		Spielvereinigung Greuther Fürth e.V.	Q153539	53
+Jefferson County	549300Q3WP6ILG7B4137	head	test	label		Jefferson County, Texas	Q156471	53
+Jefferson County, Texas	549300Q3WP6ILG7B4137	head	test	alias		Jefferson County, Texas	Q156471	53
+Písek	315700KMFDTRRSRG9T22	head	test	label		Město Písek	Q158245	53
+LG Electronics	988400RMQFTGZIOG0609	head	train	label		LG전자(주)	Q162345	53
+LG Electronics Inc.	988400RMQFTGZIOG0609	head	train	alias		LG전자(주)	Q162345	53
+Waregem	549300I3BTLHH5L7FG14	head	test	label		STAD WAREGEM	Q204547	53
+Pirelli	815600A0C9AFC1F2A709	head	test	label		PIRELLI & C. S.P.A.	Q207770	53
+Pirelli & C. S.p.A.	815600A0C9AFC1F2A709	head	test	alias		PIRELLI & C. S.P.A.	Q207770	53
+Pirelli & C	815600A0C9AFC1F2A709	head	test	alias		PIRELLI & C. S.P.A.	Q207770	53
+Järvenpää	743700KFTU3YOAAO6X91	head	train	label		Järvenpään kaupunki	Q208293	53
+Brøndby IF	213800DAZ89VABJPBD93	head	test	label		BRØNDBYERNES I.F. FODBOLD A/S	Q211906	53
+Cuyahoga County	549300GHDK9DGLUNJU89	head	test	label		County of Cuyahoga, Ohio	Q251267	53
+Cuyahoga County, Ohio	549300GHDK9DGLUNJU89	head	test	alias		County of Cuyahoga, Ohio	Q251267	53
+Cuyahoga County, OH	549300GHDK9DGLUNJU89	head	test	alias		County of Cuyahoga, Ohio	Q251267	53
+Montgomery County	549300H278P9DGB7L217	head	test	label		County Of Montgomery, Pennsylvania	Q378527	53
+Montgomery County, Pennsylvania	549300H278P9DGB7L217	head	test	alias		County Of Montgomery, Pennsylvania	Q378527	53
+Akaa	743700AYDTQ7QNKJKG72	head	train	label		Akaan kaupunki	Q413747	53
+Kolín	31570046MDI2EIUHEO49	head	test	label		Město Kolín	Q470369	53
+Prostějov	3157003LEHOJO4ZSVH42	head	train	label		Statutární město Prostějov	Q470445	53
+PricewaterhouseCoopers	5493002GVO7EO8RNNS37	head	test	label		PRICEWATERHOUSECOOPERS LLP	Q488048	53
+Kankakee	549300Z3ZVLSXELVAS52	head	test	label		City of Kankakee, Kankakee County, Illinois	Q578351	53
+Kankakee, Illinois	549300Z3ZVLSXELVAS52	head	test	alias		City of Kankakee, Kankakee County, Illinois	Q578351	53
+Kankakee, IL	549300Z3ZVLSXELVAS52	head	test	alias		City of Kankakee, Kankakee County, Illinois	Q578351	53
+UN Women	213800G4F5Z8TG82Y222	head	test	label		UNITED NATIONS ENTITY FOR GENDER EQUALITY AND THE EMPOWERMENT OF WOMEN	Q641576	53
+Union City	549300Y6CPHG6CN8ME20	head	train	label		City of Union City, California	Q846402	53
+Union City, California	549300Y6CPHG6CN8ME20	head	train	alias		City of Union City, California	Q846402	53
+Union City, CA	549300Y6CPHG6CN8ME20	head	train	alias		City of Union City, California	Q846402	53
+Cambridge University Press	9845008ED9D56E38A424	head	train	label		CAMBRIDGE UNIVERSITY PRESS & ASSESSMENT INDIA PRIVATE LIMITED	Q912887	53
+Mankato	5493003B18DJ507ZEG20	head	train	label		City of Mankato, Minnesota	Q913243	53
+Mankato, Minnesota	5493003B18DJ507ZEG20	head	train	alias		City of Mankato, Minnesota	Q913243	53
+Porterville	5493006MPGKLBQQMCF76	head	train	label		City of Porterville, California	Q927173	53
+Porterville, California	5493006MPGKLBQQMCF76	head	train	alias		City of Porterville, California	Q927173	53
+City of Porterville	5493006MPGKLBQQMCF76	head	train	alias		City of Porterville, California	Q927173	53
+Porterville, CA	5493006MPGKLBQQMCF76	head	train	alias		City of Porterville, California	Q927173	53
+Comcast	51M0QTTNCGUN7KFCFZ59	head	train	label		COMCAST CORPORATION	Q1113804	53
+Comcast Holdings	51M0QTTNCGUN7KFCFZ59	head	train	alias		COMCAST CORPORATION	Q1113804	53
+Comcast Corporation	51M0QTTNCGUN7KFCFZ59	head	train	alias		COMCAST CORPORATION	Q1113804	53
+Rome	549300FWY27YKIBU0M28	head	train	label		City of Rome, Georgia	Q6580	52
+Rome, Georgia	549300FWY27YKIBU0M28	head	train	alias		City of Rome, Georgia	Q6580	52
+AOL	549300WSNX8LE4Y8DM86	head	train	label		AOL Inc.	Q27585	52
+Maverick County	549300DC715RVTNKOV07	head	test	label		Maverick County, Texas	Q113984	52
+Maverick County, Texas	549300DC715RVTNKOV07	head	test	alias		Maverick County, Texas	Q113984	52
+Brussels Airlines	549300VSM2RG55U2QU15	head	test	label		BRUSSELS AIRLINES	Q153571	52
+Bridgestone	549300DHPOF90OYYD780	head	test	label		BRIDGESTONE CORPORATION	Q179433	52
+Bridgestone Corporation	549300DHPOF90OYYD780	head	test	alias		BRIDGESTONE CORPORATION	Q179433	52
+Heineken International	724500K5PTPSST86UQ23	head	train	label		Heineken N.V.	Q180855	52
+Fujitsu	3538000246DHJLRTUZ24	head	test	label		富士通株式会社	Q186394	52
+Fujitsu Limited	3538000246DHJLRTUZ24	head	test	alias		富士通株式会社	Q186394	52
+Harley-Davidson	ZDNAWZWXIKMWI51R2A08	head	train	label		HARLEY-DAVIDSON, INC.	Q192814	52
+Harley-Davidson, Inc.	ZDNAWZWXIKMWI51R2A08	head	train	alias		HARLEY-DAVIDSON, INC.	Q192814	52
+Hyvinkää	743700LVBZZJYHASNF45	head	test	label		Hyvinkään kaupunki	Q207753	52
+Senate	969500DV55FC0KFPXG87	head	test	label		SENAT	Q215987	52
+NEC	5493000QYMPFRTEY4K28	head	test	label		日本電気株式会社	Q219203	52
+NEC CORPORATION	5493000QYMPFRTEY4K28	head	test	alias		日本電気株式会社	Q219203	52
+Société Générale	O2RNE8IBXP4R0TD8PU41	head	test	label		SOCIETE GENERALE	Q270363	52
+Turnhout	54930073S3BWVHJ4F302	head	train	label		STAD TURNHOUT	Q271783	52
+AirBaltic	213800JVURXEAA48FV35	head	train	label		Air Baltic Corporation	Q300924	52
+Air Baltic	213800JVURXEAA48FV35	head	train	alias		Air Baltic Corporation	Q300924	52
+Lukoil	549300LCJ1UJXHYBWI24	head	train	label		Публичное акционерное общество "Нефтяная компания "ЛУКОЙЛ"	Q329347	52
+PJSC LUKOIL	549300LCJ1UJXHYBWI24	head	train	alias		Публичное акционерное общество "Нефтяная компания "ЛУКОЙЛ"	Q329347	52
+Hamina	7437001UKK3SMHX8U833	head	train	label		Haminan kaupunki	Q367780	52
+Burberry	213800PE1KEFCNFR1R50	head	test	label		BURBERRY GROUP PLC	Q390107	52
+Burberry Group Plc	213800PE1KEFCNFR1R50	head	test	alias		BURBERRY GROUP PLC	Q390107	52
+Burberry Group	213800PE1KEFCNFR1R50	head	test	alias		BURBERRY GROUP PLC	Q390107	52
+Ajinomoto	353800UT0TLROREPIC92	head	train	label		味の素株式会社	Q412826	52
+Ajinomoto Co., Inc.	353800UT0TLROREPIC92	head	train	alias		味の素株式会社	Q412826	52
+Dauphin County	549300E86X2H9JIHEX42	head	train	label		County of Dauphin	Q488690	52
+Forsyth County	5493006RK7PNBYRRD925	head	train	label		Forsyth County, Georgia	Q493092	52
+Forsyth County, Georgia	5493006RK7PNBYRRD925	head	train	alias		Forsyth County, Georgia	Q493092	52
+Rutgers University	549300BOYDHNW8J60112	head	train	label		RUTGERS, THE STATE UNIVERSITY	Q499451	52
+Rutgers--the State University	549300BOYDHNW8J60112	head	train	alias		RUTGERS, THE STATE UNIVERSITY	Q499451	52
+Wake County	5493007XQJHO082P1H29	head	test	label		County of Wake, North Carolina	Q506215	52
+Wake County, North Carolina	5493007XQJHO082P1H29	head	test	alias		County of Wake, North Carolina	Q506215	52
+Shelton	5493008YOQL2642DBV39	head	train	label		City of Shelton, Connecticut	Q594109	52
+Shelton, Connecticut	5493008YOQL2642DBV39	head	train	alias		City of Shelton, Connecticut	Q594109	52
+Giorgio Armani	81560063BF9718867E90	head	train	label		GIORGIO ARMANI S.P.A.	Q635484	52
+Giorgio Armani S.p.A.	81560063BF9718867E90	head	train	alias		GIORGIO ARMANI S.P.A.	Q635484	52
+Armani	81560063BF9718867E90	head	train	alias		GIORGIO ARMANI S.P.A.	Q635484	52
+Gainesville	5493006Y11XKB3GQIF20	head	test	label		City of Gainesville, Georgia	Q651051	52
+Gainesville, Georgia	5493006Y11XKB3GQIF20	head	test	alias		City of Gainesville, Georgia	Q651051	52
+Gainesville, GA	5493006Y11XKB3GQIF20	head	test	alias		City of Gainesville, Georgia	Q651051	52
+Gaithersburg	549300UFHDHDCHDE0F65	head	train	label		City of Gaithersburg, Maryland	Q752719	52
+Gaithersburg, Maryland	549300UFHDHDCHDE0F65	head	train	alias		City of Gaithersburg, Maryland	Q752719	52
+City of Gaithersburg	549300UFHDHDCHDE0F65	head	train	alias		City of Gaithersburg, Maryland	Q752719	52
+International Development Association	P41R60HC414IWQA1XW02	head	test	label		International Development Association	Q827525	52
+Heinola	74370030S82YVPAF5P59	head	test	label		Heinolan kaupunki	Q849934	52
+Longmont	549300E7S8EY1IWPW223	head	test	label		City of Longmont, Colorado	Q988283	52
+Longmont, Colorado	549300E7S8EY1IWPW223	head	test	alias		City of Longmont, Colorado	Q988283	52
+Longmont, CO	549300E7S8EY1IWPW223	head	test	alias		City of Longmont, Colorado	Q988283	52
+Mojang Studios	5493001FEY266NB4VE91	head	train	label		Mojang AB	Q1129295	52
+Mojang AB	5493001FEY266NB4VE91	head	train	alias		Mojang AB	Q1129295	52
+Mojang	5493001FEY266NB4VE91	head	train	alias		Mojang AB	Q1129295	52
+Supercell	743700MSCHABJ4XW2532	head	train	label		Supercell Oy	Q1438774	52
+British Council	213800S8DFQ6UFES2T83	head	train	label		BRITISH COUNCIL(THE)	Q45433	51
+Technische Universität Berlin	9676002MWW08VRXSKF03	head	train	label		Technische Universität Berlin	Q51985	51
+Technische Universität	9676002MWW08VRXSKF03	head	train	alias		Technische Universität Berlin	Q51985	51
+Levi Strauss & Co.	MB0UERO0RDFKU8258G77	head	test	label		Levi Strauss & Co.	Q127962	51
+Levi's	MB0UERO0RDFKU8258G77	head	test	alias		Levi Strauss & Co.	Q127962	51
+Levi Strauss	MB0UERO0RDFKU8258G77	head	test	alias		Levi Strauss & Co.	Q127962	51
+Sanofi	549300E9PC51EN656011	head	test	label		SANOFI	Q158205	51
+Monsanto	NONUZEX43GHIPSVDD938	head	test	label		MONSANTO COMPANY	Q207983	51
+Monsanto Company	NONUZEX43GHIPSVDD938	head	test	alias		MONSANTO COMPANY	Q207983	51
+Petrobras	5493000J801JZRCMFE49	head	test	label		PETROLEO BRASILEIRO S A PETROBRAS	Q210047	51
+Petroleo Brasileiro SA	5493000J801JZRCMFE49	head	test	alias		PETROLEO BRASILEIRO S A PETROBRAS	Q210047	51
+Saab Group	549300ZHO4JCQQI13M69	head	train	label		SAAB Aktiebolag	Q219501	51
+SAAB	549300ZHO4JCQQI13M69	head	train	alias		SAAB Aktiebolag	Q219501	51
+French Football Federation	969500GT0NEQZD7INR92	head	test	label		FEDERATION FRANCAISE FOOTBALL - FFF	Q244750	51
+FFF	969500GT0NEQZD7INR92	head	test	alias		FEDERATION FRANCAISE FOOTBALL - FFF	Q244750	51
+Aarschot	967600BTH4LSV37TCQ04	head	test	label		Stad Aarschot	Q273442	51
+China Southern Airlines	529900AJQ1Q18ABYVX84	head	train	label		中国南方航空股份有限公司	Q291090	51
+China Southern Airlines Co., Ltd.	529900AJQ1Q18ABYVX84	head	train	alias		中国南方航空股份有限公司	Q291090	51
+China Southern	529900AJQ1Q18ABYVX84	head	train	alias		中国南方航空股份有限公司	Q291090	51
+Johnson & Johnson	549300G0CFPGEF6X2043	head	train	label		Johnson & Johnson	Q333718	51
+Accenture	5493000EWHDSR3MZWH98	head	train	label		ACCENTURE PUBLIC LIMITED COMPANY	Q338825	51
+Aegean Airlines	213800VI8OH5EJM18L21	head	train	label		ΑΕΡΟΠΟΡΙΑ ΑΙΓΑΙΟΥ ΑΝΩΝΥΜΗ ΑΕΡΟΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ	Q380580	51
+Aegean Airlines SA	213800VI8OH5EJM18L21	head	train	alias		ΑΕΡΟΠΟΡΙΑ ΑΙΓΑΙΟΥ ΑΝΩΝΥΜΗ ΑΕΡΟΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ	Q380580	51
+Aegean	213800VI8OH5EJM18L21	head	train	alias		ΑΕΡΟΠΟΡΙΑ ΑΙΓΑΙΟΥ ΑΝΩΝΥΜΗ ΑΕΡΟΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ	Q380580	51
+Caterpillar Inc.	WRJR7GS4GTRECRRTVX92	head	test	label		CATERPILLAR INC.	Q459965	51
+Caterpillar	WRJR7GS4GTRECRRTVX92	head	test	alias		CATERPILLAR INC.	Q459965	51
+Bibb County	549300S2O017G8TB7209	head	train	label		Bibb County	Q488171	51
+Knox County	549300WT27UFXOLT2D56	head	train	label		Knox County, Tennessee	Q495003	51
+Knox County, Tennessee	549300WT27UFXOLT2D56	head	train	alias		Knox County, Tennessee	Q495003	51
+Lycoming County	549300TCAO8EBJY0O782	head	test	label		Lycoming County Authority	Q495633	51
+Sodankylä	743700XXZT9DLC546Q13	head	train	label		Sodankylän kunta	Q502175	51
+Mecklenburg County	5493006G3IC5PBHB7A65	head	train	label		County of Mecklenburg, North Carolina	Q507770	51
+Mecklenburg County, North Carolina	5493006G3IC5PBHB7A65	head	train	alias		County of Mecklenburg, North Carolina	Q507770	51
+International Finance Corporation	QKL54NQY28TCDAI75F60	head	test	label		INTERNATIONAL FINANCE CORPORATION	Q656801	51
+Varkaus	7437004GBTWPPCW8S749	head	test	label		Varkauden kaupunki	Q683525	51
+Rice University	549300QPVG49ONTSJJ20	head	test	label		WILLIAM MARSH RICE UNIVERSITY	Q842909	51
+William Marsh Rice University	549300QPVG49ONTSJJ20	head	test	alias		WILLIAM MARSH RICE UNIVERSITY	Q842909	51
+Rice	549300QPVG49ONTSJJ20	head	test	alias		WILLIAM MARSH RICE UNIVERSITY	Q842909	51
+Brooklyn Park	549300SRSB2KMQNYBB75	head	train	label		City of Brooklyn Park, Minnesota	Q864128	51
+Brooklyn Park, Minnesota	549300SRSB2KMQNYBB75	head	train	alias		City of Brooklyn Park, Minnesota	Q864128	51
+Havlíčkův Brod	315700GJHSETBCBWXZ66	head	train	label		Město Havlíčkův Brod	Q954596	51
+La Verne	54930008TF3OJRBUIJ91	head	test	label		City of La Verne	Q985347	51
+ByteDance	300300NIFA1100061063	head	train	label		北京字节跳动科技有限公司	Q55606242	51
+Deutsche Telekom	549300V9QSIG4WX4GJ96	head	test	label		DEUTSCHE TELEKOM AG	Q9396	50
+Telekom	549300V9QSIG4WX4GJ96	head	test	alias		DEUTSCHE TELEKOM AG	Q9396	50
+Deutsche Telekom AG	549300V9QSIG4WX4GJ96	head	test	alias		DEUTSCHE TELEKOM AG	Q9396	50
+Iveco	549300Y48YRN3IH38V13	head	test	label		IVECO S.P.A.	Q29913	50
+IVECO S.p.a.	549300Y48YRN3IH38V13	head	test	alias		IVECO S.P.A.	Q29913	50
+Bessemer	549300C6NB1J5LL6EP48	head	test	label		City of Bessemer, Alabama	Q79973	50
+Bessemer, Alabama	549300C6NB1J5LL6EP48	head	test	alias		City of Bessemer, Alabama	Q79973	50
+Bessemer, AL	549300C6NB1J5LL6EP48	head	test	alias		City of Bessemer, Alabama	Q79973	50
+Clarke County	5493001N4P5TQ2L9ZO30	head	test	label		Unified Government of Athens-Clarke County, Georgia	Q112061	50
+Clarke County, Georgia	5493001N4P5TQ2L9ZO30	head	test	alias		Unified Government of Athens-Clarke County, Georgia	Q112061	50
+ZTE	3003004FBGVVG1CW5U45	head	train	label		中兴通讯股份有限公司	Q136484	50
+Air Berlin	529900AJLXERVU6GEY09	head	test	label	529900RGKUYZ5JEP9791	Air Berlin PLC & Co. Luftverkehrs KG	Q156829	50
+Air Berlin PLC & Co. Luftverkehrs KG	529900AJLXERVU6GEY09	head	test	alias	529900RGKUYZ5JEP9791	Air Berlin PLC & Co. Luftverkehrs KG	Q156829	50
+Dougherty County	549300ZQ0JRR9C0M8I96	head	test	label		Dougherty County, Georgia	Q176480	50
+Dougherty County, Georgia	549300ZQ0JRR9C0M8I96	head	test	alias		Dougherty County, Georgia	Q176480	50
+Square Enix	529900KCRNRDF8DIA489	head	train	label		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+Square Enix Holdings Co., Ltd.	529900KCRNRDF8DIA489	head	train	alias		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+SQUARE ENIX CO., LTD.	529900KCRNRDF8DIA489	head	train	alias		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+Square Enix Holdings	529900KCRNRDF8DIA489	head	train	alias		株式会社スクウェア・エニックス・ホールディングス	Q207784	50
+Asiana Airlines	2138001V1YWXYBSZX565	head	test	label		아시아나항공 (주)	Q211165	50
+Asiana Airlines Inc.	2138001V1YWXYBSZX565	head	test	alias		아시아나항공 (주)	Q211165	50
+ASIANA	2138001V1YWXYBSZX565	head	test	alias		아시아나항공 (주)	Q211165	50
+Lehman Brothers	549300FDK6ZP3YIHRJ47	head	test	label		LEHMAN BROTHERS HOLDINGS INC.	Q212900	50
+Lehman Brothers Holdings Inc.	549300FDK6ZP3YIHRJ47	head	test	alias		LEHMAN BROTHERS HOLDINGS INC.	Q212900	50
+Royal Dutch Football Association	724500XV6THMFXZWON05	head	test	label		Koninklijke Nederlandse Voetbalbond	Q213116	50
+Koninklijke Nederlandse Voetbalbond	724500XV6THMFXZWON05	head	test	alias		Koninklijke Nederlandse Voetbalbond	Q213116	50
+Kerava	743700B4LTKYINZS2A81	head	train	label		Keravan kaupunki	Q216900	50
+Citigroup	6SHGI4ZSSLCXXQSBB395	head	train	label		CITIGROUP INC.	Q219508	50
+Citigroup Inc.	6SHGI4ZSSLCXXQSBB395	head	train	alias		CITIGROUP INC.	Q219508	50
+Michigan State University	5493000C7JLSR3TV6F07	head	train	label		Board of Trustees of Michigan State University	Q270222	50
+Michigan State	5493000C7JLSR3TV6F07	head	train	alias		Board of Trustees of Michigan State University	Q270222	50
+MI State University	5493000C7JLSR3TV6F07	head	train	alias		Board of Trustees of Michigan State University	Q270222	50
+MI State U	5493000C7JLSR3TV6F07	head	train	alias		Board of Trustees of Michigan State University	Q270222	50
+Danone	969500KMUQ2B6CBAF162	head	test	label		DANONE	Q329426	50
+Riihimäki	743700PCPZJBCX6MX045	head	test	label		Riihimäen kaupunki	Q429864	50
+Verizon	2S72QS2UO2OESLG6Y829	head	test	label		VERIZON COMMUNICATIONS INC.	Q467752	50
+Verizon Communications Inc.	2S72QS2UO2OESLG6Y829	head	test	alias		VERIZON COMMUNICATIONS INC.	Q467752	50
+Verizon Communications	2S72QS2UO2OESLG6Y829	head	test	alias		VERIZON COMMUNICATIONS INC.	Q467752	50
+Schenectady County	5493006EHBI7PZDNN537	head	test	label		County of Schenectady, New York	Q487599	50
+Schenectady County, New York	5493006EHBI7PZDNN537	head	test	alias		County of Schenectady, New York	Q487599	50
+Bay County	549300B3J43WKYUSHO26	head	test	label		Bay County, Florida	Q488865	50
+Bay County, Florida	549300B3J43WKYUSHO26	head	test	alias		Bay County, Florida	Q488865	50
+Bay County, FL	549300B3J43WKYUSHO26	head	test	alias		Bay County, Florida	Q488865	50
+Franklin County	549300OQ3HLT4CBBK749	head	train	label		County of Franklin, Pennsylvania	Q494121	50
+Franklin County, Pennsylvania	549300OQ3HLT4CBBK749	head	train	alias		County of Franklin, Pennsylvania	Q494121	50
