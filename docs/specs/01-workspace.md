@@ -1,6 +1,6 @@
 # 01 · Workspace
 
-Status: draft
+Status: approved
 
 ## Goal
 Anyone can clone the repository and run lint, type checks and tests with one command each.
@@ -10,10 +10,12 @@ CI runs the same on every pull request, so no later slice lands unchecked.
 - pnpm workspace; Node and pnpm versions pinned.
 - TypeScript in strict mode, Biome for lint and format, Vitest for tests.
 - `packages/core` with its first real code: LEI check digits (ISO 7064 mod 97-10), tested
-  against the 68 real LEIs and the tampered one from the research.
+  against every distinct LEI in `research/ranking/eval/*.tsv`, and a copy of each with one
+  character changed.
 - `.github/workflows/ci.yml` on pull requests and pushes to `main`: install from the
   lockfile, lint, typecheck, test.
 - `.editorconfig`, and a Commands section in CLAUDE.md.
+- A short pull request template (added at the owner's request during the slice).
 
 ## Not in scope
 - The web app (slice 3), the indexer (slice 5), any deploy.
@@ -22,7 +24,8 @@ CI runs the same on every pull request, so no later slice lands unchecked.
 ## Approach
 Layout `packages/*` for libraries and `apps/*` for deployables. Biome replaces ESLint and
 Prettier with one tool and one config. Vitest runs TypeScript without a build step. Versions
-are the current stable releases on the day, pinned.
+are the current stable releases on the day, pinned: Node 26 by the owner's choice (it enters
+LTS in October 2026), tool versions once in the pnpm catalog, actions by commit.
 
 ## Unknowns
 None that need a spike.
