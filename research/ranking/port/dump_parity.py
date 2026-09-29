@@ -22,7 +22,9 @@ Outputs under $DATA_DIR/parity/ (not committed):
                   names; previous legal names are not indexed).
   cases_all.json  same format as cases.json (see report.dump_js_cases), for every distinct query
                   in eval/{head,torso,tail,typo}.tsv, train and test. `top` is the Python
-                  top 10; P is full precision.
+                  top 10 from the engine's vectorised scorer, which evaluate.py --selftest
+                  checks against ranking.score_candidate; ranking.top_k gives the same
+                  top 10 for all 3,229 queries. P is full precision.
 """
 import json
 import os

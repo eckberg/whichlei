@@ -1,11 +1,12 @@
 // Compare this package with the Python reference at full scale. Run by hand, not in CI:
 // it needs GLEIF's files and the reference outputs from research/ranking/port/dump_parity.py.
 //
-//   DATA_DIR=research/data pnpm --filter @whichlei/core parity
+//   pnpm --filter @whichlei/core parity    (DATA_DIR defaults to research/data)
 import { execFileSync } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
+import { fileURLToPath } from "node:url";
 import {
   type Candidate,
   isValidBic,
@@ -16,7 +17,8 @@ import {
   topK,
 } from "../src/index.ts";
 
-const DATA_DIR = process.env.DATA_DIR ?? "research/data";
+const DATA_DIR =
+  process.env.DATA_DIR ?? fileURLToPath(new URL("../../../research/data", import.meta.url));
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 function report(
@@ -58,7 +60,9 @@ function checkTopTen(): boolean {
   const candidate = (id: number): Candidate<number> => {
     let c = tokenised.get(id);
     if (!c) {
-      const [names, prominence] = cases.ents[id] ?? [[], 0];
+      const entity = cases.ents[id];
+      if (!entity) throw new Error(`candidate ${id} has no entity`);
+      const [names, prominence] = entity;
       c = { id, prominence, names: names.map(nameTokens) satisfies NameTokens[] };
       tokenised.set(id, c);
     }

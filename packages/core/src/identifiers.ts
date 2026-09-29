@@ -77,7 +77,8 @@ export interface IdentifierReadings {
  * reading is possible; an input with none is a name or a register number.
  */
 export function identifierReadings(input: string): IdentifierReadings {
-  const code = input.replace(/\s+/g, "").toUpperCase();
+  // Upper-case a-z only: toUpperCase() would turn "ß" into "SS" and "ı" into "I".
+  const code = input.replace(/\s+/g, "").replace(/[a-z]/g, (char) => char.toUpperCase());
   const readings: IdentifierReadings = {};
   if (isValidLei(code)) readings.lei = code;
   if (isValidIsin(code)) readings.isin = code;

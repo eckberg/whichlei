@@ -149,4 +149,8 @@ describe("identifierReadings", () => {
     expect(identifierReadings("Ericsson")).toEqual({ bic: "ERICSSON" });
     expect(identifierReadings("Volvo")).toEqual({});
   });
+
+  test("upper-cases only ASCII letters", () => {
+    expect(identifierReadings("ericßon")).toEqual({});
+  });
 });

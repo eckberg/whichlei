@@ -27,8 +27,9 @@ In `packages/core`:
 Port `ranking.py` function by function; `research/ranking/port/score.mjs` is a starting
 point. Python's whitespace set is matched explicitly, since JavaScript's `\s` differs.
 `research/ranking/port/dump_core_fixture.py` writes the CI fixtures using only
-`ranking.py`: tokens for every name and query in the evaluation set plus edge cases, and
-the top 10 for every evaluation query against a fixed pool of the evaluation entities.
+`ranking.py`: tokens for every name and query in the evaluation set plus edge cases, match
+scores bit for bit, and the top 10 for every 8th evaluation query against a fixed pool of
+the evaluation entities.
 The full-scale check uses the reference's own candidates and prominence for every
 evaluation query; that data is too large to commit.
 
@@ -36,8 +37,13 @@ evaluation query; that data is too large to commit.
 - Python 3.11 has Unicode 14, Node 26 a newer version, and JavaScript has no
   "combining class" property. The full-corpus comparison shows whether that changes any
   token. Any difference is either fixed or listed here with the reason it is accepted.
-  Result: none. Dropping `\p{Mn}` and the explicit whitespace set give identical tokens for
-  all 3,742,453 names.
+  Result: identical tokens for all 3,742,453 names in the corpus. Tried on every code point,
+  2,499 give different tokens. They are accepted: none occurs in GLEIF's names, and from
+  now on this port, not the Python, is the reference. The classes:
+  - 2,118 nonspacing marks with combining class 0, which Python keeps and the port drops.
+  - 50 spacing marks with a combining class, which Python drops and the port keeps.
+  - 331 code points unassigned in Unicode 14, and 37 with newer NFKD mappings.
+  Browsers ship different Unicode versions too; slice 7 checks the query side.
 
 ## Done when
 - Tokens equal the reference for every name the index uses (golden copy 2026-09-16).

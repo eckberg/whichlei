@@ -36,6 +36,7 @@ const QUERY_STOP = new Set(
 /**
  * True if some prefix of `term` is within one edit (insert, delete, substitute, adjacent
  * transpose) of `query`. Optimal string alignment, only the band that can stay within 1.
+ * Indexes UTF-16 units where Python indexes code points; the same for tokens, which are ASCII.
  */
 export function prefixEditLe1(query: string, term: string): boolean {
   const n = query.length;
