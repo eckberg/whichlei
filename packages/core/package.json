@@ -6,7 +6,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "parity": "node --max-old-space-size=12000 scripts/parity.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",

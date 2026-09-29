@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { isValidLei } from "./lei.ts";
+import { identifierReadings, isValidBic, isValidIsin, isValidLei } from "./identifiers.ts";
 
 const EVAL_DIR = new URL("../../../research/ranking/eval/", import.meta.url);
 
@@ -77,5 +77,76 @@ describe("isValidLei", () => {
     ["non-ASCII", "529900GRZ2BQY5ZM9NÅ9"],
   ])("rejects %s: %s", (_, code) => {
     expect(isValidLei(code)).toBe(false);
+  });
+});
+
+// Real codes from GLEIF's ISIN and BIC mapping files, a fixed sample.
+const ISINS = `US92204Q1031 CH1510932507 PLING0100027 DE000MR6UEQ7 DE000VH9R0K6 DE000DU8L6J3
+  DE000FE56K26 US85855GSB85 US88605HD299 US38380ARM17 CH1307251525 DE000PM26LU8 GB00NJFZZZ01
+  DE000JY92FG9 NLBNPSE1YUO5 DE000GG0RM95 ES0A06416689 CH0568236779 US06745PUY59 US89115NAE40`
+  .trim()
+  .split(/\s+/);
+const BICS = `LBTCUS44XXX HBUKGB4169D NWBKGB2127V CLRBGB22525 LWAMCY22XXX LZCBCNBLXXX RAIFCH22B64
+  SOLADES1SFH AMMBMYKLXXX MKSNUS33XXX CIUKGB2LMAR SMBCTWTPXXX ENEAITM1XXX CLAOGB2LELL
+  CODWESMMXXX SPPYAU22XXX LOYDGB21H44 MIDLGB2147V BOFSGB21438 HLFXGB21M25`
+  .trim()
+  .split(/\s+/);
+
+describe("isValidIsin", () => {
+  test("accepts real ISINs", () => {
+    expect(ISINS.filter((isin) => !isValidIsin(isin))).toEqual([]);
+  });
+
+  test("rejects every ISIN with one digit changed", () => {
+    const accepted = ISINS.flatMap((isin) =>
+      [...isin].flatMap((char, i) =>
+        /[0-9]/.test(char)
+          ? [isin.slice(0, i) + ((Number(char) + 1) % 10) + isin.slice(i + 1)]
+          : [],
+      ),
+    ).filter(isValidIsin);
+    expect(accepted).toEqual([]);
+  });
+
+  test.each([
+    ["empty", ""],
+    ["too short", "US0378331005".slice(0, 11)],
+    ["lower case", "us0378331005"],
+    ["digit in country", "U10378331005"],
+  ])("rejects %s: %s", (_, code) => {
+    expect(isValidIsin(code)).toBe(false);
+  });
+});
+
+describe("isValidBic", () => {
+  test("accepts real BICs, with and without branch", () => {
+    const eight = BICS.map((bic) => bic.slice(0, 8));
+    expect([...BICS, ...eight].filter((bic) => !isValidBic(bic))).toEqual([]);
+  });
+
+  test("accepts a word of the right shape", () => {
+    expect(isValidBic("ERICSSON")).toBe(true);
+  });
+
+  test.each([
+    ["unknown country", "ERICQQON"],
+    ["not ISO 3166", "BANKEU22"],
+    ["lower case", "lbtcus44"],
+    ["nine characters", "LBTCUS44X"],
+    ["digit in country", "LBTC1S44"],
+  ])("rejects %s: %s", (_, code) => {
+    expect(isValidBic(code)).toBe(false);
+  });
+});
+
+describe("identifierReadings", () => {
+  test("normalises spaces and case", () => {
+    expect(identifierReadings(" 529900grz2bqy5zm9n49 ")).toEqual({ lei: "529900GRZ2BQY5ZM9N49" });
+    expect(identifierReadings("us9220 4Q1031")).toEqual({ isin: "US92204Q1031" });
+  });
+
+  test("lists every reading", () => {
+    expect(identifierReadings("Ericsson")).toEqual({ bic: "ERICSSON" });
+    expect(identifierReadings("Volvo")).toEqual({});
   });
 });
