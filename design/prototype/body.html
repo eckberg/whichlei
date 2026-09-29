@@ -1,0 +1,21 @@
+<div class="app">
+  <header class="top">
+    <a class="mark" href="#" id="home">whichlei</a>
+    <nav><button class="btn" type="button" id="about-btn">about</button></nav>
+  </header>
+  <div class="prompt">
+    <label for="q" aria-label="Search">&gt;</label>
+    <input id="q" type="text" role="combobox" aria-controls="list" aria-expanded="true" aria-autocomplete="list"
+      autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
+      placeholder="name, lei, isin, bic or register number">
+  </div>
+  <div class="info" id="info" aria-live="polite"></div>
+  <main id="main">
+    <div class="list" id="list" role="listbox" aria-label="Results"></div>
+    <aside class="preview" id="preview" aria-label="Selected record"></aside>
+  </main>
+  <footer class="keys-bar">
+    <ul id="keys" aria-label="Keyboard shortcuts"></ul>
+    <span class="meta" id="meta"></span>
+  </footer>
+</div>

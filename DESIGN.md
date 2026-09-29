@@ -46,9 +46,10 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 8 | Input type is resolved by **evidence**, not shape | "ERICSSON" is also a valid BIC. Run the candidate lookups and show the reading that has hits. |
 | 9 | LEI check digits are **validated in the browser** | ISO 7064 mod 97-10 catches a mistyped LEI before any request is sent. |
 | 10 | Every record shows its **source and date** | Correctness has to be checkable, not just claimed. |
-| 11 | **Dark, monospace, keyboard-forward** interface | LEIs, ISINs and BICs are fixed-width codes; the interface follows the data. |
+| 11 | A **terminal-style** interface: one monospace face, a prompt, reverse-video selection, and the keys for the current view in the footer. Light or dark follows the system | LEIs, ISINs and BICs are fixed-width codes, and the audience works from the keyboard. The reader's own theme setting wins. Prototype: [design/prototype](design/prototype/). |
 | 12 | Analytics: **Fathom**, cookieless and aggregate | Usage numbers without cookies or a consent banner. It sets no identifiers and never receives search input. |
 | 13 | Name: **whichlei** | It names the question it answers: which LEI does this entity have. Short, reads one way, and clear of existing LEI tools. |
+| 14 | **Enter copies the LEI** of the selected result; → opens the full record | Copying the LEI is the job. Opening the record is the exception. |
 
 ## 3. Architecture
 

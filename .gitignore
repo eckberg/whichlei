@@ -7,3 +7,6 @@ __pycache__/
 *.pyc
 *.pkl
 *.jsonl
+
+# design/prototype
+design/prototype/whichlei.html
