@@ -15,6 +15,7 @@ CI runs the same on every pull request, so no later slice lands unchecked.
 - `.github/workflows/ci.yml` on pull requests and pushes to `main`: install from the
   lockfile, lint, typecheck, test.
 - `.editorconfig`, and a Commands section in CLAUDE.md.
+- A short pull request template (added at the owner's request during the slice).
 
 ## Not in scope
 - The web app (slice 3), the indexer (slice 5), any deploy.
