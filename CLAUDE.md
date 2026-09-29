@@ -34,6 +34,15 @@ relying on it; have a different sub-agent verify anything that closes a slice.
 - Deploys and releases.
 - Changes to any Cloudflare resource that is not whichlei's.
 
+## Commands
+Node version is in `.node-version`; pnpm version is in `package.json`.
+- `pnpm install --frozen-lockfile`: install exactly what the lockfile says.
+- `pnpm lint`: Biome lint and format check. `pnpm format` applies fixes.
+- `pnpm typecheck`: `tsc` in every package.
+- `pnpm test`: Vitest, all packages.
+
+CI runs install, lint, typecheck and test on every pull request and push to `main`.
+
 ## Gotchas
 - Unicode NFKD does not fold `æ ø ß ł đ ð þ œ`. Apply an explicit table first, or Nordic,
   German and Polish names drop out of the index: "Mærsk" tokenises to `m` + `rsk`.
