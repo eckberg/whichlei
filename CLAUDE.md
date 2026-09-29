@@ -40,6 +40,9 @@ Node version is in `.node-version`; pnpm version is in `package.json`.
 - `pnpm lint`: Biome lint and format check. `pnpm format` applies fixes.
 - `pnpm typecheck`: `tsc` in every package.
 - `pnpm test`: Vitest, all packages.
+- `DATA_DIR=../../research/data pnpm --filter @whichlei/core parity`: compare `packages/core`
+  with the Python reference at full scale. Needs the data from
+  `research/ranking/port/dump_parity.py`. Not in CI.
 
 CI runs install, lint, typecheck and test on every pull request and push to `main`.
 

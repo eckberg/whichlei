@@ -1,6 +1,6 @@
 # 01 · Workspace
 
-Status: approved
+Status: done
 
 ## Goal
 Anyone can clone the repository and run lint, type checks and tests with one command each.
