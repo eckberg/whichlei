@@ -40,7 +40,7 @@ const leis = evaluationLeis();
 
 describe("isValidLei", () => {
   test("reads the evaluation set", () => {
-    expect(leis.length).toBe(1612);
+    expect(leis.length).toBe(1613);
   });
 
   test("accepts every LEI in the evaluation set", () => {
