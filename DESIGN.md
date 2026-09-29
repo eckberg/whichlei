@@ -50,6 +50,8 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 12 | Analytics: **Fathom**, cookieless and aggregate | Usage numbers without cookies or a consent banner. It sets no identifiers and never receives search input. |
 | 13 | Name: **whichlei** | It names the question it answers: which LEI does this entity have. Short, reads one way, and clear of existing LEI tools. |
 | 14 | **Enter copies the LEI** of the selected result; → opens the full record | Copying the LEI is the job. Opening the record is the exception. |
+| 15 | The index is its **own Worker with static assets**, published by a scheduled workflow after automatic checks. The site deploys by hand | Static requests are free and unlimited. A publish swaps every file at once and can be rolled back, and new data never redeploys the site. |
+| 16 | **TypeScript throughout**. Python stays in `research/` as the reference | One language for the indexer and the browser means one tokeniser. The reference checks it. |
 
 ## 3. Architecture
 
@@ -122,8 +124,8 @@ build uses nothing else. Wikidata is used only to build the evaluation set.
 
 ## 6. Open questions
 
-- **Record pages.** 3.4M pages exceed the static host's file limit. Likely generated on
-  first request and cached. Dark like the app, or light for readers arriving from search?
+- **Record pages.** 3.4M pages exceed the static-asset file limit, so they are rendered by a
+  Worker on request and cached. How long to cache, and what a crawler sees, is slice 9.
 - **Corporate hierarchy** in the first release, or later?
 - **Funds** rank slightly above other entities (fitted weight +0.32, no measurable effect).
   Keep, or set to zero?

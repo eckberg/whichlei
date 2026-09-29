@@ -17,7 +17,7 @@ be tried on a real URL and a real phone.
 | 6 | Data publishing | A scheduled workflow builds, checks and publishes the index. A failed check publishes nothing, and the previous index can be restored. |
 | 7 | Search | The production search page: keyboard flows, screen readers, both themes. End-to-end tests pass; the targets from slice 4 are met. |
 | 8 | Lookups and records | LEIs, ISINs, BICs and register numbers resolve live through the GLEIF API. The record view shows source, date and copy actions. |
-| 9 | Record pages | `/lei/<code>` is readable without JavaScript and indexable, within free-tier limits. |
+| 9 | Record pages | `/lei/<code>` is rendered by a Worker, cached, readable without JavaScript and indexable. |
 | 10 | Ranking gaps | Acronyms and short queries improve on the evaluation set, with no regressions. |
 | 11 | Launch | Live on whichlei.com with analytics, README and about page. No cookies set, checked in a browser. |
 
@@ -34,8 +34,8 @@ be tried on a real URL and a real phone.
 
 - Scheduled workflows in a public repository stop after 60 days without repository
   activity. Slice 6 needs a way to keep the schedule alive.
-- The Workers free plan allows 100,000 requests a day per account. Record pages rendered
-  by a Worker would draw on it; slice 9 decides by measurement.
+- Record pages are rendered by a Worker, so crawlers spend the account's included Worker
+  requests. Slice 9 sets cache lifetimes and measures the draw.
 - The slowest keystroke took up to 476 ms on a server CPU. Phones are slower. Slice 4
   sets the target, slice 7 meets it.
 
