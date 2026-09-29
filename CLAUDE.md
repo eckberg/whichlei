@@ -32,6 +32,7 @@ relying on it; have a different sub-agent verify anything that closes a slice.
 - Anything with a recurring cost.
 - Collecting any data beyond the existing aggregate analytics.
 - Deploys and releases.
+- Changes to any Cloudflare resource that is not whichlei's.
 
 ## Gotchas
 - Unicode NFKD does not fold `æ ø ß ł đ ð þ œ`. Apply an explicit table first, or Nordic,
@@ -43,3 +44,4 @@ relying on it; have a different sub-agent verify anything that closes a slice.
 ## Conventions
 - Plain imperative commit subjects. English in code, docs and issues.
 - No session links in commits, pull requests, issues or docs.
+- Cloudflare resources are named `whichlei-*`.
