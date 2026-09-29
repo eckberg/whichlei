@@ -42,3 +42,4 @@ relying on it; have a different sub-agent verify anything that closes a slice.
 
 ## Conventions
 - Plain imperative commit subjects. English in code, docs and issues.
+- No session links in commits, pull requests, issues or docs.
