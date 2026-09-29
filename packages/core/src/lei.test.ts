@@ -54,15 +54,28 @@ describe("isValidLei", () => {
     expect(accepted).toEqual([]);
   });
 
-  test.each([
-    ["empty", ""],
-    ["too short", "529900GRZ2BQY5ZM9N4"],
-    ["too long", "529900GRZ2BQY5ZM9N490"],
+  // Each passes the mod 97 sum, so only the shape check can reject it.
+  const passesSum: [string, string][] = [
+    ["too long", "529900GRZ2BQY5ZM9N4995"],
     ["lower case", "529900grz2bqy5zm9n49"],
+    ["letter in check digits", "529900GRZ2BQY5ZM9NJ0"],
+    ["letter in check digits", "529900GRZ2BQY5ZM9NS7"],
+  ];
+
+  test.each(passesSum)("%s passes the mod 97 sum: %s", (_, code) => {
+    const digits = [...code.toUpperCase()].map((char) => Number.parseInt(char, 36)).join("");
+    expect(BigInt(digits) % 97n).toBe(1n);
+  });
+
+  test.each([["empty", ""], ...passesSum])("rejects %s: %s", (_, code) => {
+    expect(isValidLei(code)).toBe(false);
+  });
+
+  test.each([
+    ["too short", "529900GRZ2BQY5ZM9N4"],
     ["space", "529900GRZ2BQY5ZM9N4 9"],
-    ["letter in check digits", "529900GRZ2BQY5ZM9NA9"],
     ["non-ASCII", "529900GRZ2BQY5ZM9NÅ9"],
-  ])("rejects %s", (_, code) => {
+  ])("rejects %s: %s", (_, code) => {
     expect(isValidLei(code)).toBe(false);
   });
 });
