@@ -1,6 +1,6 @@
 # 04 · Index format
 
-Status: approved
+Status: done
 
 ## Goal
 The index has a fixed format, chosen by measurement on the full corpus, and slice 7 has
