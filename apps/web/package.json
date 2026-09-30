@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.ts",
+    "bench": "node scripts/bench-render.ts",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "e2e": "playwright test",
@@ -12,7 +13,10 @@
   "devDependencies": {
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
+    "@whichlei/core": "workspace:*",
+    "@whichlei/gleif": "workspace:*",
     "typescript": "catalog:",
+    "vitest": "catalog:",
     "wrangler": "catalog:"
   }
 }

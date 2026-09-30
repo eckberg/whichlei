@@ -9,3 +9,6 @@ Then open `whichlei.html` in a browser.
 
 `scorer.js` is a browser port of [research/ranking](../../research/ranking/). On the same
 records it returns the same top 10 as the reference for all 3,245 evaluation queries.
+
+`shared.css` holds the theme and the record view. The record pages (`apps/web`) use it too,
+so change the look there.
