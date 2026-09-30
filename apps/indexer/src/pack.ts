@@ -105,6 +105,8 @@ export interface PackOptions {
   split?: number;
   limit?: number;
   cap?: number;
+  /** Order of the entities among equal prominence, lowest first. Default: their number. */
+  rank?: ArrayLike<number>;
 }
 
 /**
@@ -115,7 +117,7 @@ export interface PackOptions {
 export function pack(
   postings: Postings,
   prominence: ArrayLike<number>,
-  { split = SPLIT, limit = FILE_POSTINGS, cap = CAP }: PackOptions = {},
+  { split = SPLIT, limit = FILE_POSTINGS, cap = CAP, rank }: PackOptions = {},
 ): Packing {
   const { words, start, entities } = postings;
   const shards = planShards(words, start, split);
@@ -126,8 +128,12 @@ export function pack(
   const files: Int32Array[] = [];
   const seen = new Uint8Array(prominence.length);
   let reachable = 0;
-  const order = (a: number, b: number) =>
-    (prominence[b] as number) - (prominence[a] as number) || a - b;
+  const order =
+    rank === undefined
+      ? (a: number, b: number) => (prominence[b] as number) - (prominence[a] as number) || a - b
+      : (a: number, b: number) =>
+          (prominence[b] as number) - (prominence[a] as number) ||
+          (rank[a] as number) - (rank[b] as number);
 
   ranges.forEach(([a, b], n) => {
     bounds.push(words[a] as string);

@@ -70,6 +70,17 @@ function* entriesOf(entities: Entities, ids: Int32Array): Generator<Entry> {
   }
 }
 
+/** Position of each LEI in sorted order. */
+function leiRank(lei: readonly string[]): Int32Array {
+  const order = Int32Array.from({ length: lei.length }, (_, i) => i);
+  order.sort((a, b) => ((lei[a] as string) < (lei[b] as string) ? -1 : 1));
+  const rank = new Int32Array(lei.length);
+  order.forEach((entity, position) => {
+    rank[entity] = position;
+  });
+  return rank;
+}
+
 /** Empty `out` if it holds an earlier build; refuse a directory that holds anything else. */
 function prepare(out: string): void {
   let names: string[] = [];
@@ -119,7 +130,16 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   }
 
   const grouped = await step("group", () => postings.finish());
-  const packing = await step("pack", () => pack(grouped, entities.prominence));
+  // Equal prominence is ordered by LEI. The golden copy is in LEI order, so the entity number
+  // does it; if a copy ever is not, rank the entities by LEI.
+  const inLeiOrder = entities.lei.every(
+    (lei, i) => i === 0 || (entities.lei[i - 1] as string) < lei,
+  );
+  const rank = inLeiOrder ? undefined : leiRank(entities.lei);
+  if (rank !== undefined) log("  the golden copy is not in LEI order; ranking by LEI");
+  const packing = await step("pack", () =>
+    pack(grouped, entities.prominence, rank === undefined ? {} : { rank }),
+  );
   log(
     `  ${grouped.words.length.toLocaleString()} terms, ${packing.files.length} files,` +
       ` ${packing.capped.length} capped, ${packing.reachable.toLocaleString()} entities reachable`,

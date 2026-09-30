@@ -138,6 +138,16 @@ describe("pack", () => {
     expect([...(files[1] ?? [])]).toEqual([4, 9, 2, 0, 6]); // other + rare
   });
 
+  test("equal prominence goes by rank when one is given, else by entity number", () => {
+    const postings = () => postingsOf([["aa"], ["aa"], ["aa"]]);
+    expect(pack(postings(), [0, 0, 0]).files.map((f) => [...f])).toEqual([[0, 1, 2]]);
+    const rank = [2, 0, 1];
+    expect(pack(postings(), [0, 0, 0], { rank }).files.map((f) => [...f])).toEqual([[1, 2, 0]]);
+    // Cut to the cap, rank decides who stays.
+    const cut = pack(postings(), [0, 0, 0], { rank, cap: 2 });
+    expect(cut.files.map((f) => [...f])).toEqual([[1, 2]]);
+  });
+
   test("an entity in two terms of one file appears once", () => {
     const { files } = pack(postingsOf([["aa", "ab"], ["aa"]]), [0, 0]);
     expect(files.map((f) => [...f])).toEqual([[0, 1]]);

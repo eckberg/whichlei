@@ -168,14 +168,14 @@ export async function readEntities(
       const type = nameType(cleanName(row[otherType[i] as number] as string));
       variants.push([type, other]);
       // Only trading and alternative-language names are listed with the entity.
-      if (type === 1 || type === 2) listed.push(other);
+      if ((type === 1 || type === 2) && other !== "") listed.push(other);
     }
     for (const column of transliterated) {
       const raw = row[column] as string;
       if (raw === "") continue;
       const other = cleanName(raw);
       variants.push([3, other]);
-      listed.push(other);
+      if (other !== "") listed.push(other);
     }
     // Type order, each type in the order of the file. Array.prototype.sort is stable.
     variants.sort((a, b) => a[0] - b[0]);
