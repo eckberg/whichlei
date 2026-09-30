@@ -18,6 +18,7 @@ import {
   routingTable,
   topK,
 } from "@whichlei/core";
+import { objective } from "../src/evaluation.ts";
 import { keystrokes, sessionFiles } from "../src/session.ts";
 import {
   DATA_DIR,
@@ -129,19 +130,6 @@ for (const q of reference.keys()) {
   }
 }
 
-const STRATA = ["head_label", "head_alias", "torso", "tail", "typo_first3", "typo_later"];
-/** Mean over the six strata of MRR@10, as evaluate.objective. */
-function objective(queries: EvalQuery[], top: Map<string, string[]>): number {
-  const mrr = STRATA.map((stratum) => {
-    const rs = queries.filter((r) => r.stratum === stratum);
-    const sum = rs.reduce((a, r) => {
-      const rank = (top.get(r.query) ?? []).findIndex((lei) => r.targets.has(lei));
-      return a + (rank < 0 ? 0 : 1 / (rank + 1));
-    }, 0);
-    return sum / rs.length;
-  });
-  return mrr.reduce((a, b) => a + b, 0) / mrr.length;
-}
 const quality: Record<string, unknown> = {};
 for (const [precision, top] of Object.entries(tops)) {
   let differ = 0;
