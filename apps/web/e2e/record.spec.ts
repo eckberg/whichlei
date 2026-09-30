@@ -86,5 +86,6 @@ test.describe("live record", () => {
   test("answers 404 for a well-formed LEI that GLEIF does not have", async ({ request }) => {
     const response = await request.get("/lei/549300ZZZZZZZZZZZZ46");
     expect(response.status()).toBe(404);
+    expect(await response.text()).toContain("No such LEI");
   });
 });

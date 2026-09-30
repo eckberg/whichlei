@@ -23,9 +23,7 @@ const words = (code: string): string => code.toLowerCase().replace(/[_-]/g, " ")
 
 /** ` lang="sv"`, only when GLEIF's code looks like a language code. */
 const langAttr = (code: string | null): Html =>
-  code !== null && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(code)
-    ? html` lang="${code}"`
-    : html``;
+  code !== null && /^[A-Za-z0-9-]{1,35}$/.test(code) ? html` lang="${code}"` : html``;
 
 /** Only http(s) links from GLEIF are followed. */
 const safeUrl = (url: string): string | null => (/^https?:\/\//i.test(url) ? url : null);
@@ -179,13 +177,12 @@ function rows(record: LeiRecord): Row[] {
     "corroboration",
     record.corroborationLevel ? html`${words(record.corroborationLevel)}` : null,
   );
-  add("managed by", "managing-lou", record.managingLou ? html`${record.managingLou}` : null);
+  add("managed by", "managing-lou", record.managingLou ? leiLink(record.managingLou) : null);
   return out.filter((row): row is Row => row !== null);
 }
 
-// Characters that could end a script element or a comment, or break a script line: U+2028
-// and U+2029 are written as escapes here, never as themselves.
-const JSON_UNSAFE = new RegExp(`[<>&${String.fromCharCode(0x2028, 0x2029)}]`, "g");
+// Characters that could end a script element or start a comment inside one.
+const JSON_UNSAFE = /[<>&]/g;
 
 /** schema.org Organization, with the LEI as `leiCode`. */
 function jsonLd(record: LeiRecord, canonicalUrl: string): string {
@@ -197,11 +194,10 @@ function jsonLd(record: LeiRecord, canonicalUrl: string): string {
     name: record.legalName.name,
     legalName: record.legalName.name,
     leiCode: record.lei,
-    url: canonicalUrl,
-    sameAs: [record.source.webUrl],
+    ...(safeUrl(record.source.webUrl) ? { sameAs: [record.source.webUrl] } : {}),
   };
   const alternates = record.otherNames
-    .filter((n) => n.kind !== "transliterated")
+    .filter((n) => n.kind !== "transliterated" && n.kind !== "previous")
     .map((n) => n.name);
   if (alternates.length > 0) data.alternateName = alternates;
   if (record.creationDate) data.foundingDate = day(record.creationDate);
@@ -223,7 +219,7 @@ function jsonLd(record: LeiRecord, canonicalUrl: string): string {
   );
 }
 
-function shell(parts: { title: string; head?: Html; body: Html }): string {
+function shell(parts: { title: string; head?: Html; body: Html; copyScript?: boolean }): string {
   return html`<!doctype html>
 <html lang="en">
 <head>
@@ -245,8 +241,7 @@ ${parts.head ?? ""}
 </header>
 ${parts.body}
 </div>
-<script src="/scripts/copy.js" defer></script>
-</body>
+${parts.copyScript ? html`<script src="/scripts/copy.js" defer></script>\n` : ""}</body>
 </html>
 `.value;
 }
@@ -262,6 +257,7 @@ export function renderRecordPage(record: LeiRecord, context: RecordPageContext):
     `${name}${place ? ` (${place})` : ""}: LEI ${record.lei}, ${status.label}. ` +
     `Source: GLEIF${golden ? `, golden copy ${golden}` : ""}.`;
   const apiUrl = safeUrl(record.source.apiUrl);
+  const webUrl = safeUrl(record.source.webUrl);
 
   const head = html`<meta name="description" content="${description}">
 <link rel="canonical" href="${canonicalUrl}">
@@ -275,7 +271,7 @@ export function renderRecordPage(record: LeiRecord, context: RecordPageContext):
 </div>
 <div class="actions">
 <button class="btn" type="button" data-copy="${record.lei}" hidden>copy lei</button>
-<a class="btn" href="${record.source.webUrl}" rel="noopener">gleif.org</a>
+${webUrl ? html`<a class="btn" href="${webUrl}" rel="noopener">gleif.org</a>` : ""}
 <span class="copied" role="status" data-copy-status></span>
 </div>
 <dl class="kv">
@@ -287,7 +283,7 @@ ${rows(record).map(
 </div>
 </main>`;
 
-  return shell({ title: `${name} · LEI ${record.lei} · whichlei`, head, body });
+  return shell({ title: `${name} · LEI ${record.lei} · whichlei`, head, body, copyScript: true });
 }
 
 /** A short page for an answer that has no record: 404, 503 and the like. */

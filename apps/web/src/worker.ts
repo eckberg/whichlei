@@ -25,9 +25,16 @@ export interface CacheLike {
 
 export interface Env {
   ASSETS: Fetcher;
-  /** `"true"` lets crawlers in. Anything else keeps the site out of search engines. */
+  /**
+   * `"true"` lets crawlers in, but only on the host named by CANONICAL_ORIGIN. Anything else
+   * keeps the site out of search engines.
+   */
   ALLOW_INDEXING?: string;
-  /** Origin for canonical links, such as `https://whichlei.com`. Default: the request's own. */
+  /**
+   * The site's own origin, such as `https://whichlei.com`. Canonical links, JSON-LD and
+   * redirects point at it. Empty until launch: then they use the origin of the request, and
+   * no host is indexable.
+   */
   CANONICAL_ORIGIN?: string;
 }
 
@@ -37,6 +44,8 @@ export interface Deps {
   /** Used for GLEIF. */
   fetch: Fetch;
   now(): Date;
+  /** How long to wait for GLEIF before answering 503. */
+  gleifTimeoutMs: number;
 }
 
 const BROWSER_MAX_AGE = 3600;
@@ -65,6 +74,7 @@ interface Answer {
 }
 
 function respond(request: Request, env: Env, answer: Answer): Response {
+  const url = new URL(request.url);
   const headers = new Headers({
     "content-type": answer.contentType ?? "text/html; charset=utf-8",
     "cache-control": answer.cacheControl,
@@ -74,7 +84,7 @@ function respond(request: Request, env: Env, answer: Answer): Response {
     "content-security-policy": CSP,
     ...answer.headers,
   });
-  if (env.ALLOW_INDEXING !== "true") headers.set("x-robots-tag", "noindex");
+  if (!indexable(env, url)) headers.set("x-robots-tag", "noindex");
   return new Response(request.method === "HEAD" ? null : answer.body, {
     status: answer.status,
     headers,
@@ -104,22 +114,34 @@ function unavailable(retryAfter: number | null): Answer {
   );
 }
 
-const canonicalOrigin = (env: Env, url: URL): string => {
+/** CANONICAL_ORIGIN as an origin, or null when it is empty or not an http(s) URL. */
+function configuredOrigin(env: Env): string | null {
   try {
     if (env.CANONICAL_ORIGIN) {
       const origin = new URL(env.CANONICAL_ORIGIN);
       if (origin.protocol === "https:" || origin.protocol === "http:") return origin.origin;
     }
   } catch {
-    // Not a URL: use the request's own origin.
+    // Not a URL: treated as unset.
   }
-  return url.origin;
+  return null;
+}
+
+const canonicalOrigin = (env: Env, url: URL): string => configuredOrigin(env) ?? url.origin;
+
+/**
+ * Crawlers are let in only when the setting is on and the request came to the canonical
+ * host. The workers.dev host is never indexed (DESIGN.md decision 17).
+ */
+const indexable = (env: Env, url: URL): boolean => {
+  const canonical = configuredOrigin(env);
+  return env.ALLOW_INDEXING === "true" && canonical !== null && canonical === url.origin;
 };
 
 const asciiUpper = (text: string) => text.replace(/[a-z]/g, (c) => c.toUpperCase());
 
 /** What a request path says about the LEI it asks for. */
-export function readLeiPath(pathname: string): { lei: string; canonical: boolean } | null {
+function readLeiPath(pathname: string): { lei: string; canonical: boolean } | null {
   let segment = pathname.slice("/lei/".length);
   const trailingSlash = segment.endsWith("/");
   if (trailingSlash) segment = segment.slice(0, -1);
@@ -139,18 +161,21 @@ async function lookup(
   lei: string,
   origin: string,
   deps: Deps,
-): Promise<{ answer: Answer; outcome: CacheOutcome }> {
+): Promise<{ answer: Answer; outcome: CacheOutcome; goldenCopyDate: string | null }> {
   try {
     const record = await fetchRecord(lei, {
       fetch: deps.fetch,
-      signal: AbortSignal.timeout(GLEIF_TIMEOUT_MS),
+      signal: AbortSignal.timeout(deps.gleifTimeoutMs),
     });
+    // A record for another LEI is an answer we cannot trust: never show or cache it.
+    if (record.lei !== lei)
+      throw new GleifError("failed", `GLEIF answered ${record.lei} for ${lei}`);
     const answer = {
       status: 200,
       body: renderRecordPage(record, { canonicalOrigin: origin }),
       cacheControl: publicFor(BROWSER_MAX_AGE),
     };
-    return { answer, outcome: "found" };
+    return { answer, outcome: "found", goldenCopyDate: record.source.goldenCopyDate };
   } catch (error) {
     if (error instanceof GleifError && error.kind === "not-found") {
       const answer = message(
@@ -159,10 +184,10 @@ async function lookup(
         "No such LEI",
         `GLEIF has no record for ${lei}. The code is well formed, but no entity has it.`,
       );
-      return { answer, outcome: "not-found" };
+      return { answer, outcome: "not-found", goldenCopyDate: null };
     }
     const retryAfter = error instanceof GleifError ? error.retryAfter : null;
-    return { answer: unavailable(retryAfter), outcome: "failure" };
+    return { answer: unavailable(retryAfter), outcome: "failure", goldenCopyDate: null };
   }
 }
 
@@ -187,10 +212,11 @@ function toCache(
   key: Request,
   answer: Answer,
   outcome: CacheOutcome,
+  goldenCopyDate: string | null,
   deps: Deps,
   ctx: ExecutionContext,
 ) {
-  const ttl = cacheTtl(outcome, deps.now());
+  const ttl = cacheTtl(outcome, deps.now(), goldenCopyDate);
   if (cache === null || ttl === 0) return;
   const stored = new Response(answer.body, {
     status: answer.status,
@@ -202,6 +228,7 @@ function toCache(
 async function serveLei(request: Request, env: Env, ctx: ExecutionContext, deps: Deps) {
   const url = new URL(request.url);
   const asked = readLeiPath(url.pathname);
+  const origin = canonicalOrigin(env, url);
   if (asked === null) {
     return respond(
       request,
@@ -220,7 +247,7 @@ async function serveLei(request: Request, env: Env, ctx: ExecutionContext, deps:
       body: "",
       contentType: "text/plain; charset=utf-8",
       cacheControl: publicFor(REDIRECT_MAX_AGE),
-      headers: { location: new URL(`/lei/${asked.lei}`, url).href },
+      headers: { location: `${origin}/lei/${asked.lei}` },
     });
   }
   if (!isValidLei(asked.lei)) {
@@ -236,25 +263,25 @@ async function serveLei(request: Request, env: Env, ctx: ExecutionContext, deps:
     );
   }
 
-  const origin = canonicalOrigin(env, url);
+  // The key is the canonical URL: the query string, which a crawler can vary at will, is
+  // not part of it.
   const key = new Request(`${origin}/lei/${asked.lei}`);
   const cache = deps.cache();
   const cached = await fromCache(cache, key);
   if (cached !== null) return respond(request, env, cached);
 
-  const { answer, outcome } = await lookup(asked.lei, origin, deps);
-  toCache(cache, key, answer, outcome, deps, ctx);
+  const { answer, outcome, goldenCopyDate } = await lookup(asked.lei, origin, deps);
+  toCache(cache, key, answer, outcome, goldenCopyDate, deps, ctx);
   return respond(request, env, { ...answer, headers: { ...answer.headers, "x-cache": "MISS" } });
 }
 
-function serveRobots(env: Env): Response {
-  const allowed = env.ALLOW_INDEXING === "true";
-  return new Response(`User-agent: *\n${allowed ? "Allow: /" : "Disallow: /"}\n`, {
-    headers: {
-      "content-type": "text/plain; charset=utf-8",
-      "cache-control": publicFor(BROWSER_MAX_AGE),
-      "x-content-type-options": "nosniff",
-    },
+function serveRobots(request: Request, env: Env): Response {
+  const allowed = indexable(env, new URL(request.url));
+  return respond(request, env, {
+    status: 200,
+    body: `User-agent: *\n${allowed ? "Allow: /" : "Disallow: /"}\n`,
+    contentType: "text/plain; charset=utf-8",
+    cacheControl: publicFor(BROWSER_MAX_AGE),
   });
 }
 
@@ -262,14 +289,18 @@ export function createWorker(deps: Deps) {
   return {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
       const { pathname } = new URL(request.url);
-      if (pathname === "/robots.txt") return serveRobots(env);
-      if (!pathname.startsWith("/lei/")) return env.ASSETS.fetch(request);
+      const mine = pathname === "/robots.txt" || pathname.startsWith("/lei/");
+      if (!mine) return env.ASSETS.fetch(request);
       if (request.method !== "GET" && request.method !== "HEAD") {
-        return new Response("Method not allowed\n", {
+        return respond(request, env, {
           status: 405,
-          headers: { allow: "GET, HEAD", "cache-control": "no-store" },
+          body: "Method not allowed\n",
+          contentType: "text/plain; charset=utf-8",
+          cacheControl: "no-store",
+          headers: { allow: "GET, HEAD" },
         });
       }
+      if (pathname === "/robots.txt") return serveRobots(request, env);
       return serveLei(request, env, ctx, deps);
     },
   };
@@ -280,4 +311,5 @@ export default createWorker({
   cache: () => (globalThis as { caches?: { default: CacheLike } }).caches?.default ?? null,
   fetch: (input, init) => fetch(input, init),
   now: () => new Date(),
+  gleifTimeoutMs: GLEIF_TIMEOUT_MS,
 });

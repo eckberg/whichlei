@@ -61,7 +61,8 @@ describe("every recorded fixture", () => {
     expect(data["@context"]).toBe("https://schema.org");
     expect(data.leiCode).toBe(record.lei);
     expect(data.legalName).toBe(record.legalName.name);
-    expect(data.url).toBe(`https://whichlei.test/lei/${record.lei}`);
+    expect(data["@id"]).toBe(`https://whichlei.test/lei/${record.lei}`);
+    expect(data).not.toHaveProperty("url");
     expect(json).not.toContain("<");
   });
 });
@@ -87,6 +88,28 @@ describe("fields", () => {
     expect(text(field(page, "successors"))).toBe("Bolagsstiftarna Sirga AB");
     expect(text(field(page, "other-names"))).toContain("Rågårds i Karlskrona Aktiebolag");
     expect(text(field(page, "other-names"))).toContain("previous");
+  });
+
+  it("links the managing LOU to its own page", async () => {
+    const page = renderRecordPage(await parsedRecord("record-ericsson"), context);
+    const lou = "549300O897ZC5H7CY412";
+    expect(field(page, "managing-lou")).toBe(`<a href="/lei/${lou}">${lou}</a>`);
+  });
+
+  it("leaves previous names out of the JSON-LD alternate names, and keeps trading names", async () => {
+    const previous = await parsedRecord("record-retired");
+    expect(previous.otherNames.map((n) => n.kind)).toEqual(["previous"]);
+    const ld = (page: string) =>
+      JSON.parse(/<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "");
+    expect(ld(renderRecordPage(previous, context))).not.toHaveProperty("alternateName");
+
+    const mixed = await parsedRecord("record-toyota");
+    mixed.otherNames.push({ name: "Old Name", language: "en", kind: "previous", type: "PREVIOUS" });
+    mixed.otherNames.push({ name: "Toyota", language: "en", kind: "trading", type: "TRADING" });
+    expect(ld(renderRecordPage(mixed, context)).alternateName).toEqual([
+      "Toyota Motor Corporation",
+      "Toyota",
+    ]);
   });
 
   it("links a successor that has an LEI", async () => {
@@ -197,5 +220,13 @@ describe("renderMessagePage", () => {
     expect(page).toContain("<h1>&lt;h&gt;</h1>");
     expect(page).not.toContain("<d>");
     expect(page).toContain('<a class="btn" href="/">search</a>');
+  });
+
+  it("does not load the copy script, which a record page does", async () => {
+    const message = renderMessagePage({ title: "t", heading: "h", detail: "d" });
+    expect(message).not.toContain("<script");
+    expect(renderRecordPage(await parsedRecord("record-ericsson"), context)).toContain(
+      '<script src="/scripts/copy.js" defer></script>',
+    );
   });
 });

@@ -1,52 +1,55 @@
 import { describe, expect, it } from "vitest";
-import { cacheTtl, secondsUntilRefresh } from "./ttl.ts";
+import { cacheTtl, recordTtl } from "./ttl.ts";
 
 const at = (iso: string) => new Date(iso);
+const GOLDEN = "2026-09-30T08:00:00Z";
+const HOUR = 3600;
 
-describe("secondsUntilRefresh", () => {
-  it("counts to 09:00 UTC the same day when it is earlier", () => {
-    expect(secondsUntilRefresh(at("2026-09-30T00:00:00Z"))).toBe(9 * 3600);
-    expect(secondsUntilRefresh(at("2026-09-30T08:59:00Z"))).toBe(60);
+describe("recordTtl", () => {
+  it("expires 25 hours after the golden copy", () => {
+    // 10:00 is two hours after the golden copy, so 23 hours remain.
+    expect(recordTtl(GOLDEN, at("2026-09-30T10:00:00Z"))).toBe(23 * HOUR);
+    expect(recordTtl(GOLDEN, at("2026-10-01T08:00:00Z"))).toBe(HOUR);
   });
 
-  it("counts to 09:00 UTC the next day when that has passed", () => {
-    expect(secondsUntilRefresh(at("2026-09-30T10:00:00Z"))).toBe(23 * 3600);
-    expect(secondsUntilRefresh(at("2026-09-30T23:59:59Z"))).toBe(9 * 3600 + 1);
+  it("is at most 24 hours, even for a golden copy in the future", () => {
+    expect(recordTtl(GOLDEN, at("2026-09-30T08:00:00Z"))).toBe(24 * HOUR);
+    expect(recordTtl(GOLDEN, at("2026-09-30T00:00:00Z"))).toBe(24 * HOUR);
+    expect(recordTtl(GOLDEN, at("2026-09-29T00:00:00Z"))).toBe(24 * HOUR);
   });
 
-  it("waits a full day at exactly 09:00", () => {
-    expect(secondsUntilRefresh(at("2026-09-30T09:00:00Z"))).toBe(24 * 3600);
+  it("is at least 5 minutes, even for a golden copy that is stale or past its expiry", () => {
+    expect(recordTtl(GOLDEN, at("2026-10-01T09:00:00Z"))).toBe(300);
+    expect(recordTtl(GOLDEN, at("2026-10-01T08:59:00Z"))).toBe(300);
+    expect(recordTtl(GOLDEN, at("2026-10-05T00:00:00Z"))).toBe(300);
   });
 
-  it("rounds a part second up and is never zero", () => {
-    expect(secondsUntilRefresh(at("2026-09-30T08:59:59.400Z"))).toBe(1);
-    expect(secondsUntilRefresh(at("2026-09-30T08:59:59.999Z"))).toBe(1);
+  it("changes at the 5 minute edge", () => {
+    expect(recordTtl(GOLDEN, at("2026-10-01T08:55:00Z"))).toBe(300);
+    expect(recordTtl(GOLDEN, at("2026-10-01T08:54:00Z"))).toBe(360);
   });
 
-  it("crosses month and year ends", () => {
-    expect(secondsUntilRefresh(at("2026-12-31T12:00:00Z"))).toBe(21 * 3600);
-    expect(secondsUntilRefresh(at("2026-02-28T09:30:00Z"))).toBe(23.5 * 3600);
+  it("rounds a part second up", () => {
+    expect(recordTtl(GOLDEN, at("2026-09-30T10:00:00.400Z"))).toBe(23 * HOUR);
   });
 
-  it("never exceeds 24 hours", () => {
-    for (let minute = 0; minute < 24 * 60; minute += 7) {
-      const now = new Date(Date.UTC(2026, 8, 30, 0, minute));
-      const seconds = secondsUntilRefresh(now);
-      expect(seconds).toBeGreaterThanOrEqual(1);
-      expect(seconds).toBeLessThanOrEqual(86400);
-    }
+  it("falls back to an hour when the date is missing or not a date", () => {
+    expect(recordTtl(null, at("2026-09-30T10:00:00Z"))).toBe(HOUR);
+    expect(recordTtl("", at("2026-09-30T10:00:00Z"))).toBe(HOUR);
+    expect(recordTtl("yesterday-ish", at("2026-09-30T10:00:00Z"))).toBe(HOUR);
   });
 });
 
 describe("cacheTtl", () => {
   const now = at("2026-09-30T10:00:00Z");
-  it("keeps a record until the next refresh", () => {
-    expect(cacheTtl("found", now)).toBe(23 * 3600);
+  it("keeps a record as recordTtl says", () => {
+    expect(cacheTtl("found", now, GOLDEN)).toBe(23 * HOUR);
+    expect(cacheTtl("found", now)).toBe(HOUR);
   });
   it("keeps an unknown LEI for an hour", () => {
-    expect(cacheTtl("not-found", now)).toBe(3600);
+    expect(cacheTtl("not-found", now, GOLDEN)).toBe(HOUR);
   });
   it("never keeps a failure", () => {
-    expect(cacheTtl("failure", now)).toBe(0);
+    expect(cacheTtl("failure", now, GOLDEN)).toBe(0);
   });
 });

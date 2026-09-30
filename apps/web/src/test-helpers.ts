@@ -51,7 +51,9 @@ export interface FakeGleif {
  * GLEIF, answering each LEI from its fixture. `override` answers instead, for failures and
  * edited bodies.
  */
-export function fakeGleif(override?: (url: string) => Response | Promise<Response>): FakeGleif {
+export function fakeGleif(
+  override?: (url: string, init?: RequestInit) => Response | Promise<Response>,
+): FakeGleif {
   const byLei = new Map<string, Fixture>();
   for (const file of readdirSync(fixtureDir)) {
     if (!file.startsWith("record-")) continue;
@@ -62,9 +64,9 @@ export function fakeGleif(override?: (url: string) => Response | Promise<Respons
   const calls: string[] = [];
   return {
     calls,
-    fetch: async (url) => {
+    fetch: async (url, init) => {
       calls.push(url);
-      if (override) return override(url);
+      if (override) return override(url, init);
       const lei = /lei-records\/([0-9A-Z]{20})/.exec(url)?.[1] ?? "";
       const fixture = byLei.get(lei);
       if (!fixture) return new Response("<html>Not found</html>", { status: 404 });
@@ -120,12 +122,19 @@ export interface Harness {
   setNow(iso: string): void;
 }
 
-export function harness(options: { gleif?: FakeGleif; origin?: string } = {}): Harness {
+export function harness(
+  options: { gleif?: FakeGleif; origin?: string; gleifTimeoutMs?: number } = {},
+): Harness {
   const gleif = options.gleif ?? fakeGleif();
   const cache = fakeCache();
   const assetRequests: string[] = [];
   let now = new Date("2026-09-30T10:00:00Z");
-  const deps: Deps = { cache: () => cache, fetch: gleif.fetch, now: () => now };
+  const deps: Deps = {
+    cache: () => cache,
+    fetch: gleif.fetch,
+    now: () => now,
+    gleifTimeoutMs: options.gleifTimeoutMs ?? 8000,
+  };
   const worker = createWorker(deps);
   const origin = options.origin ?? "https://whichlei.test";
   return {

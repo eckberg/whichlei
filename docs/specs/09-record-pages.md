@@ -17,12 +17,15 @@ and date, and copies the LEI.
   their own pages, source link and golden copy date, a copy button (works without JS as
   selectable text). Terminal style from the prototype. `<title>`, description, canonical
   link, and JSON-LD `Organization` with `leiCode`.
-- Caching with the Cache API: a record until shortly after GLEIF's next daily publish
-  (about 08:00 UTC), a 404 for an hour. Browsers may keep a page for an hour.
-- Until launch, the workers.dev host is not indexed: `robots.txt` (served by the Worker)
-  disallows and pages send `X-Robots-Tag: noindex`. One setting, `ALLOW_INDEXING` in
-  `wrangler.jsonc`, turns indexing on at launch. `CANONICAL_ORIGIN` sets the origin of the
-  canonical link.
+- Caching with the Cache API: a record until 25 hours after the golden copy it came from
+  (the next publish plus an hour), kept at least 5 minutes and at most 24 hours; 1 hour when
+  the record has no golden copy date. A 404 for an hour, a failure never. Browsers may keep
+  a page for an hour.
+- Until launch, nothing is indexed: `robots.txt` (served by the Worker) disallows and pages
+  send `X-Robots-Tag: noindex`. Indexing is on only when `ALLOW_INDEXING` is `"true"` and the
+  request came to `CANONICAL_ORIGIN`, so workers.dev is never indexed. Both are variables in
+  `wrangler.jsonc`; `CANONICAL_ORIGIN` is empty until launch. It also sets the origin of
+  canonical links, JSON-LD and redirects.
 
 ## Not in scope
 - Sitemaps: they need the LEI list, so slice 6 publishes them with the index.
@@ -35,10 +38,10 @@ Escape every value. No framework.
 
 ## Unknowns
 - **CPU per request** (measured, `pnpm --filter @whichlei/web bench`: every recorded fixture,
-  1,000 runs, Node on a server CPU). Rendering a page: median 0.012 to 0.016 ms, p99 at most
-  0.30 ms. Reading GLEIF's JSON into a record as well (the cost of a cache miss): p99 at
-  most 0.52 ms. A page is about 3.5 KB of HTML. The limit is 10 ms, so there is a factor of
-  about 20. Waiting for GLEIF is not CPU time. The Worker bundle is 29 KB. Not measured in
+  1,000 runs, Node on a server CPU). Rendering a page: median 0.012 to 0.019 ms, p99 at most
+  0.37 ms. Reading GLEIF's JSON into a record as well (the cost of a cache miss): p99 at
+  most 0.60 ms. A page is about 3.5 KB of HTML. The limit is 10 ms, so there is a factor of
+  about 16. Waiting for GLEIF is not CPU time. The Worker bundle is 29 KB. Not measured in
   the Workers runtime itself: check the CPU time in the Cloudflare dashboard after deploy.
 - **Worker requests a day** (estimate, no traffic data yet). Only `/lei/*` and
   `/robots.txt` reach the Worker; the page's stylesheet and script are free static requests.
