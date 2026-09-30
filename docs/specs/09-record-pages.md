@@ -28,7 +28,8 @@ and date, and copies the LEI.
   canonical links, JSON-LD and redirects.
 
 ## Not in scope
-- Sitemaps: they need the LEI list, so slice 6 publishes them with the index.
+- Sitemaps: they need the LEI list, and nothing is indexed before launch, so they come
+  with launch (slice 11).
 - Fetching parent names: one GLEIF request per page. Parents show as linked LEIs.
 
 ## Approach
