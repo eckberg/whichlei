@@ -36,8 +36,8 @@ be tried on a real URL and a real phone.
   activity. Slice 6 needs a way to keep the schedule alive.
 - Record pages are rendered by a Worker, so crawlers spend the account's included Worker
   requests. Slice 9 sets cache lifetimes and measures the draw.
-- The slowest keystroke took up to 476 ms on a server CPU. Phones are slower. Slice 4
-  sets the target, slice 7 meets it.
+- The slowest keystroke takes up to 222 ms at 4× CPU slowdown, a stand-in for a mid-range
+  phone. Slice 4 set the targets; slice 7 meets them and checks on a real phone.
 
 ## Not planned
 

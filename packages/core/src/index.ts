@@ -1,10 +1,27 @@
 export {
+  decodeEntries,
+  type Entry,
+  encodeEntries,
+  FORMAT_VERSION,
+  filePath,
+  IndexFormatError,
+  type Manifest,
+  PROMINENCE_STEP,
+  parseManifest,
+  roundProminence,
+  routingTable,
+  type Status,
+  toCandidate,
+  UnsupportedFormatError,
+} from "./format.ts";
+export {
   type IdentifierReadings,
   identifierReadings,
   isValidBic,
   isValidIsin,
   isValidLei,
 } from "./identifiers.ts";
+export { type RouteOptions, type RoutingTable, route } from "./route.ts";
 export {
   type Candidate,
   MATCH_WEIGHTS,
@@ -14,7 +31,15 @@ export {
   matchLevel,
   matchScore,
   prefixEditLe1,
+  QUERY_STOP,
   scoreCandidate,
   topK,
 } from "./score.ts";
-export { fold, indexTerms, type NameTokens, nameTokens, queryTokens } from "./tokens.ts";
+export {
+  fold,
+  indexTerms,
+  lastIsPrefix,
+  type NameTokens,
+  nameTokens,
+  queryTokens,
+} from "./tokens.ts";

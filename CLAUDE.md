@@ -43,6 +43,8 @@ Node version is in `.node-version`; pnpm version is in `package.json`.
 - `DATA_DIR=../../research/data pnpm --filter @whichlei/core parity`: compare `packages/core`
   with the Python reference at full scale. Needs the data from
   `research/ranking/port/dump_parity.py`. Not in CI.
+- `pnpm --filter @whichlei/bench <build-index|replay|browser|score>`: the index-format
+  measurements (docs/specs/04-index-format.md, "Re-run"). Needs `DATA_DIR`. Not in CI.
 
 CI runs install, lint, typecheck and test on every pull request and push to `main`.
 

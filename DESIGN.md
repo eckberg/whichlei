@@ -36,12 +36,12 @@ These are deliberate. Requests that cross them are closed with a link here.
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | The search index is **static files on a CDN**. No search server | 6,438 files, 223 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
+| 1 | The search index is **static files on a CDN**. No search server | 6,438 files, 221 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
 | 2 | An opened record is **fetched live** from the GLEIF API | The API is too slow for typeahead (~0.5 s median, per-IP rate limit) but right for one deliberate lookup, and always current. |
 | 3 | The index is **rebuilt nightly** from GLEIF's daily files | The only compute in the system. Runs on free CI. |
 | 4 | Ranking adds a **prominence** score to **name match**, with weights fitted on an evaluation set | Name match alone ranked Telefonaktiebolaget LM Ericsson 335th for "ericsson". Fitted, the mean reciprocal rank on held-out queries goes from .23 to .65. See §4. |
 | 5 | **Trading, alternative-language and transliterated names** are searchable, not only legal names | People type the name they know. +.05 on the evaluation set for +28 MB of index. |
-| 6 | A query fetches **at most two files**, one per word, fixed once the word has three characters | Typing a whole name fetches at most 462 KB, even if every keystroke fetches. Fetching every word's file scored .004 higher for ~9× the bytes. |
+| 6 | A query fetches **at most two files**, one per word, fixed once the word has three characters | Typing a whole name fetches at most 463 KB, even if every keystroke fetches. Fetching every word's file scored .004 higher for ~9× the bytes. |
 | 7 | **No boost for governments or popularity** | Both only looked good because the evaluation's well-known entities came from Wikidata. A government boost put a government first for 57 of 1,335 company queries. |
 | 8 | Input type is resolved by **evidence**, not shape | "ERICSSON" is also a valid BIC. Run the candidate lookups and show the reading that has hits. |
 | 9 | LEI check digits are **validated in the browser** | ISO 7064 mod 97-10 catches a mistyped LEI before any request is sent. |
@@ -62,7 +62,9 @@ Two paths, split by latency.
 - **Typeahead** reads the static index. Names are split into words, and entities are
   grouped into files by word prefix. A file closes before it exceeds 1,500 entries, so
   96.7% of LEIs are reachable; the rest sit under words too common to route on, such as
-  "limited". An 18 KB routing table maps a prefix to its file. Scoring runs in the browser.
+  "limited". A 21 KB manifest carries the routing table, which maps a prefix to its file.
+  Each file is one line per entity; the browser tokenises and scores. Format:
+  [docs/index-format.md](docs/index-format.md).
 - **Record view** fetches one record from the GLEIF API when the user opens it.
 
 | Measured on the 2026-09-16 golden copy | |
@@ -70,16 +72,16 @@ Two paths, split by latency.
 | Records | 3,431,742 |
 | Reachable through the index | 96.7% |
 | Index files | 6,438 |
-| Index size, gzipped | 223 MB |
-| File size, gzipped | median ~37 KB |
-| Fetched while typing, debounce fires on every key | median 147 KB, p90 271 KB, max 462 KB |
-| Fetched while typing, debounce fires on the last key | median 64 KB, p90 105 KB, max 228 KB |
-| Scoring, slowest keystroke per query (JavaScript, idle server) | median 20 ms, p90 43 ms, max 476 ms |
-| Routing table, gzipped | 18 KB |
+| Index size, gzipped | 221 MB |
+| File size, gzipped | median 36 KB, max 82 KB |
+| Fetched while typing, debounce fires on every key | median 148 KB, p90 272 KB, max 463 KB |
+| Fetched while typing, debounce fires on the last key | median 64 KB, p90 105 KB, max 225 KB |
+| Parsing and scoring, slowest keystroke per query (Chromium, 4× CPU slowdown) | median 45 ms, p90 74 ms, max 222 ms |
+| Manifest with the routing table, gzipped | 21 KB |
 | GLEIF API latency | median ~0.5 s |
 
-Phones are several times slower than the server used for scoring times. The slowest
-keystroke needs work before it feels instant on a phone.
+4× CPU slowdown is Lighthouse's stand-in for a mid-range phone, not a real one. The targets
+search has to meet are in [docs/specs/04-index-format.md](docs/specs/04-index-format.md).
 
 Two packings were rejected. Uniform 3-character buckets give 25,867 files, over the
 20,000-file limit. Closing files by word count rather than entries left 65% of LEIs in no

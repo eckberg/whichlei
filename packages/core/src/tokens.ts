@@ -33,10 +33,16 @@ const WHITESPACE = new RegExp(
     ...[0x2028, 0x2029, 0x202f, 0x205f, 0x3000],
   )}]+`,
 );
+const TRAILING_WHITESPACE = new RegExp(`${WHITESPACE.source}$`);
 const ALNUM = /[a-z0-9]+/g;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: the whole ASCII range
+const ASCII = /^[\x00-\x7f]*$/;
 
 /** Fold for matching: the explicit table, NFKD, drop combining marks, lower case. */
 export function fold(text: string): string {
+  // ASCII has nothing to fold or decompose. Most names are ASCII, and the index parses
+  // thousands of them per file.
+  if (ASCII.test(text)) return text.toLowerCase();
   return text
     .replace(FOLD_CHARS, (char) => FOLD[char] ?? char)
     .normalize("NFKD")
@@ -100,6 +106,14 @@ export function nameTokens(name: string): NameTokens {
     seq,
     extras: [...new Set(extras)].filter((extra) => !seen.has(extra) && extra.length >= 2),
   };
+}
+
+/**
+ * Whether the last query token is still being typed, and so is a prefix: false once the
+ * text ends in whitespace (the same whitespace the tokeniser splits on). For `route`.
+ */
+export function lastIsPrefix(query: string): boolean {
+  return !TRAILING_WHITESPACE.test(query);
 }
 
 /** Tokens of a typed query. 'h&m' is one token, 'coca-cola' two; single letters merge. */
