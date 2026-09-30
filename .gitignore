@@ -15,3 +15,12 @@ design/prototype/whichlei.html
 node_modules/
 coverage/
 dist/
+
+# apps
+apps/*/dist/
+.wrangler/
+test-results/
+playwright-report/
+
+# agent worktrees
+.claude/worktrees/

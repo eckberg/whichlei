@@ -10,7 +10,8 @@
     "lint": "biome check --error-on-warnings",
     "format": "biome check --write",
     "typecheck": "pnpm -r typecheck",
-    "test": "vitest run"
+    "test": "vitest run",
+    "e2e": "pnpm -r e2e"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
