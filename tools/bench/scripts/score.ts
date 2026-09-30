@@ -9,7 +9,7 @@ import {
   type Candidate,
   decodeEntries,
   filePath,
-  type Manifest,
+  parseManifest,
   routingTable,
   toCandidate,
   topK,
@@ -19,7 +19,7 @@ import { loadEval, OUT_DIR, summary } from "./data.ts";
 
 const { values: args } = parseArgs({ options: { every: { type: "string", default: "1" } } });
 const dir = join(OUT_DIR, "lines");
-const manifest = JSON.parse(readFileSync(join(dir, "index.json"), "utf8")) as Manifest;
+const manifest = parseManifest(JSON.parse(readFileSync(join(dir, "index.json"), "utf8")));
 const table = routingTable(manifest);
 const queries = [...new Set(loadEval().map((r) => r.query))].filter(
   (_, i) => i % Number(args.every) === 0,

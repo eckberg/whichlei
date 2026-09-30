@@ -5,7 +5,9 @@
 // query's replay starts.
 import {
   filePath,
+  lastIsPrefix,
   type Manifest,
+  parseManifest,
   queryTokens,
   type RoutingTable,
   route,
@@ -43,7 +45,7 @@ async function fetchText(url: string): Promise<ArrayBuffer> {
 async function load(name: string): Promise<number> {
   const bytes = await fetchText(`/data/${name}/index.json`);
   const t0 = performance.now();
-  const manifest = JSON.parse(new TextDecoder().decode(bytes)) as Manifest;
+  const manifest = parseManifest(JSON.parse(new TextDecoder().decode(bytes)));
   const table = routingTable(manifest);
   const t1 = performance.now();
   loaded = { name, manifest, table };
@@ -64,7 +66,7 @@ async function runQuery(query: string): Promise<QueryTiming> {
   const bytes = new Map<number, ArrayBuffer>();
   for (let k = 1; k <= query.length; k++) {
     const typed = query.slice(0, k);
-    for (const f of route(queryTokens(typed), l.table, { lastIsPrefix: !typed.endsWith(" ") })) {
+    for (const f of route(queryTokens(typed), l.table, { lastIsPrefix: lastIsPrefix(typed) })) {
       if (!bytes.has(f)) bytes.set(f, await fetchText(url(l, f)));
     }
   }
@@ -75,7 +77,7 @@ async function runQuery(query: string): Promise<QueryTiming> {
     const t0 = performance.now();
     const tokens = queryTokens(typed);
     if (tokens.length === 0) continue;
-    const files = route(tokens, l.table, { lastIsPrefix: !typed.endsWith(" ") });
+    const files = route(tokens, l.table, { lastIsPrefix: lastIsPrefix(typed) });
     for (const f of files) {
       if (!parsed.has(f)) parsed.set(f, enc.decode(new TextDecoder().decode(bytes.get(f))));
     }

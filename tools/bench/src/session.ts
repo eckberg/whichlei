@@ -1,5 +1,5 @@
 // A query typed one character at a time, as evaluate.session_cost replays it.
-import { queryTokens, type RoutingTable, route } from "@whichlei/core";
+import { lastIsPrefix as isPrefix, queryTokens, type RoutingTable, route } from "@whichlei/core";
 
 export interface Keystroke {
   typed: string;
@@ -18,7 +18,7 @@ export function keystrokes(query: string, table: RoutingTable): Keystroke[] {
     const typed = query.slice(0, k);
     const tokens = queryTokens(typed);
     if (tokens.length === 0) continue;
-    const lastIsPrefix = !typed.endsWith(" ");
+    const lastIsPrefix = isPrefix(typed);
     out.push({
       typed,
       tokens,

@@ -5,20 +5,26 @@
 // Reads $DATA_DIR/index (research/ranking/port/dump_index.py). Writes $DATA_DIR/format:
 //   <encoding>/index.json, <encoding>/<build>/<n>.txt   the timed encodings, as served
 //   sizes.json                                          per-file sizes and the numbers below
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { brotliCompressSync, constants, gzipSync } from "node:zlib";
 import {
   decodeEntries,
   encodeEntries,
   filePath,
-  type Manifest,
+  parseManifest,
   roundProminence,
 } from "@whichlei/core";
 import { ENCODINGS } from "../src/encodings.ts";
-import { loadEntities, loadFiles, OUT_DIR, type RefEntity, summary } from "./data.ts";
+import { DUMP_DIR, loadEntities, loadFiles, OUT_DIR, type RefEntity, summary } from "./data.ts";
 
-const BUILD = "20260916";
+// Build id: golden-copy date and a content hash. The reference dump fixes the contents, so
+// its hash stands in for one over the built files.
+const ASOF = "2026-09-16";
+const hash = createHash("sha256");
+for (const f of ["files.tsv", "entities.tsv"]) hash.update(readFileSync(join(DUMP_DIR, f)));
+const BUILD = `${ASOF.replaceAll("-", "")}-${hash.digest("hex").slice(0, 16)}`;
 /** Cloudflare compresses on the fly; gzip level 6 and brotli quality 4 stand in for it. */
 const gzipSize = (text: string) => gzipSync(text, { level: 6 }).length;
 const brotliSize = (text: string) =>
@@ -35,20 +41,21 @@ log(`reference index: ${files.length} files, ${entities.size} entities`);
 const entriesOf = (ids: number[]) => ids.map((id) => (entities.get(id) as RefEntity).entry);
 
 mkdirSync(OUT_DIR, { recursive: true });
-const manifest: Manifest = {
+const manifest = parseManifest({
   format: 1,
   build: BUILD,
-  asOf: "2026-09-16",
+  asOf: ASOF,
   entities: entities.size,
   bounds: files.map((f) => f.bound),
   capped: files.flatMap((f, i) => (f.capped ? [i] : [])),
-};
+});
+log(`build ${BUILD}`);
 
 const sizes: Record<string, { raw: number[]; gzip: number[]; brotli: number[] }> = {};
 for (const enc of ENCODINGS) {
   const dir = join(OUT_DIR, enc.name);
   if (enc.timed) {
-    rmSync(dir, { recursive: true, force: true });
+    // Earlier builds stay, like a publish that keeps the previous build.
     mkdirSync(join(dir, BUILD), { recursive: true });
     writeFileSync(join(dir, "index.json"), JSON.stringify(manifest));
   }

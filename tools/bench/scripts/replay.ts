@@ -9,10 +9,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   type Candidate,
-  type Manifest,
   type NameTokens,
   nameTokens,
+  parseManifest,
   queryTokens,
+  roundProminence,
   route,
   routingTable,
   topK,
@@ -39,7 +40,7 @@ interface Sizes {
   sizes: Record<string, { raw: number[]; gzip: number[]; brotli: number[] }>;
 }
 const { sizes } = JSON.parse(readFileSync(join(OUT_DIR, "sizes.json"), "utf8")) as Sizes;
-const manifest = JSON.parse(readFileSync(join(OUT_DIR, "lines/index.json"), "utf8")) as Manifest;
+const manifest = parseManifest(JSON.parse(readFileSync(join(OUT_DIR, "lines/index.json"), "utf8")));
 const table = routingTable(manifest);
 const rows = loadEval();
 const splits: Record<string, EvalQuery[]> = {
@@ -109,7 +110,7 @@ const namesOf = (e: RefEntity) => {
 const precisions: Record<string, (p: number) => number> = {
   full: (p) => p,
   "1/100": (p) => Math.round(p * 100) / 100,
-  "1/10": (p) => Math.round(p * 10) / 10,
+  "1/10": roundProminence,
   "1": (p) => Math.round(p),
 };
 const tops: Record<string, Map<string, string[]>> = {};
