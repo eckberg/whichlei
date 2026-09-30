@@ -1,6 +1,6 @@
 # 02 · Core
 
-Status: approved
+Status: done
 
 ## Goal
 The search logic exists in TypeScript: normalisation, tokeniser, scorer and identifier

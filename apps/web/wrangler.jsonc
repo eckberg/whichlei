@@ -1,0 +1,12 @@
+// The site: static assets only for now. Deployed by .github/workflows/deploy-site.yml.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "whichlei-site",
+  "compatibility_date": "2026-09-29",
+  "workers_dev": true,
+  "send_metrics": false,
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}
