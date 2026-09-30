@@ -10,7 +10,8 @@
     "build-index": "node --max-old-space-size=12000 scripts/build.ts",
     "replay": "node --max-old-space-size=12000 scripts/replay.ts",
     "score": "node --max-old-space-size=8000 scripts/score.ts",
-    "browser": "node scripts/browser.ts"
+    "browser": "node scripts/browser.ts",
+    "search": "node scripts/search.ts"
   },
   "dependencies": {
     "@whichlei/core": "workspace:*"
