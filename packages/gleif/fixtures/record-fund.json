@@ -1,0 +1,177 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "2549006ZR9L6XM2MCE35",
+      "attributes": {
+        "lei": "2549006ZR9L6XM2MCE35",
+        "entity": {
+          "legalName": {
+            "name": "Strand Nordic High Yield Fund",
+            "language": "sv"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "Ostermalmstorg 1"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Stockholm",
+            "region": "SE-AB",
+            "country": "SE",
+            "postalCode": "114 42"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "C/O FCG Fonder AB",
+              "Ostermalmstorg 1"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Stockholm",
+            "region": "SE-AB",
+            "country": "SE",
+            "postalCode": "114 42"
+          },
+          "registeredAt": {
+            "id": "RA000547",
+            "other": null
+          },
+          "registeredAs": "86453",
+          "jurisdiction": "SE",
+          "category": "FUND",
+          "legalForm": {
+            "id": "8888",
+            "other": "FUND"
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2026-04-17T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2026-09-22T12:54:05Z",
+          "lastUpdateDate": "2026-09-22T12:54:05Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-09-22T12:54:05Z",
+          "managingLou": "5493001KJTIIGC8Y1R12",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000547",
+            "other": null
+          },
+          "validatedAs": "86453",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "1996078404"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "2549006ZR9L6XM2MCE35|0|25089a7afab99fbca491d55b2c5b08942b975376542fd90c6bad44602592008d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "2549006ZR9L6XM2MCE35|0|b7222f2d061b26185f7ae50e7ee6d92f41dd9ac0a55ac2d5bd675939f0661246|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/ultimate-parent-reporting-exception"
+          }
+        },
+        "fund-manager": {
+          "links": {
+            "lei-record": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/fund-manager",
+            "relationship-record": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35/fund-manager-relationship"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/2549006ZR9L6XM2MCE35"
+      }
+    },
+    "included": [
+      {
+        "type": "reporting-exceptions",
+        "id": "2549006ZR9L6XM2MCE35|0|25089a7afab99fbca491d55b2c5b08942b975376542fd90c6bad44602592008d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "2549006ZR9L6XM2MCE35",
+          "category": "DIRECT_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NON_CONSOLIDATING",
+          "reference": null
+        }
+      },
+      {
+        "type": "reporting-exceptions",
+        "id": "2549006ZR9L6XM2MCE35|0|b7222f2d061b26185f7ae50e7ee6d92f41dd9ac0a55ac2d5bd675939f0661246|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "2549006ZR9L6XM2MCE35",
+          "category": "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NON_CONSOLIDATING",
+          "reference": null
+        }
+      }
+    ]
+  }
+}

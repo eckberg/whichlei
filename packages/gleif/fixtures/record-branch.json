@@ -1,0 +1,145 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "636700XQVY1M7XLO8T61",
+      "attributes": {
+        "lei": "636700XQVY1M7XLO8T61",
+        "entity": {
+          "legalName": {
+            "name": "Partners Group Europe, Stockholm filial",
+            "language": "sv"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "sv",
+            "addressLines": [
+              "Birger Jarlsgatan 4"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Stockholm",
+            "region": "SE-AB",
+            "country": "SE",
+            "postalCode": "114 34"
+          },
+          "headquartersAddress": {
+            "language": "de",
+            "addressLines": [
+              "LENBACHPLATZ 3, LENBACHPALAIS"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "München",
+            "region": "DE-BY",
+            "country": "DE",
+            "postalCode": "80333"
+          },
+          "registeredAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "registeredAs": "516414-1169",
+          "jurisdiction": "DE",
+          "category": "BRANCH",
+          "legalForm": {
+            "id": "2HBR",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2026-05-08T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [
+            {
+              "fieldType": "TransliteratedOtherAddress",
+              "language": "de",
+              "type": "AUTO_ASCII_TRANSLITERATED_HEADQUARTERS_ADDRESS",
+              "addressLines": [
+                "LENBACHPLATZ 3, LENBACHPALAIS"
+              ],
+              "city": "Munchen",
+              "region": "DE-BY",
+              "country": "DE",
+              "postalCode": "80333"
+            }
+          ],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2026-06-09T12:17:00Z",
+          "lastUpdateDate": "2026-06-09T12:17:00Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-06-09T12:17:00Z",
+          "managingLou": "549300O897ZC5H7CY412",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "validatedAs": "516414-1169",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QSE6W3GC42",
+        "gem": null,
+        "spglobal": [
+          "2003528377"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61/field-modifications"
+          }
+        },
+        "head-office": {
+          "links": {
+            "lei-record": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61/head-office",
+            "relationship-record": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61/head-office-relationship"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/636700XQVY1M7XLO8T61"
+      }
+    }
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "98450057EFE9D01O5335",
+      "attributes": {
+        "lei": "98450057EFE9D01O5335",
+        "entity": {
+          "legalName": {
+            "name": "VONAGE BUSINESS INC.",
+            "language": "en"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "en",
+            "addressLines": [
+              "251 LITTLE FALLS DRIVE"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": "c/o CORPORATION SERVICE COMPANY",
+            "city": "WILMINGTON",
+            "region": "US-DE",
+            "country": "US",
+            "postalCode": "19808"
+          },
+          "headquartersAddress": {
+            "language": "en",
+            "addressLines": [
+              "101 Crawfords Corner Road, Suite 2416"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Holmdel",
+            "region": "US-NJ",
+            "country": "US",
+            "postalCode": "07733"
+          },
+          "registeredAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "registeredAs": "4437638",
+          "jurisdiction": "US-DE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "XTIQ",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2007-10-10T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2025-06-03T13:54:07Z",
+          "lastUpdateDate": "2026-06-25T13:36:46Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-06-04T13:15:51Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000602",
+            "other": null
+          },
+          "validatedAs": "4437638",
+          "otherValidationAuthorities": [
+            {
+              "validatedAt": {
+                "id": "RA000625"
+              },
+              "validatedAs": "0101053147"
+            }
+          ]
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": null,
+        "gem": null,
+        "spglobal": [
+          "1946070645"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "lei-records",
+            "id": "549300W9JLPW15XIFM52"
+          },
+          "links": {
+            "relationship-record": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/direct-parent-relationship",
+            "lei-record": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/direct-parent"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "lei-records",
+            "id": "549300W9JLPW15XIFM52"
+          },
+          "links": {
+            "relationship-record": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/ultimate-parent-relationship",
+            "lei-record": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335/ultimate-parent"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/98450057EFE9D01O5335"
+      }
+    },
+    "included": [
+      {
+        "type": "lei-records",
+        "id": "549300W9JLPW15XIFM52"
+      }
+    ]
+  }
+}

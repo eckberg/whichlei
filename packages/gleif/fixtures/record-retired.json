@@ -1,0 +1,212 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "984500F6D5C0F4FH0992",
+      "attributes": {
+        "lei": "984500F6D5C0F4FH0992",
+        "entity": {
+          "legalName": {
+            "name": "Slutplattan SIRGA 126698 AB",
+            "language": "sv"
+          },
+          "otherNames": [
+            {
+              "name": "Rågårds i Karlskrona Aktiebolag",
+              "language": "sv",
+              "type": "PREVIOUS_LEGAL_NAME"
+            }
+          ],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "sv",
+            "addressLines": [
+              "Backvägen 11"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "KARLSHAMN",
+            "region": null,
+            "country": "SE",
+            "postalCode": "374 30"
+          },
+          "headquartersAddress": {
+            "language": "sv",
+            "addressLines": [
+              "Backvägen 11"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "KARLSHAMN",
+            "region": null,
+            "country": "SE",
+            "postalCode": "374 30"
+          },
+          "registeredAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "registeredAs": "556319-5675",
+          "jurisdiction": "SE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "XJHM",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "INACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": "Bolagsstiftarna Sirga AB"
+          },
+          "successorEntities": [
+            {
+              "name": "Bolagsstiftarna Sirga AB",
+              "lang": "sv"
+            }
+          ],
+          "creationDate": "1987-12-15T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": [
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "SUPPORTING_DOCUMENTS",
+                  "effectiveDate": "2026-08-17T00:00:00Z",
+                  "recordedDate": "2026-09-10T12:50:08Z",
+                  "type": "ABSORPTION",
+                  "status": "COMPLETED",
+                  "affectedFields": [
+                    {
+                      "value": "Bolagsstiftarna Sirga AB",
+                      "xpath": "/lei:LEIData/lei:LEIRecords/lei:LEIRecord/lei:Entity/lei:SuccessorEntity/lei:SuccessorEntityName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "groupType": "STANDALONE",
+              "events": [
+                {
+                  "validationDocuments": "SUPPORTING_DOCUMENTS",
+                  "effectiveDate": "2026-05-19T00:00:00Z",
+                  "recordedDate": "2026-09-10T12:50:08Z",
+                  "type": "CHANGE_LEGAL_NAME",
+                  "status": "COMPLETED"
+                }
+              ]
+            }
+          ]
+        },
+        "registration": {
+          "initialRegistrationDate": "2026-04-07T12:57:00Z",
+          "lastUpdateDate": "2026-09-10T12:50:08Z",
+          "status": "RETIRED",
+          "nextRenewalDate": "2027-04-07T12:57:02Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "validatedAs": "556319-5675",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QSE3KP0KC6",
+        "gem": null,
+        "spglobal": [
+          "685280943"
+        ],
+        "conformityFlag": "NOT_APPLICABLE"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "984500F6D5C0F4FH0992|0|d612ade4d764e9b105ffdc7f4279ae048ac06cf2996ba4b614f94832c8d9385d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "984500F6D5C0F4FH0992|0|8b51f8e0f6f594da6f3062462443ea94988b7da6730be701c06eca599aa06011|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/984500F6D5C0F4FH0992"
+      }
+    },
+    "included": [
+      {
+        "type": "reporting-exceptions",
+        "id": "984500F6D5C0F4FH0992|0|d612ade4d764e9b105ffdc7f4279ae048ac06cf2996ba4b614f94832c8d9385d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "984500F6D5C0F4FH0992",
+          "category": "DIRECT_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NATURAL_PERSONS",
+          "reference": null
+        }
+      },
+      {
+        "type": "reporting-exceptions",
+        "id": "984500F6D5C0F4FH0992|0|8b51f8e0f6f594da6f3062462443ea94988b7da6730be701c06eca599aa06011|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "984500F6D5C0F4FH0992",
+          "category": "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NATURAL_PERSONS",
+          "reference": null
+        }
+      }
+    ]
+  }
+}

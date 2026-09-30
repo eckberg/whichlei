@@ -6,7 +6,13 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!research", "!design", "!packages/core/fixtures"]
+    "includes": [
+      "**",
+      "!research",
+      "!design",
+      "!packages/core/fixtures",
+      "!packages/gleif/fixtures"
+    ]
   },
   "formatter": {
     "indentStyle": "space",

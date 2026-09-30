@@ -1,0 +1,168 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "894500VYHF8PY754L456",
+      "attributes": {
+        "lei": "894500VYHF8PY754L456",
+        "entity": {
+          "legalName": {
+            "name": "KF Vermögensholding GmbH",
+            "language": "de"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "de",
+            "addressLines": [
+              "Marienfelder Str. 52"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Koblenz",
+            "region": null,
+            "country": "DE",
+            "postalCode": "56070"
+          },
+          "headquartersAddress": {
+            "language": "de",
+            "addressLines": [
+              "Marienfelder Str. 52"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Koblenz",
+            "region": null,
+            "country": "DE",
+            "postalCode": "56070"
+          },
+          "registeredAt": {
+            "id": "RA000279",
+            "other": null
+          },
+          "registeredAs": "HRB 31769",
+          "jurisdiction": "DE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "2HBR",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "2026-02-25T11:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2026-09-29T14:20:36Z",
+          "lastUpdateDate": "2026-09-29T14:20:37Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-09-29T14:20:37Z",
+          "managingLou": "529900F6BNUR3RJ2WH29",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000279",
+            "other": null
+          },
+          "validatedAs": "HRB 31769",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": null,
+        "gem": null,
+        "spglobal": null,
+        "conformityFlag": null
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "894500VYHF8PY754L456|0|25fe64e8a4a22706fd817452ed1af8954cc6c41d6a253f6fc1bf3b1b47c7c081|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "894500VYHF8PY754L456|0|38a3a641ab23eb1521c760c4f83f2ac0cc1dcb0178b0936536a87816e7d77bc2|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/894500VYHF8PY754L456"
+      }
+    },
+    "included": [
+      {
+        "type": "reporting-exceptions",
+        "id": "894500VYHF8PY754L456|0|25fe64e8a4a22706fd817452ed1af8954cc6c41d6a253f6fc1bf3b1b47c7c081|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "894500VYHF8PY754L456",
+          "category": "DIRECT_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NATURAL_PERSONS",
+          "reference": null
+        }
+      },
+      {
+        "type": "reporting-exceptions",
+        "id": "894500VYHF8PY754L456|0|38a3a641ab23eb1521c760c4f83f2ac0cc1dcb0178b0936536a87816e7d77bc2|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "894500VYHF8PY754L456",
+          "category": "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NATURAL_PERSONS",
+          "reference": null
+        }
+      }
+    ]
+  }
+}
