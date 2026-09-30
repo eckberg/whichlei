@@ -1,6 +1,6 @@
 # 03 · Skeleton on Cloudflare
 
-Status: approved
+Status: done
 
 ## Goal
 The prototype runs on a real URL. Anyone can open it on a laptop or phone and search the
