@@ -29,7 +29,7 @@ const FUZZY_MIN_LENGTH = 4;
  * Optional query words: an unmatched one is not a miss, and a name that matches only these
  * words is not shown ('republic of latvia' must not surface 'Bank of America').
  */
-const QUERY_STOP = new Set(
+export const QUERY_STOP: ReadonlySet<string> = new Set(
   "the of and de du des la le les der die das und et y for in van von di del da do a an".split(" "),
 );
 
@@ -43,24 +43,46 @@ export function prefixEditLe1(query: string, term: string): boolean {
   const m = term.length;
   if (m < n - 1) return false;
   const INF = 9;
-  let prev2: number[] = [];
-  let prev = Array.from({ length: m + 1 }, (_, j) => j);
+  if (editRows[0].length <= m)
+    editRows = [0, 1, 2].map(() => new Int32Array(2 * m + 2)) as EditRows;
+  // Three rows of the table, reused across calls: scoring calls this for most name words.
+  let [prev2, prev, cur] = editRows;
+  for (let j = 0; j <= m; j++) prev[j] = j;
   for (let i = 1; i <= n; i++) {
-    const cur = [i, ...Array<number>(m).fill(INF)];
+    cur.fill(INF, 1, m + 1);
+    cur[0] = i;
+    const q = query.charCodeAt(i - 1);
     for (let j = Math.max(1, i - 1); j <= Math.min(m, i + 1); j++) {
-      const cost = query[i - 1] === term[j - 1] ? 0 : 1;
-      let d = Math.min((prev[j] ?? INF) + 1, (cur[j - 1] ?? INF) + 1, (prev[j - 1] ?? INF) + cost);
-      if (i > 1 && j > 1 && query[i - 1] === term[j - 2] && query[i - 2] === term[j - 1]) {
-        d = Math.min(d, (prev2[j - 2] ?? INF) + 1);
+      const cost = q === term.charCodeAt(j - 1) ? 0 : 1;
+      let d = Math.min(
+        (prev[j] as number) + 1,
+        (cur[j - 1] as number) + 1,
+        (prev[j - 1] as number) + cost,
+      );
+      if (
+        i > 1 &&
+        j > 1 &&
+        q === term.charCodeAt(j - 2) &&
+        query.charCodeAt(i - 2) === term.charCodeAt(j - 1)
+      ) {
+        d = Math.min(d, (prev2[j - 2] as number) + 1);
       }
       cur[j] = d;
     }
+    const oldest = prev2;
     prev2 = prev;
     prev = cur;
+    cur = oldest;
   }
   // The query is fully consumed; any prefix of the term may remain.
-  return Math.min(...prev.slice(Math.max(0, n - 1), Math.min(m, n + 1) + 1)) <= 1;
+  for (let j = Math.max(0, n - 1); j <= Math.min(m, n + 1); j++) {
+    if ((prev[j] as number) <= 1) return true;
+  }
+  return false;
 }
+
+type EditRows = [Int32Array, Int32Array, Int32Array];
+let editRows: EditRows = [new Int32Array(64), new Int32Array(64), new Int32Array(64)];
 
 /** 3 exact word, 2 prefix, 1 fuzzy prefix (one edit), 0 none. */
 export function matchLevel(query: string, term: string): 0 | 1 | 2 | 3 {
@@ -81,43 +103,80 @@ export interface MatchFeatures {
   coverage: number;
 }
 
+/** A match level function: matchLevel, or a memo of it. */
+export type Level = (query: string, term: string) => number;
+
+/** matchLevel, remembering every answer. Names in one index file share most of their words. */
+export function memoLevel(): Level {
+  const memo = new Map<string, Map<string, number>>();
+  return (query, term) => {
+    let levels = memo.get(query);
+    if (!levels) {
+      levels = new Map();
+      memo.set(query, levels);
+    }
+    let level = levels.get(term);
+    if (level === undefined) {
+      level = matchLevel(query, term);
+      levels.set(term, level);
+    }
+    return level;
+  };
+}
+
 /** Features of one name against the query tokens. The last query token may be partial. */
-export function matchFeatures(query: string[], { seq, extras }: NameTokens): MatchFeatures {
+export function matchFeatures(
+  query: string[],
+  { seq, extras }: NameTokens,
+  level: Level = matchLevel,
+): MatchFeatures {
+  // Plain loops, no closures or temporary arrays: this runs for every candidate name on
+  // every keystroke.
   const n = query.length;
-  const levels: number[] = [];
-  const matched = new Set<number>();
+  // Content words are the non-stopwords, or every word when all are stopwords.
+  const allStop = query.every((q) => QUERY_STOP.has(q));
+  let shown = false;
+  let nMiss = 0;
+  let nFuzzy = 0;
+  let nExact = 0;
+  const matched: number[] = [];
   for (const q of query) {
     let best = 0;
     let bestPosition = -1;
-    seq.forEach((term, position) => {
-      const level = matchLevel(q, term);
-      if (level > best) {
-        best = level;
+    for (let position = 0; position < seq.length; position++) {
+      const l = level(q, seq[position] as string);
+      if (l > best) {
+        best = l;
         bestPosition = position;
       }
-    });
+    }
     for (const term of extras) {
-      const level = matchLevel(q, term);
-      if (level > best) {
-        best = level;
+      const l = level(q, term);
+      if (l > best) {
+        best = l;
         bestPosition = -1;
       }
     }
-    levels.push(best);
-    if (bestPosition >= 0) matched.add(bestPosition);
+    if (best === 1) nFuzzy++;
+    else if (best === 3) nExact++;
+    if (allStop || !QUERY_STOP.has(q)) {
+      if (best > 0) shown = true;
+      else nMiss++;
+    }
+    if (bestPosition >= 0 && !matched.includes(bestPosition)) matched.push(bestPosition);
   }
-  const sameUpTo = (count: number) => query.slice(0, count).every((q, i) => seq[i] === q);
-  const stopFree = query.flatMap((q, i) => (QUERY_STOP.has(q) ? [] : [i]));
-  const content = stopFree.length > 0 ? stopFree : query.map((_, i) => i);
+  // Leading query words equal to the name's leading words.
+  let same = 0;
+  while (same < n && same < seq.length && seq[same] === query[same]) same++;
   return {
     n,
-    shown: content.some((i) => (levels[i] ?? 0) > 0),
-    nMiss: content.filter((i) => levels[i] === 0).length,
-    nFuzzy: levels.filter((level) => level === 1).length,
-    nExact: levels.filter((level) => level === 3).length,
-    exact: n === seq.length && sameUpTo(n),
-    prefix: n <= seq.length && sameUpTo(n - 1) && (seq[n - 1] ?? "").startsWith(query[n - 1] ?? ""),
-    coverage: matched.size / Math.max(1, seq.length),
+    shown,
+    nMiss,
+    nFuzzy,
+    nExact,
+    exact: n === seq.length && same === n,
+    prefix: n <= seq.length && same >= n - 1 && (seq[n - 1] ?? "").startsWith(query[n - 1] ?? ""),
+    coverage: matched.length / Math.max(1, seq.length),
   };
 }
 
@@ -148,25 +207,27 @@ export function scoreCandidate<Id>(
   query: string[],
   candidate: Candidate<Id>,
   w: MatchWeights = MATCH_WEIGHTS,
+  level: Level = matchLevel,
 ): number | null {
   let best: number | null = null;
   for (const name of candidate.names) {
-    const m = matchScore(matchFeatures(query, name), w);
+    const m = matchScore(matchFeatures(query, name, level), w);
     if (m !== null && (best === null || m > best)) best = m;
   }
   return best === null ? null : best + candidate.prominence;
 }
 
 /** The k best candidates by score, ties broken by ascending id. */
-export function topK<Id extends number | string>(
+export function topK<C extends Candidate<number | string>>(
   query: string[],
-  candidates: Iterable<Candidate<Id>>,
+  candidates: Iterable<C>,
   k = 10,
   w: MatchWeights = MATCH_WEIGHTS,
-): Candidate<Id>[] {
-  const scored: [number, Candidate<Id>][] = [];
+): C[] {
+  const scored: [number, C][] = [];
+  const level = memoLevel();
   for (const candidate of candidates) {
-    const s = scoreCandidate(query, candidate, w);
+    const s = scoreCandidate(query, candidate, w, level);
     if (s !== null) scored.push([s, candidate]);
   }
   scored.sort(([a, x], [b, y]) => b - a || (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));

@@ -34,9 +34,14 @@ const WHITESPACE = new RegExp(
   )}]+`,
 );
 const ALNUM = /[a-z0-9]+/g;
+// biome-ignore lint/suspicious/noControlCharactersInRegex: the whole ASCII range
+const ASCII = /^[\x00-\x7f]*$/;
 
 /** Fold for matching: the explicit table, NFKD, drop combining marks, lower case. */
 export function fold(text: string): string {
+  // ASCII has nothing to fold or decompose. Most names are ASCII, and the index parses
+  // thousands of them per file.
+  if (ASCII.test(text)) return text.toLowerCase();
   return text
     .replace(FOLD_CHARS, (char) => FOLD[char] ?? char)
     .normalize("NFKD")
