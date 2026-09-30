@@ -173,6 +173,9 @@ catalogs:
     '@types/node':
       specifier: 26.6.3
       version: 26.6.3
+    playwright-core:
+      specifier: 1.63.0
+      version: 1.63.0
     typescript:
       specifier: 7.0.2
       version: 7.0.2
@@ -244,6 +247,22 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 5.0.2(@types/node@26.6.3)(vite@8.3.1(@types/node@26.6.3)(esbuild@0.28.1))
+
+  tools/bench:
+    dependencies:
+      '@whichlei/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.3
+      playwright-core:
+        specifier: 'catalog:'
+        version: 1.63.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
 
 packages:
 
