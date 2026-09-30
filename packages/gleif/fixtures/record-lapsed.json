@@ -1,0 +1,170 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "9845006B0E5096QB7036",
+      "attributes": {
+        "lei": "9845006B0E5096QB7036",
+        "entity": {
+          "legalName": {
+            "name": "Brea Transport Aktiebolag",
+            "language": "sv"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [],
+          "legalAddress": {
+            "language": "sv",
+            "addressLines": [
+              "Frimurargatan 14"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "JÖNKÖPING",
+            "region": null,
+            "country": "SE",
+            "postalCode": "554 54"
+          },
+          "headquartersAddress": {
+            "language": "sv",
+            "addressLines": [
+              "Frimurargatan 14"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "JÖNKÖPING",
+            "region": null,
+            "country": "SE",
+            "postalCode": "554 54"
+          },
+          "registeredAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "registeredAs": "556163-4519",
+          "jurisdiction": "SE",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "XJHM",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "1972-03-27T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2025-09-29T11:53:55Z",
+          "lastUpdateDate": "2026-09-29T12:23:36Z",
+          "status": "LAPSED",
+          "nextRenewalDate": "2026-09-29T11:53:57Z",
+          "managingLou": "529900T8BM49AURSDO55",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000544",
+            "other": null
+          },
+          "validatedAs": "556163-4519",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QSEA8HE2WB",
+        "gem": null,
+        "spglobal": [
+          "683769017"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "9845006B0E5096QB7036|0|ef2cc2bc5c86053422539ef4f8a17a761e52ef30e5923024139bb1614885a66d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "9845006B0E5096QB7036|0|c4f9c41719dad10c2c7dc0dbaf2c184f2d6618a7c4533638b03deb844640ca6d|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036/ultimate-parent-reporting-exception"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/9845006B0E5096QB7036"
+      }
+    },
+    "included": [
+      {
+        "type": "reporting-exceptions",
+        "id": "9845006B0E5096QB7036|0|ef2cc2bc5c86053422539ef4f8a17a761e52ef30e5923024139bb1614885a66d|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "9845006B0E5096QB7036",
+          "category": "DIRECT_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NO_KNOWN_PERSON",
+          "reference": null
+        }
+      },
+      {
+        "type": "reporting-exceptions",
+        "id": "9845006B0E5096QB7036|0|c4f9c41719dad10c2c7dc0dbaf2c184f2d6618a7c4533638b03deb844640ca6d|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "9845006B0E5096QB7036",
+          "category": "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NO_KNOWN_PERSON",
+          "reference": null
+        }
+      }
+    ]
+  }
+}

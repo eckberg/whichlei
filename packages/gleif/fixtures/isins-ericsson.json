@@ -1,0 +1,52 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/549300W9JLPW15XIFM52/isins?page%5Bsize%5D=3&page%5Bnumber%5D=1",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      },
+      "pagination": {
+        "currentPage": 1,
+        "perPage": 3,
+        "from": 1,
+        "to": 3,
+        "total": 8,
+        "lastPage": 3
+      }
+    },
+    "links": {
+      "first": "https://api.gleif.org/api/v1/lei-records/549300W9JLPW15XIFM52/isins?page%5Bnumber%5D=1&page%5Bsize%5D=3",
+      "next": "https://api.gleif.org/api/v1/lei-records/549300W9JLPW15XIFM52/isins?page%5Bnumber%5D=2&page%5Bsize%5D=3",
+      "last": "https://api.gleif.org/api/v1/lei-records/549300W9JLPW15XIFM52/isins?page%5Bnumber%5D=3&page%5Bsize%5D=3"
+    },
+    "data": [
+      {
+        "type": "isins",
+        "id": "c3b43a7e-00bf-4d1f-842c-dbc2456a2df2",
+        "attributes": {
+          "lei": "549300W9JLPW15XIFM52",
+          "isin": "SE0000805277"
+        }
+      },
+      {
+        "type": "isins",
+        "id": "78eb330c-60d6-4b92-9b81-b9479806f2a0",
+        "attributes": {
+          "lei": "549300W9JLPW15XIFM52",
+          "isin": "SE0000285140"
+        }
+      },
+      {
+        "type": "isins",
+        "id": "9daa0d67-6298-4dc2-9f29-141ad5e01458",
+        "attributes": {
+          "lei": "549300W9JLPW15XIFM52",
+          "isin": "US2948215098"
+        }
+      }
+    ]
+  }
+}

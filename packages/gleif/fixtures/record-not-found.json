@@ -1,0 +1,15 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/549300W9JLPW15XIFM99?include=direct-parent%2Cultimate-parent",
+  "status": 404,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "errors": [
+      {
+        "status": "404",
+        "title": "Not Found",
+        "detail": "Resource lei-records with id 549300W9JLPW15XIFM99 does not exist."
+      }
+    ]
+  }
+}

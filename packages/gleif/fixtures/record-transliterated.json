@@ -1,0 +1,182 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76?include=direct-parent%2Cultimate-parent",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      }
+    },
+    "data": {
+      "type": "lei-records",
+      "id": "529900E3CDUZL6H6GX76",
+      "attributes": {
+        "lei": "529900E3CDUZL6H6GX76",
+        "entity": {
+          "legalName": {
+            "name": "Sberbank Magyarország Zártkörűen Működő Részvénytársaság \"végelszámolás alatt\"",
+            "language": "hu"
+          },
+          "otherNames": [],
+          "transliteratedOtherNames": [
+            {
+              "name": "Sberbank Magyarorszag Zartkoruen Mukodo Reszvenytarsasag \"vegelszamolas alatt\"",
+              "language": "hu",
+              "type": "PREFERRED_ASCII_TRANSLITERATED_LEGAL_NAME"
+            }
+          ],
+          "legalAddress": {
+            "language": "hu",
+            "addressLines": [
+              "Rákóczi út 1-3"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Budapest",
+            "region": "HU-BU",
+            "country": "HU",
+            "postalCode": "1088"
+          },
+          "headquartersAddress": {
+            "language": "hu",
+            "addressLines": [
+              "Rákóczi út 1-3"
+            ],
+            "addressNumber": null,
+            "addressNumberWithinBuilding": null,
+            "mailRouting": null,
+            "city": "Budapest",
+            "region": "HU-BU",
+            "country": "HU",
+            "postalCode": "1088"
+          },
+          "registeredAt": {
+            "id": "RA000391",
+            "other": null
+          },
+          "registeredAs": "01-10-041720",
+          "jurisdiction": "HU",
+          "category": "GENERAL",
+          "legalForm": {
+            "id": "BKUX",
+            "other": null
+          },
+          "associatedEntity": {
+            "lei": null,
+            "name": null
+          },
+          "status": "ACTIVE",
+          "expiration": {
+            "date": null,
+            "reason": null
+          },
+          "successorEntity": {
+            "lei": null,
+            "name": null
+          },
+          "successorEntities": [],
+          "creationDate": "1992-06-16T00:00:00Z",
+          "subCategory": null,
+          "otherAddresses": [],
+          "eventGroups": []
+        },
+        "registration": {
+          "initialRegistrationDate": "2014-01-22T09:01:36Z",
+          "lastUpdateDate": "2025-12-03T18:55:25Z",
+          "status": "ISSUED",
+          "nextRenewalDate": "2027-01-31T15:22:36Z",
+          "managingLou": "52990034RLKT0WSOAM90",
+          "corroborationLevel": "FULLY_CORROBORATED",
+          "validatedAt": {
+            "id": "RA000391",
+            "other": null
+          },
+          "validatedAs": "01-10-041720",
+          "otherValidationAuthorities": []
+        },
+        "bic": null,
+        "mic": null,
+        "ocid": null,
+        "qcc": "QHUXBSB46T",
+        "gem": null,
+        "spglobal": [
+          "22227445"
+        ],
+        "conformityFlag": "CONFORMING"
+      },
+      "relationships": {
+        "managing-lou": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/managing-lou"
+          }
+        },
+        "lei-issuer": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/lei-issuer"
+          }
+        },
+        "field-modifications": {
+          "links": {
+            "related": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/field-modifications"
+          }
+        },
+        "direct-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "529900E3CDUZL6H6GX76|1|0d9fcc1540234193958ad8c501ff06c958b1913b1b20b04bffb0d4f41feca3dc|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/direct-parent-reporting-exception"
+          }
+        },
+        "ultimate-parent": {
+          "data": {
+            "type": "reporting-exceptions",
+            "id": "529900E3CDUZL6H6GX76|1|d46802bf985526770e86612ca20831f00ebbd3e2ac97c411e70c1bf94709ad66|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|"
+          },
+          "links": {
+            "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/ultimate-parent-reporting-exception"
+          }
+        },
+        "direct-children": {
+          "links": {
+            "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/direct-child-relationships",
+            "related": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76/direct-children"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.gleif.org/api/v1/lei-records/529900E3CDUZL6H6GX76"
+      }
+    },
+    "included": [
+      {
+        "type": "reporting-exceptions",
+        "id": "529900E3CDUZL6H6GX76|1|0d9fcc1540234193958ad8c501ff06c958b1913b1b20b04bffb0d4f41feca3dc|DIRECT_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "529900E3CDUZL6H6GX76",
+          "category": "DIRECT_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NON_CONSOLIDATING",
+          "reference": null
+        }
+      },
+      {
+        "type": "reporting-exceptions",
+        "id": "529900E3CDUZL6H6GX76|1|d46802bf985526770e86612ca20831f00ebbd3e2ac97c411e70c1bf94709ad66|ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT|",
+        "attributes": {
+          "validFrom": null,
+          "validTo": null,
+          "lei": "529900E3CDUZL6H6GX76",
+          "category": "ULTIMATE_ACCOUNTING_CONSOLIDATION_PARENT",
+          "reason": "NON_CONSOLIDATING",
+          "reference": null
+        }
+      }
+    ]
+  }
+}

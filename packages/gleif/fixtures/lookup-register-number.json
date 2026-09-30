@@ -1,0 +1,634 @@
+{
+  "url": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.registeredAs%5D=HRB+30000&page%5Bsize%5D=3&page%5Bnumber%5D=1",
+  "status": 200,
+  "contentType": "application/vnd.api+json",
+  "recorded": "2026-09-30",
+  "body": {
+    "meta": {
+      "goldenCopy": {
+        "publishDate": "2026-09-30T08:00:00Z"
+      },
+      "pagination": {
+        "currentPage": 1,
+        "perPage": 3,
+        "from": 1,
+        "to": 3,
+        "total": 3,
+        "lastPage": 1
+      }
+    },
+    "links": {
+      "first": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.registeredAs%5D=HRB+30000&page%5Bnumber%5D=1&page%5Bsize%5D=3",
+      "last": "https://api.gleif.org/api/v1/lei-records?filter%5Bentity.registeredAs%5D=HRB+30000&page%5Bnumber%5D=1&page%5Bsize%5D=3"
+    },
+    "data": [
+      {
+        "type": "lei-records",
+        "id": "5299004EJJ4TF9C0O947",
+        "attributes": {
+          "lei": "5299004EJJ4TF9C0O947",
+          "entity": {
+            "legalName": {
+              "name": "FIXUM Capital & Advisory GmbH",
+              "language": "de"
+            },
+            "otherNames": [],
+            "transliteratedOtherNames": [],
+            "legalAddress": {
+              "language": "de",
+              "addressLines": [
+                "Hofgründchen 65"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Neuwied",
+              "region": "DE-RP",
+              "country": "DE",
+              "postalCode": "56564"
+            },
+            "headquartersAddress": {
+              "language": "de",
+              "addressLines": [
+                "Hofgründchen 65"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Neuwied",
+              "region": "DE-RP",
+              "country": "DE",
+              "postalCode": "56564"
+            },
+            "registeredAt": {
+              "id": "RA000302",
+              "other": null
+            },
+            "registeredAs": "HRB 30000",
+            "jurisdiction": "DE",
+            "category": "GENERAL",
+            "legalForm": {
+              "id": "2HBR",
+              "other": null
+            },
+            "associatedEntity": {
+              "lei": null,
+              "name": null
+            },
+            "status": "ACTIVE",
+            "expiration": {
+              "date": null,
+              "reason": null
+            },
+            "successorEntity": {
+              "lei": null,
+              "name": null
+            },
+            "successorEntities": [],
+            "creationDate": "2024-07-30T22:00:00Z",
+            "subCategory": null,
+            "otherAddresses": [],
+            "eventGroups": []
+          },
+          "registration": {
+            "initialRegistrationDate": "2025-06-13T11:31:05Z",
+            "lastUpdateDate": "2026-04-16T09:39:31Z",
+            "status": "ISSUED",
+            "nextRenewalDate": "2027-06-13T11:31:05Z",
+            "managingLou": "5299000J2N45DDNE4Y28",
+            "corroborationLevel": "FULLY_CORROBORATED",
+            "validatedAt": {
+              "id": "RA000302",
+              "other": null
+            },
+            "validatedAs": "HRB 30000",
+            "otherValidationAuthorities": []
+          },
+          "bic": null,
+          "mic": null,
+          "ocid": null,
+          "qcc": "QDETSAFQ3F",
+          "gem": null,
+          "spglobal": [
+            "1948365741"
+          ],
+          "conformityFlag": "CONFORMING"
+        },
+        "relationships": {
+          "managing-lou": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947/managing-lou"
+            }
+          },
+          "lei-issuer": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947/lei-issuer"
+            }
+          },
+          "field-modifications": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947/field-modifications"
+            }
+          },
+          "direct-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947/direct-parent-reporting-exception"
+            }
+          },
+          "ultimate-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947/ultimate-parent-reporting-exception"
+            }
+          }
+        },
+        "links": {
+          "self": "https://api.gleif.org/api/v1/lei-records/5299004EJJ4TF9C0O947"
+        }
+      },
+      {
+        "type": "lei-records",
+        "id": "391200WQS0N6U3NT8M22",
+        "attributes": {
+          "lei": "391200WQS0N6U3NT8M22",
+          "entity": {
+            "legalName": {
+              "name": "Weisser Ingenieurgesellschaft mbH - Beratende Ingenieure",
+              "language": "de"
+            },
+            "otherNames": [],
+            "transliteratedOtherNames": [],
+            "legalAddress": {
+              "language": "de",
+              "addressLines": [
+                "Pater-Rupert-Mayer-Str. 23"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Bad Aibling",
+              "region": "DE-BY",
+              "country": "DE",
+              "postalCode": "83043"
+            },
+            "headquartersAddress": {
+              "language": "de",
+              "addressLines": [
+                "Pater-Rupert-Mayer-Str. 23"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Bad Aibling",
+              "region": "DE-BY",
+              "country": "DE",
+              "postalCode": "83043"
+            },
+            "registeredAt": {
+              "id": "RA000354",
+              "other": null
+            },
+            "registeredAs": "HRB 30000",
+            "jurisdiction": "DE",
+            "category": "GENERAL",
+            "legalForm": {
+              "id": "2HBR",
+              "other": null
+            },
+            "associatedEntity": {
+              "lei": null,
+              "name": null
+            },
+            "status": "ACTIVE",
+            "expiration": {
+              "date": null,
+              "reason": null
+            },
+            "successorEntity": {
+              "lei": null,
+              "name": null
+            },
+            "successorEntities": [],
+            "creationDate": "2021-06-23T22:00:00Z",
+            "subCategory": null,
+            "otherAddresses": [],
+            "eventGroups": []
+          },
+          "registration": {
+            "initialRegistrationDate": "2023-02-07T13:48:32Z",
+            "lastUpdateDate": "2026-01-05T12:15:17Z",
+            "status": "ISSUED",
+            "nextRenewalDate": "2027-02-07T13:48:32Z",
+            "managingLou": "39120001KULK7200U106",
+            "corroborationLevel": "FULLY_CORROBORATED",
+            "validatedAt": {
+              "id": "RA000354",
+              "other": null
+            },
+            "validatedAs": "HRB 30000",
+            "otherValidationAuthorities": []
+          },
+          "bic": null,
+          "mic": null,
+          "ocid": null,
+          "qcc": "QDEE691RFP",
+          "gem": null,
+          "spglobal": [
+            "1825046889"
+          ],
+          "conformityFlag": "CONFORMING"
+        },
+        "relationships": {
+          "managing-lou": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22/managing-lou"
+            }
+          },
+          "lei-issuer": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22/lei-issuer"
+            }
+          },
+          "field-modifications": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22/field-modifications"
+            }
+          },
+          "direct-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22/direct-parent-reporting-exception"
+            }
+          },
+          "ultimate-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22/ultimate-parent-reporting-exception"
+            }
+          }
+        },
+        "links": {
+          "self": "https://api.gleif.org/api/v1/lei-records/391200WQS0N6U3NT8M22"
+        }
+      },
+      {
+        "type": "lei-records",
+        "id": "7LTWFZYICNSX8D621K86",
+        "attributes": {
+          "lei": "7LTWFZYICNSX8D621K86",
+          "entity": {
+            "legalName": {
+              "name": "DEUTSCHE BANK AKTIENGESELLSCHAFT",
+              "language": "de"
+            },
+            "otherNames": [],
+            "transliteratedOtherNames": [],
+            "legalAddress": {
+              "language": "de",
+              "addressLines": [
+                "Taunusanlage 12"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Frankfurt am Main",
+              "region": "DE-HE",
+              "country": "DE",
+              "postalCode": "60325"
+            },
+            "headquartersAddress": {
+              "language": "de",
+              "addressLines": [
+                "Taunusanlage 12"
+              ],
+              "addressNumber": null,
+              "addressNumberWithinBuilding": null,
+              "mailRouting": null,
+              "city": "Frankfurt am Main",
+              "region": "DE-HE",
+              "country": "DE",
+              "postalCode": "60325"
+            },
+            "registeredAt": {
+              "id": "RA000242",
+              "other": null
+            },
+            "registeredAs": "HRB 30000",
+            "jurisdiction": "DE",
+            "category": "GENERAL",
+            "legalForm": {
+              "id": "6QQB",
+              "other": null
+            },
+            "associatedEntity": {
+              "lei": null,
+              "name": null
+            },
+            "status": "ACTIVE",
+            "expiration": {
+              "date": null,
+              "reason": null
+            },
+            "successorEntity": {
+              "lei": null,
+              "name": null
+            },
+            "successorEntities": [],
+            "creationDate": "1952-11-10T23:00:00Z",
+            "subCategory": null,
+            "otherAddresses": [],
+            "eventGroups": [
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2025-08-05T22:00:00Z",
+                    "recordedDate": "2025-09-01T10:30:19Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2023-09-26T22:00:00Z",
+                    "recordedDate": "2024-09-10T08:30:00Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2021-12-26T23:00:00Z",
+                    "recordedDate": "2022-03-29T11:13:32Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2020-05-14T22:00:00Z",
+                    "recordedDate": "2022-03-29T10:53:08Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2016-08-09T22:00:00Z",
+                    "recordedDate": "2022-03-29T11:59:16Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2016-08-07T22:00:00Z",
+                    "recordedDate": "2022-03-29T11:51:45Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2016-01-21T23:00:00Z",
+                    "recordedDate": "2022-03-29T11:00:06Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2015-12-20T23:00:00Z",
+                    "recordedDate": "2022-03-29T11:20:31Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2015-12-01T23:00:00Z",
+                    "recordedDate": "2022-03-29T11:54:20Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "2015-08-31T22:00:00Z",
+                    "recordedDate": "2022-03-29T11:50:28Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              },
+              {
+                "groupType": "STANDALONE",
+                "events": [
+                  {
+                    "validationDocuments": "SUPPORTING_DOCUMENTS",
+                    "effectiveDate": "1970-01-01T00:00:00Z",
+                    "recordedDate": "2025-09-01T10:37:53Z",
+                    "type": "MERGERS_AND_ACQUISITIONS",
+                    "status": "COMPLETED"
+                  }
+                ]
+              }
+            ]
+          },
+          "registration": {
+            "initialRegistrationDate": "2012-06-06T15:51:15Z",
+            "lastUpdateDate": "2026-04-07T08:05:10Z",
+            "status": "ISSUED",
+            "nextRenewalDate": "2027-06-02T06:47:59Z",
+            "managingLou": "5299000J2N45DDNE4Y28",
+            "corroborationLevel": "FULLY_CORROBORATED",
+            "validatedAt": {
+              "id": "RA000242",
+              "other": null
+            },
+            "validatedAs": "HRB 30000",
+            "otherValidationAuthorities": []
+          },
+          "bic": [
+            "DBSCESMMXXX",
+            "DEUTAEAAXXX",
+            "DEUTATWWXXX",
+            "DEUTAU2SXXX",
+            "DEUTBEBEXXX",
+            "DEUTCATTXXX",
+            "DEUTCHZZXXX",
+            "DEUTCZPXXXX",
+            "DEUTDEFFXXX",
+            "DEUTGB22CLS",
+            "DEUTGB22COM",
+            "DEUTGB22CTA",
+            "DEUTGB22DCC",
+            "DEUTGB22EEQ",
+            "DEUTGB22EMC",
+            "DEUTGB22EMK",
+            "DEUTGB22GED",
+            "DEUTGB22GEF",
+            "DEUTGB22GFI",
+            "DEUTGB22PBR",
+            "DEUTGB22STA",
+            "DEUTGB22STD",
+            "DEUTGB22STF",
+            "DEUTGB22STG",
+            "DEUTGB22STJ",
+            "DEUTGB22STM",
+            "DEUTGB22STN",
+            "DEUTGB22STT",
+            "DEUTGB22TRL",
+            "DEUTGB22XXX",
+            "DEUTGB22ZEQ",
+            "DEUTGB2LASL",
+            "DEUTGB2LASP",
+            "DEUTGB2LASR",
+            "DEUTGB2LASW",
+            "DEUTGB2LBUL",
+            "DEUTGB2LCCO",
+            "DEUTGB2LCML",
+            "DEUTGB2LCOL",
+            "DEUTGB2LCUS",
+            "DEUTGB2LDBC",
+            "DEUTGB2LF4C",
+            "DEUTGB2LF4R",
+            "DEUTGB2LF4S",
+            "DEUTGB2LFEX",
+            "DEUTGB2LGLO",
+            "DEUTGB2LGME",
+            "DEUTGB2LMMO",
+            "DEUTGB2LRTN",
+            "DEUTGB2LSRV",
+            "DEUTGB2LTRS",
+            "DEUTGB2LXXX",
+            "DEUTGB3LCLS",
+            "DEUTGB3LRTN",
+            "DEUTGB3LXXX",
+            "DEUTHKHHXXX",
+            "DEUTHU2BXXX",
+            "DEUTIDJAXXX",
+            "DEUTINBBXXX",
+            "DEUTJPJTXXX",
+            "DEUTKRSEXXX",
+            "DEUTKYKXXXX",
+            "DEUTLKLXXXX",
+            "DEUTLULBXXX",
+            "DEUTNL2AXXX",
+            "DEUTPHMMXXX",
+            "DEUTPKKAXXX",
+            "DEUTPTPLXXX",
+            "DEUTSGSGXXX",
+            "DEUTTHBKXXX",
+            "DEUTUS33XXX",
+            "DEUTVNVXXXX",
+            "DEUTZAJXXXX"
+          ],
+          "mic": [
+            "DBOX"
+          ],
+          "ocid": "de/M1201_HRB30000",
+          "qcc": "QDEK0YCPBD",
+          "gem": "E100000136992",
+          "spglobal": [
+            "410467"
+          ],
+          "conformityFlag": "CONFORMING"
+        },
+        "relationships": {
+          "managing-lou": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managing-lou"
+            }
+          },
+          "lei-issuer": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/lei-issuer"
+            }
+          },
+          "field-modifications": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/field-modifications"
+            }
+          },
+          "direct-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-parent-reporting-exception"
+            }
+          },
+          "ultimate-parent": {
+            "links": {
+              "reporting-exception": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-parent-reporting-exception"
+            }
+          },
+          "direct-children": {
+            "links": {
+              "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-child-relationships",
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-children"
+            }
+          },
+          "ultimate-children": {
+            "links": {
+              "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-child-relationships",
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-children"
+            }
+          },
+          "branches": {
+            "links": {
+              "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/branch-relationships",
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/branches"
+            }
+          },
+          "managed-funds": {
+            "links": {
+              "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managed-fund-relationships",
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managed-funds"
+            }
+          },
+          "isins": {
+            "links": {
+              "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/isins"
+            }
+          }
+        },
+        "links": {
+          "self": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86"
+        }
+      }
+    ]
+  }
+}
