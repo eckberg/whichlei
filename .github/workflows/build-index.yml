@@ -1,0 +1,56 @@
+name: Build index
+
+# By hand only: Actions → Build index → Run workflow. Builds the search index from GLEIF's
+# golden copy, checks it, and uploads it as a workflow artifact. Publishing is slice 6.
+on:
+  workflow_dispatch:
+    inputs:
+      publish-date:
+        description: Golden copy publish date, YYYY-MM-DD. Empty for the latest.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-index
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      INDEX_DIR: ${{ runner.temp }}/index
+      INPUT_DATE: ${{ inputs.publish-date }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        run: |
+          /usr/bin/time -v -o "$RUNNER_TEMP/build-time.txt" \
+            pnpm --filter @whichlei/indexer build --publish-date "${INPUT_DATE:-latest}" --out "$INDEX_DIR"
+      - name: Check
+        run: |
+          /usr/bin/time -v -o "$RUNNER_TEMP/check-time.txt" \
+            pnpm --filter @whichlei/indexer check "$INDEX_DIR" --eval
+      - name: Time and memory
+        if: always()
+        run: |
+          for step in build check; do
+            echo "== $step"
+            grep -E "Elapsed \(wall clock\)|Maximum resident set size|Exit status" "$RUNNER_TEMP/$step-time.txt" || true
+          done | tee -a "$GITHUB_STEP_SUMMARY"
+      # The index only: build.json is the build's own report, prominence.tsv is not written.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: index
+          path: ${{ runner.temp }}/index
+          retention-days: 3
+          if-no-files-found: error
