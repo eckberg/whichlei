@@ -58,6 +58,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 20 | **Names are kept whole**, also when one holds " \| " | The research joined an entity's names with " \| " in an intermediate file and split them again, cutting 64 names in two and shifting their types. Reading the golden copy directly has no such step, so a name stays what GLEIF has. 60 entries differ from the research index for this reason. |
 | 21 | Entities of **equal prominence go in LEI order**, in a file and at the 1,500 cap | A rule a reader can check with nothing but the file. The golden copy is in LEI order, so it is also the research's order by entity number. |
 | 22 | Each publish **keeps the build it replaces** and **a build that fails a check publishes nothing**. The checks compare the new build with the live one, with bounds in one reviewed file, `apps/index/checks.json` | A page that loaded the old `index.json` keeps working, and a rollback has something to return to. A bad night of GLEIF data, or a bug in the indexer, must not reach the live index unseen; a legitimate big change is a reviewed commit to the bounds. See [slice 6](docs/specs/06-data-publishing.md). |
+| 23 | **The font is self-hosted** (Red Hat Mono, SIL OFL, `apps/web/static/fonts/`) and the **CSP allows only the site, the index host and the GLEIF API**, with no inline script or style | A Google Fonts request tells a third party about every visit, against the privacy promise of decision 12. Without inline code the policy stops injected script from running. |
 
 ## 3. Architecture
 
