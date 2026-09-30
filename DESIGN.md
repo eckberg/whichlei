@@ -52,6 +52,8 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 14 | **Enter copies the LEI** of the selected result; → opens the full record | Copying the LEI is the job. Opening the record is the exception. |
 | 15 | The index is its **own Worker with static assets**, published by a scheduled workflow after automatic checks. The site deploys by hand | Static requests are free and unlimited. A publish swaps every file at once and can be rolled back, and new data never redeploys the site. |
 | 16 | **TypeScript throughout**. Python stays in `research/` as the reference | One language for the indexer and the browser means one tokeniser. The reference checks it. |
+| 17 | **Record pages are not indexed until launch.** `robots.txt` disallows everything and `/lei/*` answers `X-Robots-Tag: noindex`, both set by one variable, `ALLOW_INDEXING`, in `apps/web/wrangler.jsonc` | The pre-launch workers.dev host must not end up in search results, and each crawled page is a Worker request against the free plan's 100,000 a day (slice 9 spec). Indexing starts at launch, on the real domain, once the draw is measured. |
+| 18 | A **record page is cached until 09:00 UTC** the next time that comes around (at most 24 h), an unknown LEI for 1 h, a failure never. Browsers keep a page for 1 h | GLEIF publishes about 08:00 UTC, so a cached record is at most an hour stale after the publish and never older than a day. A failure cached would outlast the fault. |
 
 ## 3. Architecture
 
@@ -124,8 +126,9 @@ build uses nothing else. Wikidata is used only to build the evaluation set.
 
 ## 6. Open questions
 
-- **Record pages.** 3.4M pages exceed the static-asset file limit, so they are rendered by a
-  Worker on request and cached. How long to cache, and what a crawler sees, is slice 9.
+- **Record pages** are rendered by a Worker on request, as 3.4M pages exceed the static-asset
+  file limit: see decisions 17 and 18. Open: the crawler draw on the free plan's 100,000
+  Worker requests a day, known only after launch ([slice 9](docs/specs/09-record-pages.md)).
 - **Corporate hierarchy** in the first release, or later?
 - **Funds** rank slightly above other entities (fitted weight +0.32, no measurable effect).
   Keep, or set to zero?
