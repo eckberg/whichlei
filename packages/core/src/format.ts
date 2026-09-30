@@ -12,16 +12,8 @@ export const FORMAT_VERSION = 1;
  * Registration status, lower case when the entity status is INACTIVE: I issued, L lapsed,
  * T pending transfer, P pending archival, R retired, D duplicate, A annulled, M merged.
  */
-export type Status =
-  | "I"
-  | "L"
-  | "T"
-  | "P"
-  | "R"
-  | "D"
-  | "A"
-  | "M"
-  | Lowercase<"I" | "L" | "T" | "P" | "R" | "D" | "A" | "M">;
+export type Status = RegistrationStatus | Lowercase<RegistrationStatus>;
+type RegistrationStatus = "I" | "L" | "T" | "P" | "R" | "D" | "A" | "M";
 
 const STATUS = /^[ILTPRDAM]$/i;
 
