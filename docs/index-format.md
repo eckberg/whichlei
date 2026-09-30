@@ -13,8 +13,9 @@ index.json              the manifest; the only file that changes in place
 <build>/<n-1>.txt
 ```
 
-`<build>` is unique per build: the golden-copy date and a short hash of the build's
-contents, e.g. `20260916-3f9a1c0e`. A file under it never changes.
+`<build>` is unique per build: `YYYYMMDD-<hex>`, the golden-copy date (the manifest's
+`asOf` without dashes) and 8 to 64 lowercase hex digits of a hash of the build's contents,
+e.g. `20260916-3f9a1c0e`. A file under it never changes.
 
 | File | Cache-Control |
 |---|---|
@@ -25,9 +26,19 @@ Every file is UTF-8 text served as `text/plain` or `application/json`, so Cloudf
 compresses it on the fly. Nothing is precompressed.
 
 A publish uploads the new build directory and the new `index.json` in one Worker
-version. It keeps the previous build's directory too (2 × 6,439 files, under the
-20,000-file limit), so a page that loaded the old manifest keeps working. A page that
-gets a 404 for an index file reloads `index.json` and routes again.
+version. It keeps the previous build's directory too: 2 × 6,438 index files + 1 manifest
+= 12,877 files, under the 20,000-file limit. So a page that loaded the old manifest keeps
+working.
+
+## Reader rules
+
+- Parse `index.json` with `parseManifest`. On `UnsupportedFormatError` the page's code is
+  older or newer than the index: reload the page once to get matching code, then show an
+  error. Any other `IndexFormatError` is an error to show.
+- Cache fetched and parsed index files by their full path, `<build>/<n>.txt`
+  (`filePath`), never by number alone, so files of two builds never mix.
+- After a 404 for an index file, reload `index.json` once and route again. A second 404
+  is an error to show.
 
 ## Manifest: `index.json`
 
@@ -42,21 +53,29 @@ gets a 404 for an index file reloads `index.json` and routes again.
 }
 ```
 
-- `format`: this version, 1. A reader rejects any other value.
-- `asOf`: publish date of the GLEIF golden copy the build used. Shown with every result.
-- `entities`: entities reachable through the index.
-- `bounds`: the routing table. `bounds[i]` is the first index term of file `i`; the list
-  is sorted by UTF-16 code unit (terms are `[a-z0-9]`, so this is byte order). File `i`
-  holds every term `t` with `bounds[i] <= t < bounds[i + 1]`.
-- `capped`: ascending numbers of the files that hold a single oversized word and were cut
-  to their 1,500 most prominent entities.
+- `format`: this version, 1.
+- `build`: as above.
+- `asOf`: publish date of the GLEIF golden copy the build used, `YYYY-MM-DD`. Shown with
+  every result.
+- `entities`: entities reachable through the index, a non-negative integer.
+- `bounds`: the routing table, not empty. `bounds[i]` is the first index term of file
+  `i`, matching `[a-z0-9]+`, strictly ascending by UTF-16 code unit (for these characters,
+  byte order). File `i` holds every term `t` with `bounds[i] <= t < bounds[i + 1]`; a
+  term below `bounds[0]` goes to file 0.
+- `capped`: the files that hold a single oversized word and were cut to their 1,500 most
+  prominent entities. Ascending, unique, each in `[0, bounds.length)`.
 
-`route(queryTokens(text), routingTable(manifest), { lastIsPrefix, paused })` gives the
-file numbers to fetch; `filePath(manifest, n)` gives the path.
+`parseManifest` checks all of the above and drops unknown fields.
+
+To route: `route(queryTokens(text), routingTable(manifest), { lastIsPrefix:
+lastIsPrefix(text), paused })`. `lastIsPrefix(text)` is false once the text ends in
+whitespace (the tokeniser's whitespace set), because the last word is then finished.
+`paused` is true when the debounce has fired. The result is file numbers;
+`filePath(manifest, n)` gives each path.
 
 ## Index file: `<build>/<n>.txt`
 
-One line per entity, ending in `\n`. Fields are separated by `\t`:
+One line per entity. Fields are separated by `\t`:
 
 ```
 lei  prominence  country  status  legal name  [other name ...]
@@ -64,19 +83,28 @@ lei  prominence  country  status  legal name  [other name ...]
 
 | Field | Content |
 |---|---|
-| `lei` | 20 characters |
-| `prominence` | integer: prominence × 10, rounded half up (`Math.round`) |
-| `country` | ISO 3166-1 alpha-2 of the legal address |
+| `lei` | 20 characters, `[0-9A-Z]` |
+| `prominence` | integer, `-?[0-9]+`: prominence × 10, rounded with `Math.round` |
+| `country` | ISO 3166-1 alpha-2 of the legal address, `[A-Z]{2}` |
 | `status` | registration status: `I` issued, `L` lapsed, `T` pending transfer, `P` pending archival, `R` retired, `D` duplicate, `A` annulled, `M` merged; lower case when the entity status is INACTIVE |
-| `legal name` | as GLEIF has it |
-| `other name` | zero or more: trading, alternative-language and transliterated names, deduplicated, none equal to the legal name |
+| `legal name` | as GLEIF has it; not empty |
+| `other name` | zero or more: trading, alternative-language and transliterated names; none empty, none repeated, none equal to the legal name |
 
-Tabs, carriage returns and line feeds inside names are replaced by a space. The tokeniser
-treats all three as whitespace, so matching is unchanged.
+`Math.round` rounds halves toward +∞: 0.25 → `3` (0.3), −0.25 → `-2` (−0.2), −0.26 →
+`-3` (−0.3), −0.04 → `0`. A reader divides by 10.
 
-Lines are ordered by prominence, highest first, then by LEI. An entity appears in every
-file that holds one of its index terms, so the same line can be in two fetched files;
-the reader merges by LEI.
+Lines end in `\n`, the last one too. There are no empty lines, and a `\r` anywhere is an
+error. An empty file is valid and holds no entries. Tabs, carriage returns and line feeds
+inside names are replaced by a space before writing; the tokeniser treats all three as
+whitespace, so matching is unchanged. `encodeEntries` throws `IndexFormatError` on an
+entry that breaks these rules, and `decodeEntries` on a file that does.
+
+Lines are ordered by full-precision prominence, highest first, then by LEI. The 1,500-entry
+cap also uses full precision. The stored tenths are for scoring only, so two lines with
+the same stored prominence need not be in LEI order.
+
+An entity appears in every file that holds one of its index terms, so the same line can be
+in two fetched files; the reader merges by LEI.
 
 Example:
 

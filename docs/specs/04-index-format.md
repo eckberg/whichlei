@@ -86,6 +86,7 @@ CPU slowdown, 808 queries (every 4th).
 
   Median / p90 / max. A keystroke is tokenise, route, parse newly arrived files, merge and
   score, on the main thread, with the debounce firing on every key; rendering comes on top.
+  The 49,159 timed keystrokes are the 49,210 routed ones less 51 that have no tokens.
   At 1×: 9 / 16 / 53 ms. The slowest queries are long legal names typed in full, every
   word scored against up to 3,000 candidates. If slice 7 misses a target, the next step
   is scoring in a Web Worker, off the main thread, not a format change.

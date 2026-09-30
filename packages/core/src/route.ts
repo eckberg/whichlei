@@ -24,7 +24,7 @@ const MAX_SPAN = 1;
 /** At most this many words route per query. */
 const MAX_ANCHORS = 2;
 /** Sorts after every term that starts with the prefix. Terms are [a-z0-9]. */
-const PREFIX_END = "￿";
+const PREFIX_END = String.fromCharCode(0xffff);
 
 /** The file that holds `term`: the last file whose first term is <= term. */
 function fileOf(bounds: readonly string[], term: string): number {

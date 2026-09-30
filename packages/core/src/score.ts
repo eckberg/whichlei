@@ -134,7 +134,8 @@ export function matchFeatures(
   // every keystroke.
   const n = query.length;
   // Content words are the non-stopwords, or every word when all are stopwords.
-  const allStop = query.every((q) => QUERY_STOP.has(q));
+  let allStop = true;
+  for (const q of query) if (!QUERY_STOP.has(q)) allStop = false;
   let shown = false;
   let nMiss = 0;
   let nFuzzy = 0;

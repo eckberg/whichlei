@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { type RoutingTable, route } from "./route.ts";
-import { queryTokens } from "./tokens.ts";
+import { lastIsPrefix, queryTokens } from "./tokens.ts";
 
 interface RouteFixture {
   bounds: string[];
@@ -25,9 +25,10 @@ describe("route", () => {
       routes.forEach((expected, i) => {
         const typed = query.slice(0, i + 1);
         const tokens = queryTokens(typed);
-        const lastIsPrefix = !typed.endsWith(" ");
         const actual = [false, true]
-          .map((paused) => route(tokens, table, { lastIsPrefix, paused }).join(","))
+          .map((paused) =>
+            route(tokens, table, { lastIsPrefix: lastIsPrefix(typed), paused }).join(","),
+          )
           .join("|");
         if (actual !== expected)
           differences.push(`${JSON.stringify(typed)}: ${actual} vs ${expected}`);
@@ -46,8 +47,20 @@ describe("route", () => {
     expect(route(["bp"], table, { paused: true })).toHaveLength(1);
   });
 
-  test("never routes stopwords and at most two words", () => {
+  test("skips stopwords in a query of several words, and routes at most two words", () => {
     expect(route(["the", "of"], table)).toEqual([]);
     expect(route(queryTokens("svenska handelsbanken aktiebolag stockholm"), table)).toHaveLength(2);
+  });
+
+  test("treats the last word as finished after any whitespace", () => {
+    expect(lastIsPrefix("erics")).toBe(true);
+    expect(lastIsPrefix("")).toBe(true);
+    expect(lastIsPrefix("ericsson ")).toBe(false);
+    expect(lastIsPrefix(`ericsson${String.fromCharCode(0xa0)}`)).toBe(false);
+    expect(lastIsPrefix(`ericsson${String.fromCharCode(0x3000)}`)).toBe(false);
+  });
+
+  test("sends terms below the first bound to file 0", () => {
+    expect(route(["000"], { bounds: ["00a", "b"], capped: new Set() })).toEqual([0]);
   });
 });

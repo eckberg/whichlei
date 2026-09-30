@@ -4,12 +4,15 @@ export {
   encodeEntries,
   FORMAT_VERSION,
   filePath,
+  IndexFormatError,
   type Manifest,
   PROMINENCE_STEP,
+  parseManifest,
   roundProminence,
   routingTable,
   type Status,
   toCandidate,
+  UnsupportedFormatError,
 } from "./format.ts";
 export {
   type IdentifierReadings,
@@ -32,4 +35,11 @@ export {
   scoreCandidate,
   topK,
 } from "./score.ts";
-export { fold, indexTerms, type NameTokens, nameTokens, queryTokens } from "./tokens.ts";
+export {
+  fold,
+  indexTerms,
+  lastIsPrefix,
+  type NameTokens,
+  nameTokens,
+  queryTokens,
+} from "./tokens.ts";
