@@ -53,12 +53,14 @@ const REDIRECT_MAX_AGE = 86400;
 const DEFAULT_RETRY_AFTER = 60;
 const GLEIF_TIMEOUT_MS = 8000;
 
-// Only the site itself and the font hosts. The copy button script is a static file.
+// Only the site itself: styles, fonts and the copy button script are static files. A record
+// page fetches nothing, so nothing else is allowed.
 const CSP = [
   "default-src 'none'",
-  "style-src 'self' https://fonts.googleapis.com",
-  "font-src https://fonts.gstatic.com",
+  "style-src 'self'",
+  "font-src 'self'",
   "script-src 'self'",
+  "img-src 'self' data:",
   "base-uri 'none'",
   "form-action 'none'",
   "frame-ancestors 'none'",
@@ -308,7 +310,8 @@ export function createWorker(deps: Deps) {
 
 export default createWorker({
   // `caches` exists in the Workers runtime only.
-  cache: () => (globalThis as { caches?: { default: CacheLike } }).caches?.default ?? null,
+  cache: () =>
+    (globalThis as unknown as { caches?: { default: CacheLike } }).caches?.default ?? null,
   fetch: (input, init) => fetch(input, init),
   now: () => new Date(),
   gleifTimeoutMs: GLEIF_TIMEOUT_MS,

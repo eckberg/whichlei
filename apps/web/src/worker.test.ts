@@ -419,8 +419,10 @@ describe("security headers", () => {
       const csp = response.headers.get("content-security-policy") ?? "";
       expect(csp).toContain("default-src 'none'");
       expect(csp).toContain("script-src 'self'");
-      expect(csp).toContain("font-src https://fonts.gstatic.com");
-      expect(csp).toContain("style-src 'self' https://fonts.googleapis.com");
+      expect(csp).toContain("font-src 'self'");
+      expect(csp).toContain("style-src 'self'");
+      expect(csp).not.toContain("unsafe-inline");
+      expect(csp).not.toContain("google");
     }
   });
 

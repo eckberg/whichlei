@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Find the LEI of a company, fund or public body while you type. Copy it and leave.">
+<title>whichlei</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2317191e'/%3E%3Cpath d='M4 4.5l4 3.5-4 3.5' fill='none' stroke='%23fbfbfc' stroke-width='1.8'/%3E%3C/svg%3E">
+<link rel="preload" href="/fonts/red-hat-mono-latin-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles/app.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1><a class="mark" href="/" id="home">whichlei</a></h1>
+    <nav><button class="btn" type="button" id="about-btn">about</button></nav>
+  </header>
+  <search class="find">
+  <div class="prompt">
+    <span class="caret" aria-hidden="true">&gt;</span>
+    <input id="q" type="text" role="combobox" aria-label="Search by name or LEI" aria-controls="list"
+      aria-expanded="false" aria-autocomplete="list" autocomplete="off" autocapitalize="off"
+      spellcheck="false" enterkeyhint="search" placeholder="name or lei">
+  </div>
+  <div class="info" id="info"></div>
+  </search>
+  <div class="sr-only" id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+  <main id="main" class="single">
+    <div class="list" id="list" role="listbox" aria-label="Results" hidden></div>
+    <section class="preview" id="preview" aria-label="Selected record" hidden></section>
+    <div id="doc">
+      <noscript><div class="doc"><p class="lead">whichlei needs JavaScript to search. To open a record without it, go to /lei/ followed by the LEI.</p></div></noscript>
+    </div>
+  </main>
+  <footer class="keys-bar">
+    <ul id="keys" aria-label="Keyboard shortcuts"></ul>
+    <span class="meta" id="meta"></span>
+  </footer>
+</div>
+</body>
+</html>
