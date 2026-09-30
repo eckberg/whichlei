@@ -1,0 +1,41 @@
+/* Record pages only. Theme tokens and the record view come from design/prototype/shared.css,
+   which the build puts in front of this file. */
+.page {
+  padding-inline: 16px;
+  max-width: 1320px;
+  margin-inline: auto;
+}
+.page > .record {
+  border-top: 1px solid var(--rule);
+}
+.record .lei {
+  user-select: all;
+}
+.record .actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1ch 2ch;
+}
+.record .kv dd > div + div {
+  margin-top: 2px;
+}
+.copied {
+  color: var(--ok);
+}
+.record time {
+  font: inherit;
+}
+.record .src {
+  overflow-wrap: anywhere;
+}
+/* Narrow screens: the label sits above its value, so long labels never clip. */
+@media (max-width: 640px) {
+  .record .kv {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .record .kv dd {
+    margin-bottom: 8px;
+  }
+}

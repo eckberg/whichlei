@@ -1,12 +1,26 @@
-// The site: static assets only for now. Deployed by .github/workflows/deploy-site.yml.
+// The site: static assets, plus a Worker that answers /lei/* (record pages) and /robots.txt.
+// Every other path is a free static request. Deployed by .github/workflows/deploy-site.yml.
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "whichlei-site",
+  "main": "src/worker.ts",
   "compatibility_date": "2026-09-29",
   "workers_dev": true,
   "send_metrics": false,
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/lei/*", "/robots.txt"]
+  },
+  "vars": {
+    // Record pages are not indexed until launch (DESIGN.md decision 17). Crawlers are let in
+    // only when ALLOW_INDEXING is "true" AND the request came to CANONICAL_ORIGIN, so the
+    // workers.dev host is never indexed. At launch: set both.
+    "ALLOW_INDEXING": "false",
+    // The site's own origin, such as "https://whichlei.com". Canonical links, JSON-LD and
+    // redirects point at it. Empty until launch: they use the request's own origin. The
+    // Cache API also needs a custom domain.
+    "CANONICAL_ORIGIN": ""
   }
 }

@@ -52,6 +52,8 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 14 | **Enter copies the LEI** of the selected result; → opens the full record | Copying the LEI is the job. Opening the record is the exception. |
 | 15 | The index is its **own Worker with static assets**, published by a scheduled workflow after automatic checks. The site deploys by hand | Static requests are free and unlimited. A publish swaps every file at once and can be rolled back, and new data never redeploys the site. |
 | 16 | **TypeScript throughout**. Python stays in `research/` as the reference | One language for the indexer and the browser means one tokeniser. The reference checks it. |
+| 17 | **Record pages are not indexed until launch, and workers.dev never is.** `robots.txt` disallows everything and `/lei/*` answers `X-Robots-Tag: noindex`, unless `ALLOW_INDEXING` is `"true"` and the request came to the host in `CANONICAL_ORIGIN` (both in `apps/web/wrangler.jsonc`, the second empty until launch) | The pre-launch workers.dev host must not end up in search results, even after launch: it would duplicate the canonical site. Each crawled page is also a Worker request against the free plan's 100,000 a day (slice 9 spec). Indexing starts at launch, on the real domain, once the draw is measured. |
+| 18 | A **record page is cached until 25 hours after its golden copy** (at least 5 minutes, at most 24 h; 1 h if undated), an unknown LEI for 1 h, a failure never. Browsers keep a page for 1 h | GLEIF publishes about daily, but the hour is not measured, so a record expires at the next publish plus an hour of slack and is never older than a day. A failure cached would outlast the fault. |
 
 ## 3. Architecture
 
@@ -124,8 +126,9 @@ build uses nothing else. Wikidata is used only to build the evaluation set.
 
 ## 6. Open questions
 
-- **Record pages.** 3.4M pages exceed the static-asset file limit, so they are rendered by a
-  Worker on request and cached. How long to cache, and what a crawler sees, is slice 9.
+- **Record pages** are rendered by a Worker on request, as 3.4M pages exceed the static-asset
+  file limit: see decisions 17 and 18. Open: the crawler draw on the free plan's 100,000
+  Worker requests a day, known only after launch ([slice 9](docs/specs/09-record-pages.md)).
 - **Corporate hierarchy** in the first release, or later?
 - **Funds** rank slightly above other entities (fitted weight +0.32, no measurable effect).
   Keep, or set to zero?
