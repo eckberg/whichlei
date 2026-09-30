@@ -19,8 +19,12 @@ export class IndexFormatError extends Error {
  */
 export class UnsupportedFormatError extends IndexFormatError {
   override name = "UnsupportedFormatError";
-  constructor(readonly format: unknown) {
+  /** The manifest's `format` value. */
+  readonly format: unknown;
+  // A plain field, not a parameter property: Node's type stripping cannot erase those.
+  constructor(format: unknown) {
     super(`unsupported index format ${JSON.stringify(format)}; this code reads ${FORMAT_VERSION}`);
+    this.format = format;
   }
 }
 
