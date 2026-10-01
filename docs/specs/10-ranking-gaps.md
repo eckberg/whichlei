@@ -122,11 +122,15 @@ word); "anz", "iag", "pko", "bny" (not the legal name's initials); "ge", "gm", "
 - The acronym set is small and hand-picked, and its test half was looked at while
   designing the features (legal forms, the spelled-out variant). Only the weights and
   options were chosen on train alone.
-- Scoring time in the browser. The initials and legal form of a name are worked out once
-  per name and cached. In Node, slowest keystroke per query, every 4th query, two runs
-  each: 14.2 / 26.1 and 14.0 / 27.2 ms (median / p90) before, 14.0 / 27.2 and 14.2 / 26.0
-  ms after: no difference above this shared machine's noise. Slice 7's browser harness
-  checks it on the production page.
+- Scoring time in the browser. Slice 7's bench (`pnpm --filter @whichlei/bench search
+  --rate 4 --every 16 --page-every 16 --last-every 16 --modes last --skip bytes`), one
+  locked session, core of origin/main (A) against this slice (C), slowest keystroke per
+  query at 4x, debounce on the last key, median / p90: `Search` A 75.9 / 121, 72.7 / 125,
+  72.8 / 134 ms and C 79.3 / 120, 74.6 / 127 ms; the page, key to final results, slowest
+  per query, A 259 / 356, 255 / 336, 274 / 359 ms and C 265 / 349, 275 / 377 ms. No
+  difference above noise. A first version, which cached a shape per name in a WeakMap
+  and built every name's initials, was 94 / 142 ms: the initials are now tried only for
+  a name whose first word starts with the query's letter.
 
 ## Done when
 - The acronym set improves on test beyond noise (+.25, interval [.11, .48]); the short
