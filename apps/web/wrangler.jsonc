@@ -8,7 +8,11 @@
   // The Worker reads the index host, another Worker on this account. Without this flag that
   // fetch fails (error 1042) on workers.dev, and on one zone it would skip the other Worker.
   "compatibility_flags": ["global_fetch_strictly_public"],
+  // workers.dev stays: the preview and e2e target, never indexed (DESIGN.md decision 27).
   "workers_dev": true,
+  // The canonical host (decision 27): a custom domain creates its own DNS record and
+  // certificate, and makes the Cache API work (decision 18).
+  "routes": [{ "pattern": "whichlei.com", "custom_domain": true }],
   "send_metrics": false,
   "assets": {
     "directory": "./dist",
@@ -17,17 +21,17 @@
     "run_worker_first": ["/lei/*", "/robots.txt"]
   },
   "vars": {
-    // Record pages are not indexed until launch (DESIGN.md decision 17). Crawlers are let in
-    // only when ALLOW_INDEXING is "true" AND the request came to CANONICAL_ORIGIN, so the
-    // workers.dev host is never indexed. At launch: set both.
-    "ALLOW_INDEXING": "false",
-    // The site's own origin, such as "https://whichlei.com". Canonical links, JSON-LD and
-    // redirects point at it. Empty until launch: they use the request's own origin. The
-    // Cache API also needs a custom domain.
-    "CANONICAL_ORIGIN": "",
+    // Crawlers are let in only when ALLOW_INDEXING is "true" AND the request came to
+    // CANONICAL_ORIGIN, so the workers.dev host is never indexed (DESIGN.md decision 17).
+    // Rollback: set "false" and redeploy.
+    "ALLOW_INDEXING": "true",
+    // The site's own origin. Canonical links, JSON-LD and redirects point at it, and the
+    // build reads it too: the search page's canonical link and the analytics loader's host
+    // check (/scripts/stats.js). Empty: they use the request's own origin, and nothing counts.
+    "CANONICAL_ORIGIN": "https://whichlei.com",
     // Where the published index is served from, for the names of legal form and registration
     // authority codes (<build>/codes.json). The same value as INDEX_ORIGIN in deploy-site.yml
     // (a test checks). Empty: record pages show the codes.
-    "INDEX_ORIGIN": "https://whichlei-index.lumenspring.workers.dev"
+    "INDEX_ORIGIN": "https://index.whichlei.com"
   }
 }

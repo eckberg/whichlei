@@ -1,8 +1,9 @@
 name: Deploy site
 
 # By hand only: Actions → Deploy site → Run workflow. Deploys apps/web to the
-# whichlei-site Worker on workers.dev, runs the browser tests against it, then deploys
-# apps/redirect (the whichlei-redirect Worker for www.whichlei.com).
+# whichlei-site Worker (workers.dev and whichlei.com), runs the browser tests against the
+# workers.dev host, deploys apps/redirect (the whichlei-redirect Worker for www.whichlei.com),
+# then runs the live check against whichlei.com.
 on:
   workflow_dispatch:
 
@@ -18,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
-      name: workers.dev
-      url: ${{ steps.deploy.outputs.url }}
+      name: production
+      url: https://whichlei.com
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -35,7 +36,7 @@ jobs:
       # The search page reads the index origin at build time (slice 7).
       - run: pnpm --filter @whichlei/web build
         env:
-          INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
+          INDEX_ORIGIN: https://index.whichlei.com
       - id: deploy
         working-directory: apps/web
         run: |
@@ -50,3 +51,11 @@ jobs:
       - name: Deploy the www redirect
         working-directory: apps/redirect
         run: pnpm exec wrangler deploy
+      # The live check (docs/specs/11-launch.md): a browser on the apex, Fathom let in but
+      # answered by the check itself, so nothing is counted. It fails, and cannot hang: the
+      # step and the test both have a limit.
+      - name: Live check on whichlei.com
+        timeout-minutes: 5
+        run: pnpm --filter @whichlei/web e2e live
+        env:
+          LIVE_URL: https://whichlei.com

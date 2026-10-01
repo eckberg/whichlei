@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
+      INDEX_ORIGIN: https://index.whichlei.com
       WRANGLER_SEND_METRICS: "false"
     steps:
       - name: Confirm

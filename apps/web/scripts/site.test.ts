@@ -59,9 +59,9 @@ describe("canonicalOrigin", () => {
     expect(() => canonicalOrigin('{ "CANONICAL_ORIGIN": "whichlei.com" }')).toThrow();
   });
 
-  it("is set in the real wrangler.jsonc", () => {
+  it("is the apex in the real wrangler.jsonc", () => {
     const wrangler = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
-    expect(() => canonicalOrigin(wrangler)).not.toThrow();
+    expect(canonicalOrigin(wrangler)).toBe("https://whichlei.com");
   });
 });
 
@@ -76,6 +76,42 @@ describe("searchPage", () => {
 
   it("adds nothing before launch", () => {
     expect(searchPage(page, "")).toBe(page);
+  });
+});
+
+describe("the launch settings of wrangler.jsonc", () => {
+  const wrangler = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+
+  it("serves the apex as a custom domain, and keeps workers.dev", () => {
+    expect(wrangler).toContain('"routes": [{ "pattern": "whichlei.com", "custom_domain": true }]');
+    expect(wrangler).toContain('"workers_dev": true');
+  });
+
+  it("lets crawlers in, on the canonical host only", () => {
+    expect(wrangler).toContain('"ALLOW_INDEXING": "true"');
+    expect(wrangler).toContain('"CANONICAL_ORIGIN": "https://whichlei.com"');
+  });
+
+  it("reads the index from index.whichlei.com, in every place that names it", () => {
+    expect(wrangler).toContain('"INDEX_ORIGIN": "https://index.whichlei.com"');
+    for (const file of ["deploy-site.yml", "publish-index.yml", "rollback-index.yml"]) {
+      const workflow = readFileSync(
+        new URL(`../../../.github/workflows/${file}`, import.meta.url),
+        "utf8",
+      );
+      expect(workflow, file).toMatch(/INDEX_ORIGIN: https:\/\/index\.whichlei\.com\s/);
+      expect(workflow, file).not.toContain("lumenspring");
+    }
+  });
+
+  it("is checked against the apex by the deploy workflow, in a production environment", () => {
+    const workflow = readFileSync(
+      new URL("../../../.github/workflows/deploy-site.yml", import.meta.url),
+      "utf8",
+    );
+    expect(workflow).toContain("name: production");
+    expect(workflow).toContain("url: https://whichlei.com");
+    expect(workflow).toContain("LIVE_URL: https://whichlei.com");
   });
 });
 

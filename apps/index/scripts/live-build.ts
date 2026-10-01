@@ -1,6 +1,6 @@
 // Print the build the live index.json names, or nothing if there is no live index.
 //
-//   pnpm --silent --filter @whichlei/index live-build --origin https://whichlei-index.lumenspring.workers.dev
+//   pnpm --silent --filter @whichlei/index live-build --origin https://index.whichlei.com
 //
 // A network fault exits 1: it is never taken for "no live index".
 import { parseArgs } from "node:util";
