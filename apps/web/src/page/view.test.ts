@@ -31,6 +31,7 @@ const state = (over: Partial<SearchState> = {}): SearchState => ({
   tokens: ["ericsson"],
   message: "",
   reload: false,
+  lei: null,
   index: { asOf: "2026-09-16", entities: 3317220 },
   ...over,
 });
@@ -71,6 +72,19 @@ describe("rowsHtml", () => {
     expect(out).not.toContain("<img");
     expect(out).not.toContain("<b>");
     expect(out).toContain("&lt;img");
+  });
+
+  it("escapes HTML-special characters inside the marked part of a name", () => {
+    const att: Hit = { entry: entry({ name: "AT&T <b>Inc", otherNames: [] }) };
+    const out = rowsHtml([att], ["att"], 0);
+    expect(out).toContain("<mark>AT&amp;T</mark>");
+    expect(out).toContain("&lt;b&gt;Inc");
+    expect(out).not.toContain("<b>");
+    // The mark itself holds the special characters.
+    const tag: Hit = { entry: entry({ name: "<b>x", otherNames: [] }) };
+    const marked = rowsHtml([tag], ["b"], 0);
+    expect(marked).toContain("&lt;<mark>b</mark>&gt;x");
+    expect(marked).not.toContain("<b>");
   });
 
   it("makes the row of a typed LEI say what opening does", () => {
@@ -116,11 +130,21 @@ describe("infoLine", () => {
   });
 
   it("names the check digits, good and bad", () => {
-    const bad = infoLine(state({ phase: "bad-lei", hits: [] }));
+    const bad = infoLine(state({ phase: "bad-lei", hits: [], lei: "invalid" }));
     expect(bad.tone).toBe("bad");
     expect(bad.text).toContain("check digits");
-    const good = infoLine(state({ hits: [{ entry: entry(), typed: true }] }));
+    const good = infoLine(state({ hits: [{ entry: entry(), typed: true }], lei: "valid" }));
     expect(good.html.value).toContain("check digits ok");
+    expect(good.text).toBe("lei, check digits ok");
+  });
+
+  it("counts the names beside the row of a valid LEI, and notes bad check digits as a line", () => {
+    const row = { entry: entry({ lei: `${"H".repeat(18)}01` }), typed: true } as const;
+    const withNames = infoLine(state({ hits: [row, { entry: entry() }], lei: "valid" }));
+    expect(withNames.text).toBe("lei, check digits ok · 1 match");
+    const invalid = infoLine(state({ hits: [{ entry: entry() }], lei: "invalid" }));
+    expect(invalid.text).toBe("1 match · not a valid lei: the check digits don’t match");
+    expect(invalid.html.value).toContain('<span class="warn">');
   });
 
   it("offers a retry on an error, and says when no index is set up", () => {

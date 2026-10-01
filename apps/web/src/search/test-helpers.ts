@@ -33,11 +33,12 @@ export function memorySource(manifest: Manifest, files: Map<number, string>) {
   const requests: { file: number; signal: AbortSignal | undefined }[] = [];
   let manifests = 0;
   const source: IndexSource = {
+    peek: () => manifest,
     manifest: () => {
       manifests++;
       return Promise.resolve(manifest);
     },
-    file: (file, signal) => {
+    file: (_build, file, signal) => {
       requests.push({ file, signal });
       const text = files.get(file);
       return text === undefined

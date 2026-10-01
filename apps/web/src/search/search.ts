@@ -45,7 +45,7 @@ export type Phase =
   | "no-match"
   /** Too little typed to know which files to read. */
   | "short"
-  /** Twenty characters that look like an LEI, with check digits that do not verify. */
+  /** Twenty characters of LEI shape whose check digits fail, and no name matches. */
   | "bad-lei"
   /** The index could not be read. `message` says why. */
   | "error";
@@ -60,6 +60,11 @@ export interface SearchState {
   message: string;
   /** With `error`: the page is out of date, and reloading it is what helps, not retrying. */
   reload: boolean;
+  /**
+   * What the input is as an LEI: "valid" (a row for it is in `hits`), "invalid" (twenty
+   * characters of that shape whose check digits fail), or null. A name search runs either way.
+   */
+  lei: "valid" | "invalid" | null;
   /** The published index: date of its GLEIF golden copy and size. Null until it loads. */
   index: { asOf: string; entities: number } | null;
 }
@@ -88,30 +93,69 @@ export interface SearchOptions {
   now?: () => number;
 }
 
-type Reading =
+/**
+ * What the input is. Names are searched whatever the shape: 621 legal names are an LEI's shape
+ * once their spaces are gone, and "ERICSSON" is a valid BIC (DESIGN.md decision 8).
+ */
+export type Reading =
   | { kind: "empty" }
-  | { kind: "lei"; lei: string }
-  | { kind: "bad-lei" }
-  | { kind: "name"; tokens: string[]; lastIsPrefix: boolean; partialLei: number };
+  | {
+      kind: "name";
+      tokens: string[];
+      lastIsPrefix: boolean;
+      /** Length of an input that looks like part of an LEI, for a note when nothing matches. */
+      partialLei: number;
+      /** The row for a valid LEI. */
+      lei: Hit | null;
+      /** Twenty characters of LEI shape, no spaces, whose check digits fail. */
+      badLei: boolean;
+      /** The input has spaces in it: names come before an LEI row. */
+      nameFirst: boolean;
+    };
 
 // An LEI has this shape before its check digits are looked at. The check itself is core's.
 const LEI_SHAPE = /^[0-9A-Z]{18}[0-9]{2}$/;
 const PARTIAL_LEI = /^[0-9A-Z]{6,19}$/;
+/** Lengths of ISINs (12) and BICs (8, 11): not partial LEIs. Slice 8 looks those up. */
+const OTHER_CODES = new Set([8, 11, 12]);
 
-/** What the input is, by its shape and check digits alone (DESIGN.md decisions 8 and 9). */
+export type NameReading = Extract<Reading, { kind: "name" }>;
+
+/** What `SearchState.lei` says about this input. */
+const leiNote = (reading: NameReading): SearchState["lei"] =>
+  reading.lei ? "valid" : reading.badLei ? "invalid" : null;
+
+/** A valid LEI typed in full is one row that opens its record. The index cannot look it up. */
+function leiRow(lei: string): Hit {
+  const entry: Entry = {
+    lei,
+    name: "",
+    otherNames: [],
+    country: "",
+    status: "I",
+    prominence: 0,
+  };
+  return { entry, typed: true };
+}
+
 export function readInput(text: string): Reading {
   if (text.trim() === "") return { kind: "empty" };
+  const nameFirst = /\s/.test(text.trim());
   const { lei } = identifierReadings(text);
-  if (lei !== undefined) return { kind: "lei", lei };
   // Upper-case a-z only, as identifierReadings does.
   const code = text.replace(/\s+/g, "").replace(/[a-z]/g, (c) => c.toUpperCase());
-  if (LEI_SHAPE.test(code)) return { kind: "bad-lei" };
   const digits = code.match(/[0-9]/g)?.length ?? 0;
   return {
     kind: "name",
     tokens: queryTokens(text),
     lastIsPrefix: lastIsPrefix(text),
-    partialLei: PARTIAL_LEI.test(code) && digits >= 3 ? code.length : 0,
+    partialLei:
+      !nameFirst && PARTIAL_LEI.test(code) && digits >= 3 && !OTHER_CODES.has(code.length)
+        ? code.length
+        : 0,
+    lei: lei === undefined ? null : leiRow(lei),
+    badLei: lei === undefined && !nameFirst && LEI_SHAPE.test(code),
+    nameFirst,
   };
 }
 
@@ -124,6 +168,7 @@ export function initialState(configured: boolean): SearchState {
     tokens: [],
     message: "",
     reload: false,
+    lei: null,
     index: null,
   };
 }
@@ -211,15 +256,20 @@ export class Search {
     const reading = readInput(text);
     this.#reading = reading;
     this.#text = text;
-    if (reading.kind !== "name") {
+    if (reading.kind === "empty") {
       this.#stop();
       this.#answer = null;
-      this.#fixed(text, reading);
+      const phase = this.#source ? "empty" : "unconfigured";
+      if (this.#source) this.#syncBuild(this.#source);
+      this.#set({ text, tokens: [], phase, hits: [], message: "", lei: null });
       return Promise.resolve();
     }
     if (!this.#source) {
+      // No index to search: a valid LEI still gets its row.
       this.#stop();
-      this.#set({ text, phase: "unconfigured", hits: [], tokens: [], message: "" });
+      const hits = reading.lei ? [reading.lei] : [];
+      const phase = reading.lei ? "done" : reading.badLei ? "bad-lei" : "unconfigured";
+      this.#set({ text, tokens: [], phase, hits, message: "", lei: leiNote(reading) });
       return Promise.resolve();
     }
     if (Number.isFinite(this.#debounceMs)) {
@@ -239,34 +289,11 @@ export class Search {
   /** Try the current input again, after an error. */
   retry(): Promise<void> {
     this.#answer = null;
-    if (this.#reading.kind !== "name") {
+    if (this.#reading.kind === "empty") {
       void this.input(this.#text);
       return this.load();
     }
     return this.input(this.#text).then(() => this.pause());
-  }
-
-  // ---- Inputs that need no index -------------------------------------------------------
-
-  #fixed(text: string, reading: Exclude<Reading, { kind: "name" }>) {
-    const base = { text, tokens: [], message: "" };
-    if (reading.kind === "empty") {
-      const phase = this.#source ? "empty" : "unconfigured";
-      this.#set({ ...base, phase, hits: [] });
-    } else if (reading.kind === "bad-lei") {
-      this.#set({ ...base, phase: "bad-lei", hits: [] });
-    } else {
-      // A valid LEI is one row that opens its record. The index cannot look an LEI up.
-      const entry: Entry = {
-        lei: reading.lei,
-        name: "",
-        otherNames: [],
-        country: "",
-        status: "I",
-        prominence: 0,
-      };
-      this.#set({ ...base, phase: "done", hits: [{ entry, typed: true }] });
-    }
   }
 
   // ---- The pass -----------------------------------------------------------------------
@@ -289,13 +316,25 @@ export class Search {
 
   async #pass(
     text: string,
-    reading: Extract<Reading, { kind: "name" }>,
+    reading: NameReading,
     generation: number,
     paused: boolean,
     retried = false,
   ): Promise<void> {
     const source = this.#source as IndexSource;
+    this.#syncBuild(source);
     const { tokens } = reading;
+    const note = leiNote(reading);
+    /** Names, and the row of a valid LEI before them, or after them when there are spaces. */
+    const arrange = (names: readonly Hit[]): readonly Hit[] => {
+      const row = reading.lei;
+      if (!row || names.some((hit) => hit.entry.lei === row.entry.lei)) return names;
+      return reading.nameFirst ? [...names, row] : [row, ...names];
+    };
+    const set = (patch: Partial<SearchState>) =>
+      this.#set({ text, tokens, lei: note, message: "", ...patch });
+    // A valid LEI is on screen at once, before any name has been found.
+    const instant = reading.lei && !reading.nameFirst ? { hits: [reading.lei] } : {};
     let busy = 0;
     let mark = this.#now();
     const controller = new AbortController();
@@ -303,7 +342,7 @@ export class Search {
     this.#controller = controller;
     try {
       if (!this.#manifest || !this.#table) {
-        this.#set({ text, tokens, phase: "loading", message: "" });
+        set({ phase: "loading", ...instant });
         busy += this.#now() - mark;
         await this.#loadManifest(source);
         if (generation !== this.#generation) return;
@@ -329,10 +368,12 @@ export class Search {
         // Nothing to read: too short to route, or a wide word that waits for a pause.
         previous?.abort();
         this.#answer = null;
+        const shown = arrange([]);
         if (paused) {
-          this.#set({ text, tokens, phase: "short", hits: [], message: "" });
+          const phase = shown.length > 0 ? "done" : reading.badLei ? "bad-lei" : "short";
+          set({ phase, hits: shown });
         } else {
-          this.#set({ text, tokens, phase: "loading", message: "" });
+          set({ phase: "loading", ...instant });
         }
         this.stats = { ...base, ms: busy + this.#now() - mark };
         return;
@@ -342,7 +383,7 @@ export class Search {
         // The same words over the same files as the last answer.
         previous?.abort();
         const { phase, hits, message } = this.#answer;
-        this.#set({ text, tokens, phase, hits, message });
+        set({ phase, hits, message });
         this.stats = { ...base, skipped: true, ms: busy + this.#now() - mark };
         return;
       }
@@ -352,8 +393,8 @@ export class Search {
       let texts: string[] = [];
       if (missing.length > 0) {
         // Results stay on screen while these load.
-        this.#set({ text, tokens, phase: "loading", message: "" });
-        const pending = missing.map((file) => source.file(file, controller.signal));
+        set({ phase: "loading", ...instant });
+        const pending = missing.map((file) => source.file(manifest.build, file, controller.signal));
         // Only now: a file both passes need is already being waited for by this one.
         previous?.abort();
         busy += this.#now() - mark;
@@ -401,14 +442,16 @@ export class Search {
       // The same entries in the same order for the same words (a pause pass over files that
       // add nothing to the top): keep the array the page holds, so it has nothing to redraw.
       const held = this.#state.hits;
+      const names = top.map(({ entry }) => ({ entry }));
+      const arranged = arrange(names);
       const same =
-        held.length === top.length &&
+        held.length === arranged.length &&
         this.#state.tokens.join(" ") === tokens.join(" ") &&
-        top.every((c, i) => c.entry === held[i]?.entry);
-      const hits: readonly Hit[] = same ? held : top.map(({ entry }) => ({ entry }));
-      const phase = hits.length > 0 ? "done" : "no-match";
+        arranged.every((hit, i) => hit.entry === held[i]?.entry);
+      const hits: readonly Hit[] = same ? held : arranged;
+      const phase = hits.length > 0 ? "done" : reading.badLei ? "bad-lei" : "no-match";
       const message =
-        hits.length === 0 && reading.partialLei > 0
+        phase === "no-match" && reading.partialLei > 0
           ? `looks like an lei: ${reading.partialLei}/20 characters`
           : "";
       this.#answer = { key, phase, hits, message };
@@ -419,27 +462,64 @@ export class Search {
         ms: busy + this.#now() - mark,
         parseMs,
       };
-      this.#set({ text, tokens, phase, hits, message });
+      set({ phase, hits, message });
     } catch (error) {
-      if (generation !== this.#generation || isAbort(error)) return;
-      if (error instanceof IndexChangedError && !retried) {
-        // Republished while the page was open: drop what belongs to the old build, route again.
-        this.#parsed.clear();
-        this.#merged = null;
-        this.#answer = null;
-        this.#manifest = null;
-        this.#table = null;
-        return this.#pass(text, reading, generation, paused, true);
+      if (error instanceof IndexChangedError) {
+        // Republished while the page was open. Whatever this pass was for, what the page holds
+        // belongs to the old build: drop it, and read the new manifest, which also moves the
+        // date in the footer.
+        this.#forgetBuild();
+        if (generation !== this.#generation) {
+          // This pass is stale, but the query the box holds now may still be answered from the
+          // old build or not at all: route it again.
+          void this.#reload(source);
+          return;
+        }
+        if (!retried) return this.#pass(text, reading, generation, paused, true);
       }
+      if (generation !== this.#generation || isAbort(error)) return;
       this.#answer = null;
-      this.#set({
-        text,
-        tokens,
+      set({
         phase: "error",
-        hits: [],
+        hits: arrange([]),
         message: describe(error),
         reload: needsReload(error),
       });
+    }
+  }
+
+  /**
+   * The source may have moved to another build without this pass hearing of it (a request
+   * nobody was waiting for any more met the 404). Whatever is held is of the old build then.
+   */
+  #syncBuild(source: IndexSource) {
+    const now = source.peek();
+    if (now === null || this.#manifest === null || now === this.#manifest) return;
+    this.#forgetBuild();
+    this.#manifest = now;
+    this.#table = routingTable(now);
+    this.#set({ index: { asOf: now.asOf, entities: now.entities } });
+  }
+
+  /** Drop everything that belongs to the build the page has been reading. */
+  #forgetBuild() {
+    this.#parsed.clear();
+    this.#merged = null;
+    this.#answer = null;
+    this.#manifest = null;
+    this.#table = null;
+  }
+
+  /** After a republish seen by a stale pass: load the manifest, and answer the current input. */
+  async #reload(source: IndexSource) {
+    try {
+      await this.#loadManifest(source);
+    } catch {
+      return;
+    }
+    const reading = this.#reading;
+    if (reading.kind === "name") {
+      void this.#pass(this.#text, reading, ++this.#generation, true);
     }
   }
 

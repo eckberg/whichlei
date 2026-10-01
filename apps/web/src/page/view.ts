@@ -179,7 +179,8 @@ export type Tone = "ok" | "bad" | "warn" | "";
 
 /** The line under the prompt: how many matches, or what is wrong. */
 export function infoLine(state: SearchState): { html: Html; text: string; tone: Tone } {
-  const n = state.hits.length;
+  // Matches by name; the row of a valid LEI is not one.
+  const n = state.hits.filter((hit) => !hit.typed).length;
   const matches =
     n === 1 ? "1 match" : n >= RESULT_LIMIT ? `top ${n} matches` : `${fmt(n)} matches`;
   switch (state.phase) {
@@ -202,14 +203,20 @@ export function infoLine(state: SearchState): { html: Html; text: string; tone: 
         tone: "bad",
       };
     case "done": {
-      if (state.hits[0]?.typed) {
-        return {
-          html: html`lei · <span class="ok">check digits ok</span>`,
-          text: "lei, check digits ok",
-          tone: "ok",
-        };
+      const parts: [Html, string][] = [];
+      if (state.lei === "valid") {
+        parts.push([html`lei · <span class="ok">check digits ok</span>`, "lei, check digits ok"]);
       }
-      return line(matches, "");
+      if (n > 0) parts.push([html`${matches}`, matches]);
+      if (state.lei === "invalid") {
+        const note = "not a valid lei: the check digits don’t match";
+        parts.push([html`<span class="warn">${note}</span>`, note]);
+      }
+      return {
+        html: raw(parts.map(([markup]) => markup.value).join(" · ")),
+        text: parts.map(([, text]) => text).join(" · "),
+        tone: state.lei === "valid" && n === 0 ? "ok" : "",
+      };
     }
   }
 }

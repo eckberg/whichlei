@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { IndexClient } from "./client.ts";
 import { SearchHost, type ToPage } from "./host.ts";
-import { Search } from "./search.ts";
+import { initialState, Search, type SearchState } from "./search.ts";
 import { ERICSSON, fakeServer, fixture } from "./test-helpers.ts";
 
 const ORIGIN = "https://index.test";
@@ -91,16 +91,94 @@ describe("SearchHost", () => {
     expect(posted.at(-1)).toMatchObject({ seq: 2, state: { phase: "done", text: "volvo" } });
   });
 
-  it("answers a valid LEI and a bad one without the index", async () => {
-    const { host, server, posted, runDeferred } = setup();
+  it("answers a valid LEI with its row at once, and a bad one with the names it finds", async () => {
+    const { host, posted, runDeferred } = setup();
     host.handle({ type: "input", seq: 1, text: "HWUPKR0MPOU8FGXBT395" });
     runDeferred();
     await settle();
-    expect(posted.at(-1)?.state.phase).toBe("bad-lei");
+    expect(posted.at(-1)?.state).toMatchObject({ phase: "done", lei: "invalid" });
     host.handle({ type: "input", seq: 2, text: "HWUPKR0MPOU8FGXBT394" });
     runDeferred();
     await settle();
     expect(posted.at(-1)?.state.hits[0]).toMatchObject({ typed: true });
-    expect(server.log).toEqual([]);
+    expect(posted.at(-1)?.state.lei).toBe("valid");
+  });
+});
+
+describe("SearchHost, with a search that answers when told", () => {
+  /** A `Search` that does nothing by itself: the test calls its listener. */
+  function stub() {
+    let listener: ((state: SearchState) => void) | null = null;
+    const search = {
+      subscribe: (l: (state: SearchState) => void) => {
+        listener = l;
+        return () => {};
+      },
+      input: () => Promise.resolve(),
+      load: () => Promise.resolve(),
+      retry: () => Promise.resolve(),
+      stats: null,
+    } as unknown as Search;
+    const posted: ToPage[] = [];
+    const deferred: (() => void)[] = [];
+    const host = new SearchHost(
+      search,
+      (m) => posted.push(m),
+      (run) => void deferred.push(run),
+    );
+    const answer = (text: string) => listener?.({ ...initialState(true), text, phase: "done" });
+    return {
+      host,
+      posted,
+      answer,
+      runDeferred: () => {
+        for (const run of deferred.splice(0)) run();
+      },
+    };
+  }
+
+  it("drops an answer while a newer input waits, and posts the newest one's", () => {
+    const { host, posted, answer, runDeferred } = stub();
+    host.handle({ type: "input", seq: 1, text: "a" });
+    runDeferred();
+    answer("a");
+    expect(posted.map((m) => m.seq)).toEqual([1]);
+    // Input 2 has arrived but is not being worked on yet: an answer now is for input 1.
+    host.handle({ type: "input", seq: 2, text: "ab" });
+    answer("a");
+    expect(posted.map((m) => m.seq)).toEqual([1]);
+    runDeferred();
+    answer("ab");
+    expect(posted.map((m) => m.seq)).toEqual([1, 2]);
+  });
+
+  it("works on the newest of several inputs, and none of the ones before it", () => {
+    const calls: string[] = [];
+    let listener: ((state: SearchState) => void) | null = null;
+    const search = {
+      subscribe: (l: (state: SearchState) => void) => {
+        listener = l;
+        return () => {};
+      },
+      input: (text: string) => {
+        calls.push(text);
+        return Promise.resolve();
+      },
+      load: () => Promise.resolve(),
+      retry: () => Promise.resolve(),
+      stats: null,
+    } as unknown as Search;
+    const queued: (() => void)[] = [];
+    const host = new SearchHost(
+      search,
+      () => {},
+      (run) => void queued.push(run),
+    );
+    void listener;
+    for (const [seq, text] of ["e", "er", "eri"].entries())
+      host.handle({ type: "input", seq: seq + 1, text });
+    expect(queued).toHaveLength(1);
+    queued[0]?.();
+    expect(calls).toEqual(["eri"]);
   });
 });

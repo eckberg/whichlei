@@ -1,5 +1,10 @@
 import { type Entry, encodeEntries, type Manifest } from "@whichlei/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  LEI_NAMED_INVALID,
+  LEI_NAMED_VALID,
+  LEI_SHAPED_NAME,
+} from "../../scripts/fixture-index.ts";
 import { IndexClient } from "./client.ts";
 import { readInput, Search, type SearchState } from "./search.ts";
 import { deferred, ERICSSON, fakeServer, fixture, memorySource } from "./test-helpers.ts";
@@ -48,18 +53,35 @@ function tinyIndex() {
 }
 
 describe("readInput", () => {
-  it("tells names, valid LEIs and LEIs with bad check digits apart", () => {
+  it("reads every input as a name, and notes what else it is", () => {
     expect(readInput("")).toEqual({ kind: "empty" });
     expect(readInput("   ")).toEqual({ kind: "empty" });
-    expect(readInput(ERICSSON)).toEqual({ kind: "lei", lei: ERICSSON });
+    expect(readInput(ERICSSON)).toMatchObject({
+      kind: "name",
+      lei: { typed: true, entry: { lei: ERICSSON } },
+      badLei: false,
+      nameFirst: false,
+    });
     expect(
       readInput(` ${ERICSSON.toLowerCase().slice(0, 10)} ${ERICSSON.toLowerCase().slice(10)} `),
-    ).toEqual({
-      kind: "lei",
-      lei: ERICSSON,
+    ).toMatchObject({ kind: "name", lei: { entry: { lei: ERICSSON } }, nameFirst: true });
+    expect(readInput("549300W9JLPW15XIFM51")).toMatchObject({ lei: null, badLei: true });
+    expect(readInput("ericsson")).toMatchObject({ kind: "name", tokens: ["ericsson"], lei: null });
+  });
+
+  it("never lets the shape of an LEI keep a name from being searched", () => {
+    // 621 real legal names are twenty characters of LEI shape once their spaces are gone.
+    expect(readInput(LEI_SHAPED_NAME)).toMatchObject({
+      kind: "name",
+      tokens: ["ast", "bond", "portfolio", "2021"],
+      badLei: false,
+      lei: null,
+      nameFirst: true,
     });
-    expect(readInput("549300W9JLPW15XIFM51")).toEqual({ kind: "bad-lei" });
-    expect(readInput("ericsson")).toMatchObject({ kind: "name", tokens: ["ericsson"] });
+    expect(readInput(LEI_NAMED_INVALID)).toMatchObject({
+      badLei: true,
+      tokens: [expect.any(String)],
+    });
   });
 
   it("lets a BIC-shaped word be a name (decision 8)", () => {
@@ -71,9 +93,13 @@ describe("readInput", () => {
     expect(readInput("volvo")).toMatchObject({ lastIsPrefix: true });
   });
 
-  it("notes a partial LEI", () => {
+  it("notes a partial LEI, but not an ISIN or a BIC", () => {
     expect(readInput("549300W9JLPW15")).toMatchObject({ partialLei: 14 });
     expect(readInput("ericsson")).toMatchObject({ partialLei: 0 });
+    // Twelve and eight or eleven characters are ISINs and BICs: only names are searched.
+    expect(readInput("US0378331005")).toMatchObject({ partialLei: 0 });
+    expect(readInput("TEERSESSXXX")).toMatchObject({ partialLei: 0 });
+    expect(readInput("ERICSS22")).toMatchObject({ partialLei: 0 });
   });
 });
 
@@ -284,28 +310,68 @@ describe("Search", () => {
     expect(server.log.at(-1)).toMatch(/^20260917-0a0b0c0d\//);
   });
 
-  it("shows one row that opens the record for a valid LEI, without reading the index", async () => {
-    const { search, server } = withServer();
+  it("puts the row of a valid LEI first, before any name has been found", async () => {
+    const { manifest, files } = fixture();
+    const server = fakeServer(ORIGIN, manifest, files);
+    const search = new Search(new IndexClient(ORIGIN, { fetch: server.fetch }));
+    await search.load();
+    const release = server.hold(await routedPath(manifest, LEI_NAMED_VALID.toLowerCase()));
+    const pending = search.input(LEI_NAMED_VALID.toLowerCase());
+    await Promise.resolve();
+    expect(search.state).toMatchObject({ phase: "loading", lei: "valid" });
+    expect(search.state.hits).toHaveLength(1);
+    expect(search.state.hits[0]).toMatchObject({ typed: true, entry: { lei: LEI_NAMED_VALID } });
+    release();
+    await pending;
+    // Then the names that are that code, below the row.
+    expect(search.state).toMatchObject({ phase: "done", lei: "valid" });
+    expect(search.state.hits[0]).toMatchObject({ typed: true });
+    expect(search.state.hits[1]?.entry.name).toBe(LEI_NAMED_VALID);
+  });
+
+  it("shows only the row for a valid LEI that no name matches", async () => {
+    const { search } = withServer();
     for (const text of [
       ERICSSON,
       ERICSSON.toLowerCase(),
       ` ${ERICSSON.slice(0, 8)} ${ERICSSON.slice(8)}`,
     ]) {
       await search.input(text);
-      expect(search.state.phase).toBe("done");
+      await search.pause();
+      expect(search.state).toMatchObject({ phase: "done", lei: "valid" });
       expect(search.state.hits).toHaveLength(1);
       expect(search.state.hits[0]).toMatchObject({ typed: true, entry: { lei: ERICSSON } });
     }
-    expect(server.log).toEqual([]);
   });
 
-  it("says the check digits are wrong and makes no request", async () => {
-    const { search, server } = withServer();
+  it("searches names for a name that is an LEI with bad check digits", async () => {
+    const { search } = withServer();
+    await search.input(LEI_NAMED_INVALID);
+    expect(search.state.phase).toBe("done");
+    expect(search.state.lei).toBe("invalid");
+    expect(search.state.hits[0]?.entry.name).toBe(LEI_NAMED_INVALID);
+  });
+
+  it("says the check digits are wrong only when no name matches", async () => {
+    const { search } = withServer();
     await search.input("549300W9JLPW15XIFM51");
-    expect(search.state.phase).toBe("bad-lei");
-    expect(search.state.hits).toEqual([]);
     await search.pause();
-    expect(server.log).toEqual([]);
+    expect(search.state).toMatchObject({ phase: "bad-lei", hits: [], lei: "invalid" });
+  });
+
+  it("finds a name that is an LEI's shape once its spaces are gone", async () => {
+    const { search } = withServer();
+    await search.input(LEI_SHAPED_NAME);
+    await search.pause();
+    expect(search.state).toMatchObject({ phase: "done", lei: null });
+    expect(search.state.hits[0]?.entry.name).toBe(LEI_SHAPED_NAME);
+    // Typed a key at a time, it is a name all the way, never a bad LEI.
+    const typed = withServer();
+    for (let k = 1; k <= LEI_SHAPED_NAME.length; k++) {
+      await typed.search.input(LEI_SHAPED_NAME.slice(0, k));
+      expect(typed.search.state.phase).not.toBe("bad-lei");
+    }
+    expect(typed.search.state.hits[0]?.entry.name).toBe(LEI_SHAPED_NAME);
   });
 
   it("clears on empty input", async () => {
@@ -322,6 +388,8 @@ describe("Search", () => {
     expect(search.state.phase).toBe("unconfigured");
     await search.input(ERICSSON);
     expect(search.state.hits[0]?.entry.lei).toBe(ERICSSON);
+    await search.input("549300W9JLPW15XIFM51");
+    expect(search.state.phase).toBe("bad-lei");
     await search.input("");
     expect(search.state.phase).toBe("unconfigured");
     await search.load();
@@ -473,3 +541,122 @@ async function routedPath(manifest: Manifest, word: string): Promise<string> {
   if (file === undefined) throw new Error(`${word} routes nowhere`);
   return `${manifest.build}/${file}.txt`;
 }
+
+describe("a republish while the page is open", () => {
+  /**
+   * The same data in a new build whose files are numbered one higher, with a routing table to
+   * match (a new first file, empty): so a file number of the old table means another file here.
+   */
+  function shiftedBuild() {
+    const { manifest, files } = fixture();
+    const shifted = new Map<number, string>([[0, ""]]);
+    for (const [k, v] of files) shifted.set(k + 1, v);
+    const next: Manifest = {
+      ...manifest,
+      build: "20260917-0a0b0c0d",
+      asOf: "2026-09-17",
+      bounds: ["0", ...manifest.bounds],
+      capped: manifest.capped.map((n) => n + 1),
+    };
+    return { manifest, files, next, shifted };
+  }
+
+  it("never mixes builds when the box is cleared while the manifest reloads", async () => {
+    const { manifest, files, next, shifted } = shiftedBuild();
+    const server = fakeServer(ORIGIN, manifest, files);
+    const search = new Search(new IndexClient(ORIGIN, { fetch: server.fetch }), {
+      debounceMs: Number.POSITIVE_INFINITY,
+    });
+    await search.load();
+    await search.input("volvo");
+    const volvo = search.state.hits.map((h) => h.entry.name);
+    expect(volvo.length).toBeGreaterThan(0);
+
+    server.publish(next, shifted);
+    // A word whose file is not held: it 404s, and the manifest reload is held up. Meanwhile the
+    // box is cleared, so the pass that asked is stale when the reload ends.
+    const release = server.hold("index.json");
+    const asked = search.input("ericsson");
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await search.input("");
+    release();
+    await asked;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    // The box is empty and the footer already shows the new build's date.
+    await search.input("");
+    expect(search.state.index?.asOf).toBe("2026-09-17");
+    // A new search reads the new build only.
+    const fresh = new Search(new IndexClient(ORIGIN, { fetch: server.fetch }), {
+      debounceMs: Number.POSITIVE_INFINITY,
+    });
+    await fresh.input("scania");
+    await search.input("scania");
+    expect(search.state.hits.map((h) => h.entry.name)).toEqual(
+      fresh.state.hits.map((h) => h.entry.name),
+    );
+    await search.input("volvo");
+    expect(search.state.hits.map((h) => h.entry.name)).toEqual(volvo);
+    const builds = new Set(
+      server.log
+        .slice(-4)
+        .filter((p) => p !== "index.json")
+        .map((p) => p.split("/")[0]),
+    );
+    expect(builds).toEqual(new Set(["20260917-0a0b0c0d"]));
+  });
+
+  it("asks for a file of the build it routed with, and routes again when that is gone", async () => {
+    const { manifest, files, next, shifted } = shiftedBuild();
+    const server = fakeServer(ORIGIN, manifest, files);
+    const client = new IndexClient(ORIGIN, { fetch: server.fetch });
+    const search = new Search(client, { debounceMs: Number.POSITIVE_INFINITY });
+    await search.load();
+    server.publish(next, shifted);
+    // Another reader of the client sees the republish first.
+    await expect(client.file(manifest.build, 0)).rejects.toMatchObject({
+      name: "IndexChangedError",
+    });
+    // Search still holds the old table. It must not read file numbers of it from the new build.
+    await search.input("volvo");
+    expect(search.state.phase).toBe("done");
+    expect(search.state.index?.asOf).toBe("2026-09-17");
+    const requested = server.log.filter((p) => p.endsWith(".txt") && p.startsWith(next.build));
+    expect(requested.length).toBeGreaterThan(0);
+    expect(server.log.filter((p) => p.startsWith(manifest.build)).length).toBe(1);
+  });
+});
+
+describe("a pass that became stale while it was fetching", () => {
+  it("does not draw its answer over the newer input", async () => {
+    // A source that ignores abort, so only the check after the fetch can stop the stale pass.
+    const { manifest, files } = fixture();
+    const gates = new Map<number, ReturnType<typeof deferred<string>>>();
+    const source = {
+      peek: () => manifest,
+      manifest: () => Promise.resolve(manifest),
+      file: (_build: string, file: number) => {
+        const gate = deferred<string>();
+        gates.set(file, gate);
+        return gate.promise;
+      },
+    };
+    const search = new Search(source, { debounceMs: Number.POSITIVE_INFINITY });
+    await search.load();
+    const first = search.input("ericsson");
+    await Promise.resolve();
+    const ericssonFile = [...gates.keys()][0] as number;
+    const second = search.input("volvo");
+    await Promise.resolve();
+    const volvoFile = [...gates.keys()].find((f) => f !== ericssonFile) as number;
+    gates.get(volvoFile)?.resolve(files.get(volvoFile) as string);
+    await second;
+    const volvo = search.state.hits.map((h) => h.entry.lei);
+    expect(search.state.text).toBe("volvo");
+    // The first fetch ends now. Its answer is dropped.
+    gates.get(ericssonFile)?.resolve(files.get(ericssonFile) as string);
+    await first;
+    expect(search.state.text).toBe("volvo");
+    expect(search.state.hits.map((h) => h.entry.lei)).toEqual(volvo);
+  });
+});

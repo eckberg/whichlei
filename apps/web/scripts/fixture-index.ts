@@ -1,4 +1,4 @@
-// A small index for tests and local work: the prototype's 2,924 records, encoded with the
+// A small index for tests and local work: the prototype's 2,924 records and three of its own, encoded with the
 // format in packages/core and packed the way the real index is (files of consecutive index
 // terms, closed before they hold too many entries), with a small cap so that there are
 // dozens of files and routing has something to decide.
@@ -47,11 +47,26 @@ interface PrototypeData {
   records: PrototypeRecord[];
 }
 
+/**
+ * Records the prototype lacks, for names that look like identifiers. Each is an LEI's shape once
+ * its spaces are gone, or is an LEI (valid or not) as a whole: a search must find them by name.
+ */
+export const LEI_SHAPED_NAME = "AST Bond Portfolio 2021";
+/** A name that is itself a valid LEI (the check digits verify), and one that is not. */
+export const LEI_NAMED_VALID = "HWUPKR0MPOU8FGXBT394";
+export const LEI_NAMED_INVALID = "HWUPKR0MPOU8FGXBT395";
+export const LEI_SHAPED_RECORDS: PrototypeRecord[] = [
+  { l: "529900ASTBONDPORT001", n: LEI_SHAPED_NAME, c: "SE", p: 1 },
+  { l: "529900LEINAMEDVALI01", n: LEI_NAMED_VALID, c: "SE", p: 1 },
+  { l: "529900LEINAMEDBAD002", n: LEI_NAMED_INVALID, c: "SE", p: 1 },
+];
+
 export function loadPrototype(): PrototypeData {
   const sandbox: { window: { WL_DATA?: PrototypeData } } = { window: {} };
   runInNewContext(readFileSync(new URL("data.js", prototype), "utf8"), sandbox);
   if (!sandbox.window.WL_DATA) throw new Error("data.js did not define WL_DATA");
-  return sandbox.window.WL_DATA;
+  const data = sandbox.window.WL_DATA;
+  return { ...data, records: [...data.records, ...LEI_SHAPED_RECORDS] };
 }
 
 const REGISTRATION: Record<string, string> = {

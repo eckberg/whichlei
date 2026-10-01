@@ -9,10 +9,16 @@ import { filePath, type Manifest, parseManifest, UnsupportedFormatError } from "
 
 /** Where the search reads the index from. `IndexClient` is the real one. */
 export interface IndexSource {
+  /** The manifest the source holds now, without waiting. Null until one has loaded. */
+  peek(): Manifest | null;
   /** The manifest. Loaded once; after an `IndexChangedError` it is the new one. */
   manifest(): Promise<Manifest>;
-  /** The text of index file `file` of the current build. */
-  file(file: number, signal?: AbortSignal): Promise<string>;
+  /**
+   * The text of index file `file` of build `build`, the one the caller routed with. If the
+   * index has been republished since, the file numbers mean something else: it rejects with
+   * `IndexChangedError`, and the caller routes again.
+   */
+  file(build: string, file: number, signal?: AbortSignal): Promise<string>;
 }
 
 /**
@@ -78,6 +84,10 @@ export class IndexClient implements IndexSource {
     this.#maxFiles = maxFiles;
   }
 
+  peek(): Manifest | null {
+    return this.#current;
+  }
+
   manifest(): Promise<Manifest> {
     if (this.#current) return Promise.resolve(this.#current);
     this.#loading ??= this.#loadManifest().then(
@@ -94,10 +104,12 @@ export class IndexClient implements IndexSource {
     return this.#loading;
   }
 
-  file(file: number, signal?: AbortSignal): Promise<string> {
+  file(build: string, file: number, signal?: AbortSignal): Promise<string> {
     if (signal?.aborted) return Promise.reject(abortError());
     const manifest = this.#current;
-    if (!manifest) return this.manifest().then(() => this.file(file, signal));
+    if (!manifest) return this.manifest().then(() => this.file(build, file, signal));
+    // Routed with another build's table: the same number is another file here.
+    if (manifest.build !== build) return Promise.reject(new IndexChangedError());
     const path = filePath(manifest, file);
     const cached = this.#texts.get(path);
     if (cached !== undefined) {

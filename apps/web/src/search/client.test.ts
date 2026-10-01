@@ -39,16 +39,19 @@ describe("IndexClient", () => {
 
   it("shares one request between two callers of the same file, and keeps the text", async () => {
     const { client, server, manifest, files } = setup();
-    const [a, b] = await Promise.all([client.file(3), client.file(3)]);
+    const [a, b] = await Promise.all([
+      client.file(manifest.build, 3),
+      client.file(manifest.build, 3),
+    ]);
     expect(a).toBe(files.get(3));
     expect(b).toBe(a);
-    await client.file(3);
+    await client.file(manifest.build, 3);
     expect(server.log.filter((p) => p === `${manifest.build}/3.txt`)).toHaveLength(1);
   });
 
   it("fetches the file from the build directory named in the manifest", async () => {
     const { client, server, manifest } = setup();
-    await client.file(0);
+    await client.file(manifest.build, 0);
     expect(server.log).toEqual(["index.json", `${manifest.build}/0.txt`]);
   });
 
@@ -57,13 +60,13 @@ describe("IndexClient", () => {
     await client.manifest();
     const release = server.hold(`${manifest.build}/1.txt`);
     const controller = new AbortController();
-    const pending = client.file(1, controller.signal);
+    const pending = client.file(manifest.build, 1, controller.signal);
     controller.abort();
     await expect(pending).rejects.toMatchObject({ name: "AbortError" });
     expect(server.aborted).toEqual([`${manifest.build}/1.txt`]);
     release();
     // Asking again starts a fresh request.
-    const again = client.file(1);
+    const again = client.file(manifest.build, 1);
     await expect(again).resolves.toContain("\t");
   });
 
@@ -72,8 +75,8 @@ describe("IndexClient", () => {
     await client.manifest();
     const release = server.hold(`${manifest.build}/1.txt`);
     const first = new AbortController();
-    const a = client.file(1, first.signal);
-    const b = client.file(1);
+    const a = client.file(manifest.build, 1, first.signal);
+    const b = client.file(manifest.build, 1);
     first.abort();
     await expect(a).rejects.toMatchObject({ name: "AbortError" });
     expect(server.aborted).toEqual([]);
@@ -82,10 +85,12 @@ describe("IndexClient", () => {
   });
 
   it("rejects at once when the signal has already aborted", async () => {
-    const { client, server } = setup();
+    const { client, server, manifest } = setup();
     const controller = new AbortController();
     controller.abort();
-    await expect(client.file(1, controller.signal)).rejects.toMatchObject({ name: "AbortError" });
+    await expect(client.file(manifest.build, 1, controller.signal)).rejects.toMatchObject({
+      name: "AbortError",
+    });
     expect(server.log).toEqual([]);
   });
 
@@ -93,11 +98,13 @@ describe("IndexClient", () => {
     const { client, server, manifest, files } = setup();
     await client.manifest();
     server.publish(...republish(manifest, files));
-    await expect(client.file(2)).rejects.toBeInstanceOf(IndexChangedError);
+    await expect(client.file(manifest.build, 2)).rejects.toBeInstanceOf(IndexChangedError);
     expect(server.log.filter((p) => p === "index.json")).toHaveLength(2);
     expect((await client.manifest()).build).toBe("20260917-0a0b0c0d");
+    // A caller that routed with the old build is told so, whatever it asks for.
+    await expect(client.file(manifest.build, 2)).rejects.toBeInstanceOf(IndexChangedError);
     // The next file comes from the new build.
-    expect(await client.file(2)).toBe(files.get(2));
+    expect(await client.file("20260917-0a0b0c0d", 2)).toBe(files.get(2));
     expect(server.log.at(-1)).toBe("20260917-0a0b0c0d/2.txt");
   });
 
@@ -105,7 +112,10 @@ describe("IndexClient", () => {
     const { client, server, manifest, files } = setup();
     await client.manifest();
     server.publish(...republish(manifest, files));
-    const results = await Promise.allSettled([client.file(1), client.file(2)]);
+    const results = await Promise.allSettled([
+      client.file(manifest.build, 1),
+      client.file(manifest.build, 2),
+    ]);
     expect(results.every((r) => r.status === "rejected")).toBe(true);
     expect(server.log.filter((p) => p === "index.json")).toHaveLength(2);
   });
@@ -116,7 +126,7 @@ describe("IndexClient", () => {
     const broken = new Map(files);
     broken.delete(4);
     server.publish(manifest, broken);
-    const error = await client.file(4).catch((e: unknown) => e);
+    const error = await client.file(manifest.build, 4).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(IndexError);
     expect(error).toMatchObject({ kind: "http" });
   });
@@ -143,10 +153,10 @@ describe("IndexClient", () => {
   it("keeps at most maxFiles files in memory", async () => {
     const { server, manifest } = setup();
     const client = new IndexClient(ORIGIN, { fetch: server.fetch, maxFiles: 2 });
-    await client.file(0);
-    await client.file(1);
-    await client.file(2);
-    await client.file(0);
+    await client.file(manifest.build, 0);
+    await client.file(manifest.build, 1);
+    await client.file(manifest.build, 2);
+    await client.file(manifest.build, 0);
     expect(server.log.filter((p) => p === `${manifest.build}/0.txt`)).toHaveLength(2);
   });
 });
