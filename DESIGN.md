@@ -60,7 +60,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 22 | Each publish **keeps the build it replaces** and **a build that fails a check publishes nothing**. The checks compare the new build with the live one, with bounds in one reviewed file, `apps/index/checks.json` | A page that loaded the old `index.json` keeps working, and a rollback has something to return to. A bad night of GLEIF data, or a bug in the indexer, must not reach the live index unseen; a legitimate big change is a reviewed commit to the bounds. See [slice 6](docs/specs/06-data-publishing.md). |
 | 23 | **The font is self-hosted** (Red Hat Mono, SIL OFL, `apps/web/static/fonts/`) and the **CSP allows only the site, the index host and the GLEIF API**, with no inline script or style | A Google Fonts request tells a third party about every visit, against the privacy promise of decision 12. Without inline code the policy stops injected script from running. |
 | 24 | **Search runs in a Web Worker**: the index client, routing, decoding and scoring. The page sends every input with a sequence number, the worker works on the newest only, and answers to older inputs are dropped | Typing never waits on scoring, which took up to 300 ms of the main thread at 4× CPU slowdown (slice 7 spec). A pass cannot be interrupted, so what the user typed meanwhile replaces the queue rather than lining up behind it. Where `Worker` is missing the same code runs on the page. |
-| 26 | **Acronyms are searchable**: entities with prominence ≥ 1 also index the initials of their names ("Skandinaviska Enskilda Banken AB" → "seb"), and a one-word query equal to a name's initials matches it | 31 of 32 well-known acronyms found nothing: no index term held them. On a set of 79 acronyms and short names, held-out half, the right entity first .48 → .70, for +7 index files (+0.16% bytes). Two-letter initials and a lower threshold cost more, for no better objective on the fitting half. [Slice 10](docs/specs/10-ranking-gaps.md). |
+| 26 | **Acronyms are searchable**: entities with prominence ≥ 1 also index the initials of their names ("Skandinaviska Enskilda Banken AB" → "seb"), and a one-word query equal to a name's initials matches it | All 22 acronyms in a set of well-known ones found nothing: no index term held them. On that set of 60 acronyms and short names, held-out half, the right entity first .53 → .73, for +7 index files (+0.17% bytes). The scorer applies the same prominence test, so a result does not depend on the file an entity came from. Two-letter initials and a lower threshold cost more, for no better objective on the fitting half. [Slice 10](docs/specs/10-ranking-gaps.md). |
 
 ## 3. Architecture
 
@@ -125,13 +125,14 @@ bugs, so these numbers may be slightly optimistic.
 
 Slice 10 added acronyms and names less their legal form ("bp" finds BP P.L.C., not BPCE).
 Held-out half, the right entity first: well-known entities .557 → .570, the other strata
-unchanged or up; 79 well-known acronyms and short names .48 → .70; the evaluation set's
+unchanged or up; 60 well-known acronyms and short names .53 → .73; the evaluation set's
 one-word queries of two to four characters .26 → .29 (named entities .38 → .45).
 
 Known gaps: two-letter acronyms ("ge", "db"), acronyms of entities with prominence under 1
 ("klm", "hbo"), acronyms that are not the legal name's initials ("anz", "iag"); "seb" still
 finds SEB SA first (more prominent, and named exactly that); "sas" and "sca" rank second
-behind companies with that legal form; ~92k names with no Latin-script form, typos in the
+behind companies with that legal form; "tsb" ranks "TSB, L.P." (a shell named exactly
+that, less its legal form) above TSB Bank PLC; ~92k names with no Latin-script form, typos in the
 first three or four characters, previous names.
 
 Method, code and full results: [`research/ranking/`](research/ranking/).

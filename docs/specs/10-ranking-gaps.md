@@ -9,17 +9,22 @@ name of ("bp" → BP P.L.C., not BPCE), with no stratum of the evaluation set wo
 before.
 
 ## Scope
-- A set of 79 well-known acronyms and short names with verified targets, apart from the
+- A set of 60 well-known acronyms and short names with verified targets, apart from the
   evaluation set: `research/ranking/eval/acronyms.tsv`, written by `build_acronyms.py`,
-  which checks each LEI against the golden copy and records how (`verified` column).
+  which checks each LEI against the golden copy and records how (`verified` column). Of
+  the 79 it lists, 19 whose entity is also a target of the evaluation set ("ibm", "bmw",
+  "bp", "sas", "hsbc", "h&m" …) are left out, so the two sets share no entity.
 - `tools/bench`: `gaps.ts` (replay a built index: per stratum, per subset, rank and cause
-  per query, index size, bytes per query), `fit.ts` (choose the new weights on train),
-  `compare.ts` (before against after, with a clustered bootstrap).
+  per query, index size, bytes per query), `fit.ts` (choose the new weights on train; it
+  prints nothing of the test half), `compare.ts` (before against after, with a clustered
+  bootstrap).
 - `packages/core`: `LEGAL_FORMS`, `formStart`, `nameInitials`; two match features with their
   own weights. `REFERENCE_MATCH_WEIGHTS` is the reference with both at 0; the parity tests
   and `parity.ts` use it.
 - `apps/indexer`: entities with prominence ≥ 1 also index the initials of their names
-  (`--initials-min-prominence`; `Infinity` builds the research's index).
+  (`--initials-min-prominence`; `Infinity` builds the research's index). The scorer
+  applies the same test (`INITIALS_MIN_PROMINENCE`, on the prominence the file stores),
+  so a result does not depend on which file an entity was fetched from.
 
 ## Not in scope
 - The 19 reference weights: not refitted. Typos in the first characters, previous names,
@@ -27,15 +32,15 @@ before.
 
 ## Measured before
 Built from the 2026-09-16 golden copy (`research/data`), replayed as `check --eval` does.
-Subsets: the acronym set (79; 40 test), and the evaluation set's short queries, one word of
+Subsets: the acronym set (60; 30 test), and the evaluation set's short queries, one word of
 2 to 4 characters outside the typo strata (144; 58 test: 29 head, 29 torso).
 
-- **Acronym set**: 44 first. 31 of the 32 queries that are a name's initials ("seb",
-  "ibm", "aig") fail as **not a candidate**: no index term equals the acronym, so the
-  entity is in no fetched file. ("imf" works: GLEIF lists "IMF" as a name.) Of the 47
-  that are a word of the name, 4 **score low**: "bp" behind BPCE (a prefix match with
-  prominence 8.6 against 5.9), "sas" and "sca" behind French "… SAS" and "… SCA"
-  companies, "pnc" behind its own bank.
+- **Acronym set**: 36 first. All 22 queries that are a name's initials, or their start
+  ("seb", "aig", "rbc"), fail as **not a candidate**: no index term equals the acronym, so
+  the entity is in no fetched file. Of the 38 that are a word of the name, 2 **score low**: "sca" behind
+  French "… SCA" companies, "pnc" behind its own bank. In the evaluation set, "bp" ranks
+  behind BPCE (a prefix match with prominence 8.6 against 5.9), and "sas" behind French
+  "… SAS" companies.
 - **Short queries**: 37 of 144 first (both halves). 97 score low, mostly one-word torso
   queries, ambiguous by construction (METHOD.md), and city names; 10 are not candidates, 8
   of them acronyms (BMW, IBM, KLM, AMD, HBO, WWE, PBS, TSMC).
@@ -47,17 +52,19 @@ Subsets: the acronym set (79; 40 test), and the evaluation set's short queries, 
    out, trailing legal form out (`LEGAL_FORMS`, the frequent last words of legal names that
    are legal forms); a second variant keeps the legal form's first word when it is spelled
    out ("corporation": BBC, HSBC). Three to six words, each starting with a letter. The
-   indexer adds them as terms for entities with prominence ≥ 1 (10,197 entities gain a
-   term). The browser computes the same initials from the names in the file: no format
-   change.
+   indexer adds them as terms for entities whose stored prominence is ≥ 1 (10,977 entities
+   gain a term). The browser computes the same initials from the names in the file: no
+   format change.
 2. **`m_initials` = 6.5**: a name that the one-word query equals the initials of scores 6.5
-   (plus prominence), when that beats its word match. 0 turns it off.
+   (plus prominence), when that beats its word match, for a candidate with prominence ≥ 1.
+   0 turns it off, and the initials are then not looked at.
 3. **`m_base_exact` = 1**: the query equals the name less its trailing legal form ("bp" for
    BP P.L.C.).
 
 Weights by grid on the train half, the 19 reference weights fixed, maximising mean MRR@10
-over the six strata and the acronym set's train half (39). Index options by the same
-criterion, then by cost:
+over the six strata and the acronym set's train half. Index options by the same criterion,
+then by cost. First round, with the 79-query set (39 train) and no prominence test in the
+scorer:
 
 | Option (train) | Objective | Criterion: six strata and acronym set | Files |
 |---|---|---|---|
@@ -69,6 +76,17 @@ criterion, then by cost:
 | 2-letter initials too, ≥ 0.2 | .6663 | .6920 | 6,477; 572 fewer entities reachable |
 | `m_initials` alone / `m_base_exact` alone | .6641 / .6649 | .6901 / .6633 | |
 
+Second round, after review: the 60-query set (30 train) and the prominence test in the
+scorer. The grid chose the same weights, 6.5 and 1.
+
+| Option (train) | Objective | Criterion | Files |
+|---|---|---|---|
+| Reference | .6629 | .6658 | 6,438 |
+| **Chosen, as above** | **.6663** | **.6949** | **6,445** |
+| No initials for funds (8,228 entities instead of 10,977) | .6664 | .6950 | 6,442 |
+| Hyphenated words as one ("DWS-Fonds BPT" → "db", not "dfb") | .6663 | .6949 | 6,445 |
+| Both | .6664 | .6950 | 6,442 |
+
 Rejected:
 - **A penalty for matching only a legal form** ("sas" in "Akuo Energy SAS"): no change on
   train at any weight from 0 to 1.5, worse at 2. Dropped; "sas" and "sca" stay second.
@@ -76,6 +94,10 @@ Rejected:
   cap 11 more files (779 against 768) and push 565 more entities out of the index.
 - **Abbreviated legal forms in the initials**: "Koninklijke Philips N.V." became "kpn" and
   beat KPN. Only a spelled-out form counts.
+- **No initials for funds** (a quarter of the holders): one torso query on train (+.0001),
+  within noise. And the scorer cannot apply it: an index line has no category, so a fund
+  fetched through another word would still match by its initials.
+- **Hyphenated words as one word**: no change on train.
 - **Routing a short word while typing**, not only on a pause: the evaluation scores the
   paused query, so it cannot show a gain, and every two-letter prefix would fetch a file.
 
@@ -91,14 +113,15 @@ objective is about ±.003, on one stratum up to ±.013.
 | Head alias | 253 | .8781 | .8785 | +.0004 [−.0018, .0016] |
 | Torso | 250 | .5264 | .5295 | +.0032 [−.0048, .0143] |
 | Tail, typo first 3, typo later | 250, 280, 280 | .9760, .3264, .5689 | same | 0 |
-| Acronym set | 40 | .5062 | .7550 | +.2488 [.1125, .4844] |
+| Acronym set | 30 | .5500 | .7900 | +.2400 [.0606, .5800] |
 | Short queries | 58 | .3635 | .3793 | +.0158 [−.0244, .0489] |
 | of which head | 29 | .491 | .542 | |
 | of which torso | 29 | .236 | .217 | |
 
-S@1, test: acronym set .475 → .700; short queries .259 → .293 (head .379 → .448, torso
-.138 → .138); head label .557 → .570. Train: objective .6629 → .6663 [.0002, .0065],
-acronym set .654 → .846, short queries .325 → .371. No stratum is lower on test; on train
+The objective's gain on test, +.0022 [−.0009, .0049], is within noise: the real gain is
+the acronym set. S@1, test: acronym set .533 → .733; short queries .259 → .293 (head
+.379 → .448, torso .138 → .138); head label .557 → .570. Train: objective .6629 → .6663
+[.0002, .0065], acronym set .683 → .867, short queries .325 → .371. No stratum is lower on test; on train
 tail −.0007 and typo later −.0024, within their intervals. The short queries gain on test
 is within noise: the torso half is one-word queries for a random holder of an ISIN or a
 child, ambiguous by construction (METHOD.md), and moves down slightly; the head half,
@@ -107,16 +130,17 @@ named entities, moves up. Of the 300 + 253 head queries on test, 8 rose ("bp", "
 5 → 8, "vaasa", "augusta", "southwest" by one or more places).
 
 Index (gzip level 6) and bytes per test query, typed one key at a time (median / p90 /
-max): files 6,438 → 6,445 (+0.1%), entries 7,495,588 → 7,505,754 (+0.14%), 220.61 →
-220.95 MB (+0.16%), reachable entities 3,317,220 → 3,317,217. Debounce on every key
-147.9 / 271.8 / 463.1 → 148.1 / 271.8 / 465.2 KB; on the last key 63.9 / 105.2 / 224.7 →
-63.9 / 105.2 / 224.9 KB.
+max): files 6,438 → 6,445 (+0.1%), entries 7,495,588 → 7,506,529 (+0.15%), 220.61 →
+220.98 MB (+0.17%), reachable entities 3,317,220 → 3,317,217. Debounce on every key
+147.9 / 271.8 / 463.1 → 148.1 / 271.9 / 465.2 KB; on the last key 63.9 / 105.2 / 224.7 →
+63.9 / 105.3 / 224.9 KB.
 
-Still not first in the acronym set: "seb" (SEB SA, the French group, is more prominent and
-named exactly that); "klm", "hbo", "tcs" (prominence under 1); "edf" ("de" is a stop
-word); "anz", "iag", "pko", "bny" (not the legal name's initials); "ge", "gm", "db", "sg"
-(two letters); "sbi" 5th, "bat", "sas", "sca", "tsb" (behind "TSB, L.P.", by
-`m_base_exact`) and "pnc" 2nd.
+Still not first in the acronym set (13 of 60): "seb" (SEB SA, the French group, is more
+prominent and named exactly that); "tcs" (prominence under 1); "edf" ("de" is a stop
+word); "anz", "iag", "pko", "bny" (not the legal name's initials); "ge" (two letters);
+"sbi" 5th, "bat", "sca", "tsb" (behind the shell "TSB, L.P.", by `m_base_exact`) and
+"pnc" 2nd. Left out with the overlap, and also not first: "klm", "hbo" (prominence under
+1), "gm", "db", "sg" (two letters), "sas".
 
 ## Unknowns
 - The acronym set is small and hand-picked, and its test half was looked at while
@@ -133,7 +157,7 @@ word); "anz", "iag", "pko", "bny" (not the legal name's initials); "ge", "gm", "
   a name whose first word starts with the query's letter.
 
 ## Done when
-- The acronym set improves on test beyond noise (+.25, interval [.11, .48]); the short
+- The acronym set improves on test beyond noise (+.24, interval [.06, .58]); the short
   queries improve within noise (+.016), their named half by +.05; no stratum of the
   objective falls: the table above (`compare.ts`).
 - Index size and bytes per query within a few percent: +0.16% and +0.1% (median).
@@ -142,8 +166,8 @@ word); "anz", "iag", "pko", "bny" (not the legal name's initials); "ge", "gm", "
   tokens 3,742,453 / 3,742,453 and top 10 3,229 / 3,229 identical.
 - The indexer's own replay agrees: `check --eval` on the new build, objective .6537 test,
   .6598 all (before: .6515, .6570); the same inputs give the same build id twice.
-- `pnpm lint && pnpm typecheck && pnpm test` pass; new tests in `initials.test.ts` and
-  `build.test.ts`.
+- `pnpm lint && pnpm typecheck && pnpm test` pass; new tests in `initials.test.ts` (with
+  the prominence test in the scorer) and `build.test.ts`.
 
 ## Re-run
 ```
