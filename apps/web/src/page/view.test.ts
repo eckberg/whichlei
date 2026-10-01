@@ -94,6 +94,50 @@ describe("rowsHtml", () => {
   });
 });
 
+describe("lookup rows", () => {
+  const found: Hit = {
+    entry: entry({ name: "Apple Inc.", country: "US", otherNames: [] }),
+    via: "isin",
+    status: { label: "active", tone: "active" },
+  };
+  const confirmed: Hit = {
+    entry: found.entry,
+    status: { label: "active", tone: "active" },
+    typed: true,
+  };
+
+  it("tags a row with the reading, and marks nothing in its name", () => {
+    const out = rowsHtml([found], ["apple"], 0);
+    expect(out).toContain('<span class="aka via">isin</span> Apple Inc.');
+    expect(out).not.toContain("<mark>");
+    expect(out).toContain('<span class="st st-active">active</span>');
+  });
+
+  it("shows GLEIF's own words for the state, not the index's letter", () => {
+    const lapsed: Hit = { ...found, status: { label: "lapsed", tone: "lapsed" } };
+    expect(rowsHtml([lapsed], [], 0)).toContain('<span class="st st-lapsed">lapsed</span>');
+  });
+
+  it("shows the legal name of an LEI that GLEIF has confirmed, with no tag", () => {
+    const out = rowsHtml([confirmed], [], 0);
+    expect(out).toContain("Apple Inc.");
+    expect(out).not.toContain("open the record");
+    expect(out).not.toContain("via");
+  });
+
+  it("escapes the tag and the name", () => {
+    const hostile: Hit = { ...found, via: "<i>", entry: entry({ name: "<b>x" }) };
+    const out = rowsHtml([hostile], [], 0);
+    expect(out).not.toContain("<i>");
+    expect(out).not.toContain("<b>");
+  });
+
+  it("says in the preview how the entity was found", () => {
+    expect(previewHtml(found)).toContain("<dt>found by</dt><dd>isin, at GLEIF</dd>");
+    expect(previewHtml(confirmed)).toContain("found at GLEIF");
+  });
+});
+
 describe("previewHtml", () => {
   it("shows the index's data and links to the record", () => {
     const out = previewHtml({ entry: entry() });
@@ -175,6 +219,74 @@ describe("infoLine", () => {
   });
 });
 
+describe("infoLine with lookups", () => {
+  const none = { leiMissing: false, found: [], pending: false, failure: null } as const;
+
+  it("counts the hits of each reading apart from the matches by name", () => {
+    const rows: Hit[] = [
+      { entry: entry(), via: "isin" },
+      { entry: entry({ lei: "B".repeat(20) }) },
+    ];
+    const out = infoLine(state({ hits: rows }), {
+      ...none,
+      found: [{ kind: "isin", shown: 1, total: 1 }],
+    });
+    expect(out.text).toBe("isin · 1 hit · 1 match");
+  });
+
+  it("says when GLEIF has more than is shown", () => {
+    const out = infoLine(state(), { ...none, found: [{ kind: "reg.no", shown: 10, total: 37 }] });
+    expect(out.text).toContain("reg.no · top 10 of 37");
+  });
+
+  it("says no such LEI at GLEIF instead of the check digits being fine", () => {
+    const out = infoLine(state({ lei: "valid", phase: "no-match", hits: [] }), {
+      ...none,
+      leiMissing: true,
+    });
+    expect(out.text).toBe("no such LEI at GLEIF");
+    const withNames = infoLine(state({ lei: "valid" }), { ...none, leiMissing: true });
+    expect(withNames.text).toBe("no such LEI at GLEIF · 1 match");
+    expect(withNames.text).not.toContain("check digits ok");
+  });
+
+  it.each([
+    ["busy", "GLEIF is busy, try again in a minute"],
+    ["offline", "could not reach GLEIF"],
+  ] as const)("says %s, with a retry that is not the index's", (failure, text) => {
+    const out = infoLine(state({ phase: "no-match", hits: [] }), { ...none, failure });
+    expect(out.text).toBe(text);
+    expect(out.html.value).toContain('data-act="retry-lookup"');
+    expect(out.html.value).not.toContain('data-act="retry"');
+  });
+
+  it("keeps the names' count beside a failure", () => {
+    const out = infoLine(state(), { ...none, failure: "offline" });
+    expect(out.text).toBe("1 match · could not reach GLEIF");
+  });
+
+  it("says a lookup is at work instead of 'no matches'", () => {
+    const out = infoLine(state({ phase: "no-match", hits: [] }), { ...none, pending: true });
+    expect(out.text).toBe("looking up at GLEIF…");
+    expect(infoLine(state({ phase: "short", hits: [] }), { ...none, pending: true }).text).toBe(
+      "looking up at GLEIF…",
+    );
+    expect(infoLine(state({ phase: "no-match", hits: [] })).text).toBe("no matches");
+  });
+
+  it("announces what the lookups found or could not do", () => {
+    expect(announcement(state(), { ...none, failure: "busy" })).toBe(
+      "1 match · GLEIF is busy, try again in a minute",
+    );
+    expect(
+      announcement(state({ phase: "no-match", hits: [] }), { ...none, leiMissing: true }),
+    ).toBe("no such LEI at GLEIF");
+    expect(
+      announcement(state({ phase: "short", hits: [] }), { ...none, pending: true }),
+    ).toBeNull();
+  });
+});
+
 describe("announcement", () => {
   it("waits while the search is unsettled", () => {
     expect(announcement(state({ phase: "loading" }))).toBeNull();
@@ -203,10 +315,20 @@ describe("the static screens", () => {
     expect(aboutHtml(null)).toContain("WHICHLEI(1)");
   });
 
-  it("offers examples that work without a lookup service", () => {
+  it("offers an example of every kind of input", () => {
     const out = usageHtml();
-    expect(out).toContain('data-q="ericsson"');
-    expect(out).not.toMatch(/isin|bic|register/i);
+    for (const example of ["ericsson", "US0378331005", "TEERSESSXXX", "556016-0680"]) {
+      expect(out).toContain(`data-q="${example}"`);
+    }
+    expect(out).toMatch(/isin/);
+    expect(out).toMatch(/bic/);
+    expect(out).toMatch(/swedish register number/);
+  });
+
+  it("says in the about page that identifiers go to GLEIF, and nothing else does", () => {
+    const out = aboutHtml(null);
+    expect(out).toContain("sent to the GLEIF API");
+    expect(out).toContain("Nothing else you type goes anywhere");
   });
 
   it("has no inline style or script", () => {
