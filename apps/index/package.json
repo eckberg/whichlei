@@ -7,6 +7,7 @@
     "assemble": "node scripts/assemble.ts",
     "verify-live": "node scripts/verify-live.ts",
     "live-build": "node scripts/live-build.ts",
+    "rollback-target": "node scripts/rollback-target.ts",
     "deploy": "wrangler deploy",
     "typecheck": "tsc"
   },

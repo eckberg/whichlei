@@ -189,39 +189,40 @@ export interface Inputs {
   queries: QueryResult[];
   /** Makes one check fail, to prove a failing check publishes nothing. */
   forceFail?: boolean;
+  /** Skip the bounds relative to the live build, for this run only. The absolute ones apply. */
+  acceptChange?: boolean;
 }
 
 const n = (value: number) => Math.round(value).toLocaleString("en-US");
 const pct = (value: number) => `${(100 * value).toFixed(2)}%`;
 
+/**
+ * The absolute bounds always hold. With a live value, the change from it must also stay
+ * within `tolerance`, unless the change is accepted for this run.
+ */
 function bounded(
   name: string,
   value: number,
   live: number | undefined,
   tolerance: number,
   absolute: Range,
+  acceptChange: boolean,
 ): CheckRow {
-  if (live === undefined || !Number.isFinite(live) || live <= 0) {
-    return {
-      name,
-      value: n(value),
-      limit: `${n(absolute.min)} to ${n(absolute.max)} (no live value)`,
-      ok: value >= absolute.min && value <= absolute.max,
-    };
+  const limits = [`${n(absolute.min)} to ${n(absolute.max)}`];
+  let ok = value >= absolute.min && value <= absolute.max;
+  if (live !== undefined && Number.isFinite(live) && live > 0 && !acceptChange) {
+    const min = live * (1 - tolerance);
+    const max = live * (1 + tolerance);
+    limits.push(`${n(min)} to ${n(max)} (live ${n(live)} ± ${(100 * tolerance).toFixed(0)}%)`);
+    ok = ok && value >= min && value <= max;
   }
-  const min = live * (1 - tolerance);
-  const max = live * (1 + tolerance);
-  return {
-    name,
-    value: n(value),
-    limit: `${n(min)} to ${n(max)} (live ${n(live)} ± ${(100 * tolerance).toFixed(0)}%)`,
-    ok: value >= min && value <= max,
-  };
+  return { name, value: n(value), limit: limits.join("; "), ok };
 }
 
 /** Every blocking check, as a table row. Pure: all inputs are in `inputs`. */
 export function evaluate(inputs: Inputs): CheckRow[] {
   const { config, measured, objective, live, queries } = inputs;
+  const acceptChange = inputs.acceptChange === true;
   const rows: CheckRow[] = [];
   const { manifest } = measured;
   rows.push({
@@ -245,10 +246,18 @@ export function evaluate(inputs: Inputs): CheckRow[] {
       live?.entities,
       config.relative.entities,
       config.absolute.entities,
+      acceptChange,
     ),
   );
   rows.push(
-    bounded("files", measured.files, live?.files, config.relative.files, config.absolute.files),
+    bounded(
+      "files",
+      measured.files,
+      live?.files,
+      config.relative.files,
+      config.absolute.files,
+      acceptChange,
+    ),
   );
   rows.push(
     bounded(
@@ -257,6 +266,7 @@ export function evaluate(inputs: Inputs): CheckRow[] {
       live?.gzipBytes,
       config.relative.gzipBytes,
       config.absolute.gzipBytes,
+      acceptChange,
     ),
   );
 
@@ -276,20 +286,21 @@ export function evaluate(inputs: Inputs): CheckRow[] {
       limit: "run indexer check --eval --json",
       ok: false,
     });
-  } else if (liveObjective === undefined || !Number.isFinite(liveObjective)) {
-    rows.push({
-      name: "objective",
-      value: objective.test.toFixed(4),
-      limit: `at least ${config.absolute.objective.toFixed(4)} (no live value)`,
-      ok: objective.test >= config.absolute.objective,
-    });
   } else {
-    const floor = liveObjective - config.objectiveDrop;
+    const limits = [`at least ${config.absolute.objective.toFixed(4)}`];
+    let ok = objective.test >= config.absolute.objective;
+    if (liveObjective !== undefined && Number.isFinite(liveObjective) && !acceptChange) {
+      const floor = liveObjective - config.objectiveDrop;
+      limits.push(
+        `at least ${floor.toFixed(4)} (live ${liveObjective.toFixed(4)} - ${config.objectiveDrop})`,
+      );
+      ok = ok && objective.test >= floor;
+    }
     rows.push({
       name: "objective",
       value: objective.test.toFixed(4),
-      limit: `at least ${floor.toFixed(4)} (live ${liveObjective.toFixed(4)} - ${config.objectiveDrop})`,
-      ok: objective.test >= floor,
+      limit: limits.join("; "),
+      ok,
     });
   }
 
@@ -299,6 +310,14 @@ export function evaluate(inputs: Inputs): CheckRow[] {
       value: first ?? "no result",
       limit: `${expected} first`,
       ok: first === expected,
+    });
+  }
+  if (acceptChange) {
+    rows.push({
+      name: "accept-change",
+      value: "relative bounds skipped for this run",
+      limit: "absolute bounds still apply",
+      ok: true,
     });
   }
   if (inputs.forceFail) {

@@ -146,6 +146,21 @@ export async function assemble(options: AssembleOptions): Promise<AssembleResult
     else if (previous.build === manifest.build) {
       log(`the live build is this build, ${manifest.build}: nothing to keep`);
       previous = undefined;
+      // Its report stays as published, not as this run measured it.
+      const response = await getRetry(
+        http,
+        `${live.replace(/\/+$/, "")}/${manifest.build}/report.json`,
+      );
+      if (response.ok) {
+        const body = Buffer.from(await response.arrayBuffer());
+        try {
+          verify("report.json", body);
+          writeFileSync(join(out, manifest.build, "report.json"), body);
+          log("kept the live report.json");
+        } catch {
+          log("the live report.json is unreadable: this run's is published");
+        }
+      } else await response.body?.cancel();
     }
   }
   if (previous !== undefined && live !== undefined) {

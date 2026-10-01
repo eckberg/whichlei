@@ -5,6 +5,7 @@ import { request as httpsRequest } from "node:https";
 import { brotliDecompressSync, gunzipSync } from "node:zlib";
 import { decodeEntries, filePath, type Manifest, parseManifest } from "@whichlei/core";
 import { IMMUTABLE, REVALIDATE } from "./headers.ts";
+import { transient, withRetry } from "./live.ts";
 
 /** A response with its body as it came over the wire, still compressed. */
 export interface RawResponse {
@@ -36,6 +37,22 @@ export const httpsTransport: Transport = (url) =>
     req.setTimeout(60_000, () => req.destroy(new Error(`${url}: timed out`)));
     req.end();
   });
+
+/** The transport again on a network error, 429 or 5xx, as `getRetry` does for fetch. */
+export function retrying(
+  transport: Transport,
+  sleep: (ms: number) => Promise<void>,
+  options: { attempts?: number; baseDelayMs?: number } = {},
+): Transport {
+  return (url) =>
+    withRetry(
+      sleep,
+      url,
+      () => transport(url),
+      (response) => (transient(response.status) ? `HTTP ${response.status}` : undefined),
+      options,
+    );
+}
 
 function decode(response: RawResponse): Buffer {
   const encoding = response.headers["content-encoding"];
@@ -146,7 +163,8 @@ function check(
 
 /** Fetches what the live Worker serves and checks it. Does not throw on a failed check. */
 export async function verifyLive(options: VerifyOptions): Promise<VerifyResult> {
-  const { origin, transport, sleep, log, waitSeconds = 120, now = Date.now } = options;
+  const { origin, sleep, log, waitSeconds = 120, now = Date.now } = options;
+  const transport = retrying(options.transport, sleep);
   const base = origin.replace(/\/+$/, "");
   const rows: VerifyRow[] = [];
 

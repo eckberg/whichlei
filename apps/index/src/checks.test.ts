@@ -138,6 +138,65 @@ describe("evaluate against a live build", () => {
   });
 });
 
+describe("absolute bounds and accept-change", () => {
+  const tiny = {
+    ...measured,
+    manifest: { ...manifest, entities: 1000 },
+    records: 1030,
+    files: 10,
+    gzipBytes: 5000,
+  };
+  const tinyLive = { ...live, entities: 1000, files: 10, gzipBytes: 5000 } as PublishedReport;
+
+  test("the absolute bounds hold even when the change from the live build is small", () => {
+    // Inside the relative bounds of a live build that was itself out of range.
+    expect(failed(evaluate(inputs({ measured: tiny, live: tinyLive })))).toEqual([
+      "entities",
+      "files",
+      "gzip bytes",
+    ]);
+  });
+
+  test("the objective floor holds against a live build that was already below it", () => {
+    const weak = { ...live, objective: { test: 0.55, all: 0.55 } } as PublishedReport;
+    expect(failed(evaluate(inputs({ live: weak, objective: { test: 0.55, all: 0.55 } })))).toEqual([
+      "objective",
+    ]);
+  });
+
+  test("accept-change skips the relative bounds and says so", () => {
+    const big = {
+      ...measured,
+      manifest: { ...manifest, entities: 3_600_000 },
+      records: 3_700_000,
+      files: 7_000,
+      gzipBytes: 245_000_000,
+    };
+    expect(failed(evaluate(inputs({ measured: big })))).toEqual([
+      "entities",
+      "files",
+      "gzip bytes",
+    ]);
+    const rows = evaluate(
+      inputs({ measured: big, acceptChange: true, objective: { test: 0.63, all: 0.63 } }),
+    );
+    expect(failed(rows)).toEqual([]);
+    expect(rows.some((r) => r.name === "accept-change")).toBe(true);
+  });
+
+  test("accept-change does not skip the absolute bounds or the floor", () => {
+    const rows = evaluate(
+      inputs({
+        measured: tiny,
+        live: tinyLive,
+        acceptChange: true,
+        objective: { test: 0.5, all: 0.5 },
+      }),
+    );
+    expect(failed(rows)).toEqual(["entities", "files", "gzip bytes", "objective"]);
+  });
+});
+
 describe("evaluate on a first publish", () => {
   const first = (over: Partial<Inputs> = {}) => inputs({ live: undefined, ...over });
 

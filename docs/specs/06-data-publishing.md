@@ -15,9 +15,16 @@ can be restored with one run.
   golden copy (GLEIF publishes at 00:00, 08:00 and 16:00 UTC), run the checks, add the
   live build's files so open pages keep working, deploy, and verify the live index.
 - Checks, each one blocking: the manifest parses; entities, files and size within set
-  bounds of the live build; reachability at least 96%; the evaluation objective no more
+  bounds of the live build and inside absolute bounds that always apply (a manual run can
+  accept a change for that run, skipping only the relative bounds); reachability at least 96%; the evaluation objective no more
   than 0.01 below the live build's; a few fixed queries find their entity first.
-- `.github/workflows/rollback-index.yml`, by hand: restore the previous Worker version.
+- After the deploy the run verifies the live index. If that fails, it restores the Worker
+  version that was live before and verifies that, and the run ends red. The summary says
+  DEPLOYED + VERIFIED, ROLLED BACK, or DEPLOYED, NOT VERIFIED (a first publish has nothing
+  to restore).
+- `.github/workflows/rollback-index.yml`, by hand: restore a Worker version, given by id or
+  else the newest build older than the live one (never "the previous version"). The live
+  build is read once the run has its turn in the publish group.
 - Keep the schedule alive: GitHub stops scheduled workflows after 60 days without
   repository activity. Each run re-enables its own workflow through the API.
 - The site build gets the index origin, so slice 7's page can use it.

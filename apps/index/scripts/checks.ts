@@ -9,6 +9,8 @@
 //                 there is no live index yet, the absolute bounds in checks.json apply.
 //   --config      thresholds, default checks.json
 //   --markdown    append the table to this file (the job summary)
+//   --accept-change  skip the bounds relative to the live build, for this run only. The
+//                 absolute bounds in checks.json, the objective floor included, still apply.
 //   --force-fail  make one check fail, to prove that a failing check publishes nothing
 //
 // Writes <build>/measured.json, which `assemble` needs. It says whether the build passed.
@@ -36,6 +38,7 @@ const { values } = parseArgs({
     live: { type: "string" },
     config: { type: "string" },
     markdown: { type: "string" },
+    "accept-change": { type: "boolean", default: false },
     "force-fail": { type: "boolean", default: false },
   },
 });
@@ -100,6 +103,7 @@ const rows = evaluate({
   live,
   queries: runQueries(dir, manifest, config.queries),
   forceFail: values["force-fail"],
+  acceptChange: values["accept-change"],
 });
 const passed = rows.every((r) => r.ok);
 writeFileSync(

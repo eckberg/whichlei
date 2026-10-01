@@ -238,8 +238,43 @@ describe("a normal publish", () => {
   test("the same build live again keeps nothing", async () => {
     const { http, requests } = fake(liveSite(NEW));
     const result = await assemble({ build: built, out, live: ORIGIN, http });
-    expect(requests).toEqual(["/index.json"]);
+    expect(requests).toEqual(["/index.json", `/${NEW}/report.json`]);
     expect(result.builds).toEqual([NEW]);
+  });
+
+  test("the same build live keeps its own report.json, or ours if it has none", async () => {
+    const same = fake(
+      liveSite(NEW, { [`${NEW}/report.json`]: JSON.stringify({ build: NEW, kept: true }) }),
+    );
+    await assemble({ build: built, out, live: ORIGIN, http: same.http });
+    expect(JSON.parse(readFileSync(join(out, NEW, "report.json"), "utf8"))).toEqual({
+      build: NEW,
+      kept: true,
+    });
+
+    const site = liveSite(NEW);
+    site.delete(`${NEW}/report.json`);
+    await assemble({ build: built, out, live: ORIGIN, http: fake(site).http });
+    expect(JSON.parse(readFileSync(join(out, NEW, "report.json"), "utf8"))).toMatchObject({
+      entities: 3,
+    });
+
+    const bad = fake(liveSite(NEW, { [`${NEW}/report.json`]: "{not json" }));
+    await assemble({ build: built, out, live: ORIGIN, http: bad.http });
+    expect(JSON.parse(readFileSync(join(out, NEW, "report.json"), "utf8"))).toMatchObject({
+      entities: 3,
+    });
+  });
+
+  test("a first publish that alone reaches the limit fails the final check", async () => {
+    const { http } = fake(new Map());
+    // 4 files of the build + index.json = 5.
+    await expect(assemble({ build: built, out, live: ORIGIN, http, maxFiles: 5 })).rejects.toThrow(
+      /the version holds 5 files, the limit is 5/,
+    );
+    await expect(
+      assemble({ build: built, out, live: ORIGIN, http, maxFiles: 6 }),
+    ).resolves.toMatchObject({ files: 5 });
   });
 
   test("an unreadable live index.json is a warning and a first publish", async () => {

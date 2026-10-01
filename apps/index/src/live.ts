@@ -19,27 +19,54 @@ export const realHttp = (log: (message: string) => void = () => {}): Http => ({
 });
 
 /**
+ * Runs `attempt` until it returns a result `retryable` does not reject, up to `attempts`
+ * times with a growing pause. A throw counts as a failed attempt. Throws after the last.
+ */
+export async function withRetry<T>(
+  sleep: Http["sleep"],
+  what: string,
+  attempt: () => Promise<T>,
+  retryable: (result: T) => string | undefined,
+  { attempts = 4, baseDelayMs = 500 } = {},
+): Promise<T> {
+  let last = "";
+  for (let n = 1; n <= attempts; n++) {
+    try {
+      const result = await attempt();
+      const problem = retryable(result);
+      if (problem === undefined) return result;
+      last = problem;
+    } catch (error) {
+      last = (error as Error).message;
+    }
+    if (n < attempts) await sleep(baseDelayMs * 2 ** (n - 1));
+  }
+  throw new Error(`${what}: failed after ${attempts} attempts: ${last}`);
+}
+
+/** A status worth another try: rate limited, or the server's fault. */
+export const transient = (status: number): boolean => status === 429 || status >= 500;
+
+/**
  * GET with retries on network errors, 429 and 5xx. Any other status is returned as it is,
  * so the caller decides what a 404 means.
  */
 export async function getRetry(
   http: Http,
   url: string,
-  { attempts = 4, baseDelayMs = 500 } = {},
+  options: { attempts?: number; baseDelayMs?: number } = {},
 ): Promise<Response> {
-  let last: unknown;
-  for (let attempt = 1; attempt <= attempts; attempt++) {
-    try {
-      const response = await http.fetch(url);
-      if (response.status !== 429 && response.status < 500) return response;
-      await response.body?.cancel();
-      last = new Error(`${url}: HTTP ${response.status}`);
-    } catch (error) {
-      last = error;
-    }
-    if (attempt < attempts) await http.sleep(baseDelayMs * 2 ** (attempt - 1));
-  }
-  throw new Error(`${url}: failed after ${attempts} attempts: ${(last as Error).message}`);
+  return withRetry(
+    http.sleep,
+    url,
+    () => http.fetch(url),
+    (response) => {
+      if (!transient(response.status)) return undefined;
+      void response.body?.cancel();
+      return `HTTP ${response.status}`;
+    },
+    options,
+  );
 }
 
 const trimSlash = (origin: string) => origin.replace(/\/+$/, "");

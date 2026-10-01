@@ -28,7 +28,7 @@ compresses it on the fly. Nothing is precompressed.
 
 A publish uploads the new build directory and the new `index.json` in one Worker
 version. It keeps the previous build's directory too: 2 × (6,438 index files + `codes.json`
-+ `report.json`) + 1 manifest = 12,883 files, under the 20,000-file limit. So a page that
++ `report.json`) + 1 manifest = 12,881 files, under the 20,000-file limit. So a page that
 loaded the old manifest keeps working. The publish asserts the count stays under the limit.
 
 Every response carries `Access-Control-Allow-Origin: *` and `X-Content-Type-Options:
@@ -145,9 +145,11 @@ A code that is missing from the file is shown as the code.
 
 Added by publishing (slice 6), not by the indexer. It is the indexer's `build.json` plus what
 `index checks` measured over the built files, and it is part of the build's directory so the
-next publish can compare against it: entities, files and size must stay within set bounds of
-the live build, and the evaluation objective must not fall (`apps/index/checks.json`). Pages
-do not read it.
+next publish can compare against it (`apps/index/checks.json`): entities, files and gzip
+size must stay within 3%, 5% and 10% of the live build's, and the evaluation objective may
+fall at most 0.01 below its. Fixed absolute bounds and a floor for the objective always
+apply too, and are all there is on a first publish. A manual run can skip the relative
+bounds for that run (`accept-change`). Pages do not read it.
 
 ```json
 {

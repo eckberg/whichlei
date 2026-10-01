@@ -243,7 +243,43 @@ describe("verifyLive", () => {
     });
     const result = await verifyLive(options(transport, { build: NEW }));
     expect(result.ok).toBe(false);
-    expect(result.rows.find((r) => !r.ok)?.detail).toBe("socket hang up");
+    expect(result.rows.find((r) => !r.ok)?.detail).toMatch(
+      /failed after 4 attempts: socket hang up/,
+    );
+  });
+});
+
+describe("retries", () => {
+  test("a 503 or a dropped connection is tried again", async () => {
+    const inner = site([NEW]);
+    const calls = new Map<string, number>();
+    const flaky: Transport = async (url) => {
+      const path = new URL(url).pathname;
+      const n = (calls.get(path) ?? 0) + 1;
+      calls.set(path, n);
+      if (path === `/${NEW}/0.txt` && n === 1)
+        return { status: 503, headers: {}, body: Buffer.alloc(0) };
+      if (path === `/${NEW}/1.txt` && n < 3) throw new Error("ECONNRESET");
+      return inner(url);
+    };
+    const result = await verifyLive(options(flaky, { build: NEW }));
+    expect(result.ok).toBe(true);
+    expect(calls.get(`/${NEW}/0.txt`)).toBe(2);
+    expect(calls.get(`/${NEW}/1.txt`)).toBe(3);
+  });
+
+  test("a 404 is not retried", async () => {
+    let calls = 0;
+    const inner = site([NEW]);
+    const transport: Transport = async (url) => {
+      if (new URL(url).pathname === `/${NEW}/1.txt`) calls++;
+      return new URL(url).pathname === `/${NEW}/1.txt`
+        ? { status: 404, headers: {}, body: Buffer.alloc(0) }
+        : inner(url);
+    };
+    const result = await verifyLive(options(transport, { build: NEW }));
+    expect(result.ok).toBe(false);
+    expect(calls).toBe(1);
   });
 });
 
