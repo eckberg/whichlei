@@ -160,7 +160,7 @@ describe("a record whose every string is hostile", () => {
     expect(recordJson).not.toContain("<");
     expect(recordJson).not.toContain(">");
     expect(recordJson).not.toContain("&");
-    expect(page.match(/<\/script>/g)).toHaveLength(3); // JSON-LD, the record and the copy script
+    expect(page.match(/<\/script>/g)).toHaveLength(4); // JSON-LD, the record, the copy and stats scripts
   });
 
   it("escapes a hostile message page", () => {

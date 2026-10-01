@@ -8,6 +8,7 @@ import type { Hit } from "../search/entry.ts";
 import { initialState, Search, type SearchPort, type SearchState } from "../search/search.ts";
 import { type KeyContext, keyAction } from "./keys.ts";
 import { ResilientSearch } from "./resilient.ts";
+import { browserCounter } from "./stats.ts";
 import {
   aboutHtml,
   announcement,
@@ -68,6 +69,9 @@ export function start(): void {
   // their own; the page shows them together.
   const lookups = new Lookups();
   const composer = new Composer();
+  // Counts settled searches for the analytics (decision 31). It is told, never asked: it holds
+  // no query beyond memory and sends no text.
+  const counter = browserCounter();
 
   let view: View = "search";
   let selected = 0;
@@ -179,6 +183,7 @@ export function start(): void {
     performance.clearMeasures("whichlei:render");
     if (view === "search" && s.phase !== "loading" && s.text !== "" && s.text === q.value) {
       measureResults(inputAt, inputs, s);
+      if (s.phase === "done" || s.phase === "no-match") counter.shown(s.text);
     }
   }
 
@@ -268,12 +273,16 @@ export function start(): void {
 
   const copyLei = () => {
     const current = hit();
-    if (current) void copy(current.entry.lei);
+    if (!current) return;
+    counter.acted();
+    void copy(current.entry.lei);
   };
 
   function openRecord() {
     const current = hit();
-    if (current) location.assign(recordHref(current.entry.lei));
+    if (!current) return;
+    counter.acted();
+    location.assign(recordHref(current.entry.lei));
   }
 
   function move(by: number) {
@@ -298,6 +307,7 @@ export function start(): void {
       }
     }
     // The answers, now or when the files arrive, come through the subscriptions.
+    counter.input(text);
     void search.input(text);
     lookups.input(text);
   }
@@ -387,6 +397,7 @@ export function start(): void {
       return;
     }
     if (target.dataset.act === "copy") copyLei();
+    else if (target.dataset.act === "open") counter.acted();
     else if (target.dataset.act === "reload") location.reload();
     else if (target.dataset.act === "retry-lookup") {
       lookups.retry();

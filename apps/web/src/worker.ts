@@ -62,14 +62,17 @@ const REDIRECT_MAX_AGE = 86400;
 const DEFAULT_RETRY_AFTER = 60;
 const GLEIF_TIMEOUT_MS = 8000;
 
-// Only the site itself: styles, fonts and the copy button script are static files. A record
-// page fetches nothing, so nothing else is allowed.
+// The site itself: styles, fonts and the copy button script are static files. A record page
+// fetches nothing but Fathom's script, its page-view image and its beacon (decision 23); the
+// stats loader decides on the canonical host whether any of that happens.
+const FATHOM = "https://cdn.usefathom.com";
 const CSP = [
   "default-src 'none'",
   "style-src 'self'",
   "font-src 'self'",
-  "script-src 'self'",
-  "img-src 'self' data:",
+  `script-src 'self' ${FATHOM}`,
+  `img-src 'self' data: ${FATHOM}`,
+  `connect-src ${FATHOM}`,
   "base-uri 'none'",
   "form-action 'none'",
   "frame-ancestors 'none'",

@@ -9,7 +9,7 @@ import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
-import { indexOrigin, pageCsp } from "./site.ts";
+import { canonicalOrigin, indexOrigin, pageCsp, searchPage } from "./site.ts";
 
 const statics = new URL("../static/", import.meta.url);
 // DIST_DIR builds somewhere else, as tools/bench does for its copy of the site.
@@ -20,6 +20,10 @@ const read = (name: string) => readFileSync(new URL(name, statics), "utf8");
 const write = (name: string, content: string) => writeFileSync(new URL(name, dist), content);
 
 const origin = indexOrigin(process.env.INDEX_ORIGIN);
+// The site's own origin, from the one place that sets it. Empty before launch.
+const canonical = canonicalOrigin(
+  readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
+);
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(new URL("styles/", dist), { recursive: true });
@@ -50,12 +54,22 @@ await build({
   format: "esm",
 });
 
+// The analytics loader (/scripts/stats.js), a file of its own: no inline script. It does
+// nothing unless the page is on the canonical origin.
+await build({
+  ...common,
+  entryPoints: [new URL("../src/page/stats-entry.ts", import.meta.url).pathname],
+  outfile: new URL("scripts/stats.js", dist).pathname,
+  format: "iife",
+  define: { __CANONICAL_ORIGIN__: JSON.stringify(canonical) },
+});
+
 // The search page and the record pages share the fonts and the theme; each adds its own.
 const base = `${read("fonts.css")}\n${read("shared.css")}`;
 write("styles/app.css", `${base}\n${read("search.css")}`);
 write("styles/record.css", `${base}\n${read("record.css")}`);
 copyFileSync(new URL("copy.js", statics), new URL("scripts/copy.js", dist));
-copyFileSync(new URL("index.html", statics), new URL("index.html", dist));
+write("index.html", searchPage(read("index.html"), canonical));
 write(
   "404.html",
   `<!doctype html>
@@ -76,5 +90,5 @@ write(
 
 const size = (name: string) => readFileSync(new URL(name, dist)).length.toLocaleString("en-US");
 console.log(
-  `dist: app.js ${size("app.js")} bytes, search-worker.js ${size("search-worker.js")} bytes, app.css ${size("styles/app.css")} bytes; index ${origin || "not configured"}`,
+  `dist: app.js ${size("app.js")} bytes, search-worker.js ${size("search-worker.js")} bytes, app.css ${size("styles/app.css")} bytes; index ${origin || "not configured"}; canonical ${canonical || "not set"}`,
 );

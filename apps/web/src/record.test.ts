@@ -267,7 +267,7 @@ describe("escaping", () => {
   it("keeps the name from closing the JSON-LD script", async () => {
     const page = await hostilePage();
     const scripts = page.match(/<script\b/g) ?? [];
-    expect(scripts).toHaveLength(3); // JSON-LD, the record as JSON and the copy script
+    expect(scripts).toHaveLength(4); // JSON-LD, the record as JSON, the copy and stats scripts
     const json = /<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
     expect(JSON.parse(json).name).toBe(hostile);
     expect(json).not.toContain("<");
@@ -301,11 +301,11 @@ describe("renderMessagePage", () => {
     expect(page).toContain('<a class="btn" href="/">search</a>');
   });
 
-  it("does not load the copy script, which a record page does", async () => {
+  it("does not load the copy or stats script, which a record page does", async () => {
     const message = renderMessagePage({ title: "t", heading: "h", detail: "d" });
     expect(message).not.toContain("<script");
-    expect(renderRecordPage(await parsedRecord("record-ericsson"), context)).toContain(
-      '<script src="/scripts/copy.js" defer></script>',
-    );
+    const page = renderRecordPage(await parsedRecord("record-ericsson"), context);
+    expect(page).toContain('<script src="/scripts/copy.js" defer></script>');
+    expect(page).toContain('<script src="/scripts/stats.js" defer></script>');
   });
 });
