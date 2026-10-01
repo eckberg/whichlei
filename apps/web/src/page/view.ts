@@ -155,8 +155,10 @@ export function aboutHtml(index: SearchState["index"]): string {
 <p>An LEI is a 20-character code defined by ISO 17442. Its last two characters are check digits (ISO 7064 mod 97-10), so a mistyped LEI is caught in your browser before anything is looked up.</p>
 <p>An ISIN, a BIC or a register number is looked up at GLEIF, which lists the entity behind it. A name that looks like none of them is only searched in the index.</p>
 <h2>KEYS</h2><dl class="keys">${KEYS.map(([key, does]) => html`<dt>${key}</dt><dd>${does}</dd>`)}</dl>
-<h2>DATA</h2><p>Every record comes from GLEIF, the Global Legal Entity Identifier Foundation. The search index is rebuilt daily from GLEIF’s golden copy, published under CC0. An opened record is fetched live from the GLEIF API.</p>${data}
-<h2>PRIVACY</h2><p>No account and no cookies. Name search runs in your browser, on files from the index host. When what you type looks like an LEI, an ISIN, a BIC or a register number, it is also sent to the GLEIF API (api.gleif.org), after a short pause, to look it up. Nothing else you type goes anywhere. Analytics are cookieless and aggregate, and never see what you type.</p>
+<h2>DATA</h2><p>Every record comes from GLEIF, the Global Legal Entity Identifier Foundation. The search index is rebuilt daily from GLEIF’s golden copy, published under CC0. An opened record is fetched live from the GLEIF API. whichlei is not affiliated with GLEIF.</p>${data}
+<h2>PRIVACY</h2><p>No account and no cookies. Name search runs in your browser, on files from the index host. When what you type looks like an LEI, an ISIN, a BIC or a register number, it is also sent to the GLEIF API (api.gleif.org), after a short pause, to look it up. Nothing else you type goes anywhere.</p>
+<p>Analytics are <a href="https://usefathom.com" target="_blank" rel="noopener">Fathom</a>, without cookies. It gets the page you are on (“/” or “/lei/”, never the LEI), the site that sent you (its domain, not the page), and a count of searches without their text. It never sees what you type.</p>
+<h2>SOURCE</h2><p>The code and the issue tracker are on <a href="https://github.com/eckberg/whichlei" target="_blank" rel="noopener">GitHub</a>, under the MIT licence.</p>
 <h2>SEE ALSO</h2><p><a href="https://www.gleif.org" target="_blank" rel="noopener">gleif.org</a>, <a href="https://search.gleif.org" target="_blank" rel="noopener">search.gleif.org</a></p>
 <div class="man-head foot"><span>whichlei</span><span>${asOf}</span><span>WHICHLEI(1)</span></div></div>`
     .value;

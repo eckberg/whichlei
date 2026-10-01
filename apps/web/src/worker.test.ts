@@ -418,7 +418,9 @@ describe("security headers", () => {
       expect(response.headers.get("referrer-policy")).toBe("no-referrer");
       const csp = response.headers.get("content-security-policy") ?? "";
       expect(csp).toContain("default-src 'none'");
-      expect(csp).toContain("script-src 'self'");
+      expect(csp).toContain("script-src 'self' https://cdn.usefathom.com;");
+      expect(csp).toContain("img-src 'self' data: https://cdn.usefathom.com;");
+      expect(csp).toContain("connect-src https://cdn.usefathom.com;");
       expect(csp).toContain("font-src 'self'");
       expect(csp).toContain("style-src 'self'");
       expect(csp).not.toContain("unsafe-inline");
@@ -433,10 +435,11 @@ describe("security headers", () => {
     expect(csp).not.toMatch(/script-src[^;]*unsafe-inline/);
     const page = await response.text();
     // Only the two JSON data blocks (JSON-LD, and the record for copy json) and the static copy
-    // script.
+    // and stats scripts.
     const scripts = [...page.matchAll(/<script\b([^>]*)>/g)].map((match) => match[1]);
     expect(scripts.sort()).toEqual([
       ' src="/scripts/copy.js" defer',
+      ' src="/scripts/stats.js" defer',
       ' type="application/json" id="record-json"',
       ' type="application/ld+json"',
     ]);

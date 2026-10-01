@@ -232,7 +232,7 @@ function jsonLd(record: LeiRecord, canonicalUrl: string): string {
 const scriptSafe = (json: string): string =>
   json.replace(JSON_UNSAFE, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
-function shell(parts: { title: string; head?: Html; body: Html; copyScript?: boolean }): string {
+function shell(parts: { title: string; head?: Html; body: Html; scripts?: boolean }): string {
   return html`<!doctype html>
 <html lang="en">
 <head>
@@ -251,7 +251,7 @@ ${parts.head ?? ""}
 </header>
 ${parts.body}
 </div>
-${parts.copyScript ? html`<script src="/scripts/copy.js" defer></script>\n` : ""}</body>
+${parts.scripts ? html`<script src="/scripts/copy.js" defer></script>\n<script src="/scripts/stats.js" defer></script>\n` : ""}</body>
 </html>
 `.value;
 }
@@ -295,7 +295,7 @@ ${rows(record, context.codes ?? null).map(
 </div>
 </main>`;
 
-  return shell({ title: `${name} · LEI ${record.lei} · whichlei`, head, body, copyScript: true });
+  return shell({ title: `${name} · LEI ${record.lei} · whichlei`, head, body, scripts: true });
 }
 
 /** A short page for an answer that has no record: 404, 503 and the like. */

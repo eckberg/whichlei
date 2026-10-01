@@ -2,7 +2,7 @@
 //
 //   pnpm --filter @whichlei/bench search [--rate 4] [--every 4] [--bytes-every 1]
 //       [--page-every 16] [--last-every 4] [--modes every,last,inthread]
-//       [--skip bytes,timing,page]
+//       [--skip bytes,timing,page] [--stats on|off] [--settle-ms 0]
 //
 // Needs the lines encoding of the index in $DATA_DIR/format/lines (pnpm build-index) and
 // sizes.json. Three parts, each on the production code from apps/web, not a copy:
@@ -17,6 +17,9 @@
 //           production one plus a self-slowdown (page/throttled-worker.ts). Modes: `every`
 //           (the debounce fires after every key), `last` (keys 50 ms apart), `inthread` (no
 //           Worker: the old way, for the long tasks).
+// `--stats off` builds the page without the search counter (slice 11); `--stats on` (default)
+// keeps it, with a stub `window.fathom` that counts its calls. `--settle-ms 2100` waits that
+// long after the last key of each query, so the counter sends and the stub is called.
 // Writes $DATA_DIR/format/search-<rate>x.json (merged with an earlier run). Heavy: run it
 // under the lock (CLAUDE.md).
 import { spawnSync } from "node:child_process";
@@ -39,6 +42,8 @@ const { values: args } = parseArgs({
     "last-every": { type: "string", default: "4" },
     modes: { type: "string", default: "every,last,inthread" },
     skip: { type: "string", default: "" },
+    stats: { type: "string", default: "on" },
+    "settle-ms": { type: "string", default: "0" },
     encoding: { type: "string", default: "lines" },
     port: { type: "string", default: "8799" },
   },
@@ -77,6 +82,32 @@ if (!skip.has("page")) {
     stdio: "inherit",
   });
   if (build.status !== 0) throw new Error("the site did not build");
+}
+if (args.stats !== "on" && args.stats !== "off") throw new Error("--stats is on or off");
+// Without the counter: the page's own build, rebuilt with a stand-in for src/page/stats.ts.
+if (!skip.has("page") && args.stats === "off") {
+  await esbuild({
+    entryPoints: [join(REPO, "apps/web/src/page/index.ts")],
+    outfile: join(siteDist, "app.js"),
+    bundle: true,
+    format: "iife",
+    target: "es2024",
+    minify: true,
+    sourcemap: "linked",
+    legalComments: "none",
+    logLevel: "warning",
+    define: { __INDEX_ORIGIN__: JSON.stringify(origin) },
+    plugins: [
+      {
+        name: "no-stats",
+        setup(b) {
+          b.onResolve({ filter: /\/stats\.ts$/ }, () => ({
+            path: join(REPO, "tools/bench/page/no-stats.ts"),
+          }));
+        },
+      },
+    ],
+  });
 }
 const server = await serve();
 const browser = await chromium.launch({
@@ -207,26 +238,38 @@ interface PagePerf {
 async function runPage(mode: PageMode, queries: string[]) {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
   page.on("pageerror", (e) => log("page error", e));
-  await page.addInitScript((noWorker: boolean) => {
-    if (noWorker) (window as { Worker?: unknown }).Worker = undefined;
-    const perf: PagePerf = { events: [], renders: [], results: [], longtasks: [] };
-    (window as unknown as { __perf: PagePerf }).__perf = perf;
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) {
-        if (e.name === "whichlei:render") perf.renders.push(e.duration);
-        else if (e.name === "whichlei:results") {
-          const key = ((e as PerformanceMeasure).detail as { key: number }).key;
-          perf.results.push({ key, d: e.duration });
-        }
+  await page.addInitScript(
+    ([noWorker, stub]: [boolean, boolean]) => {
+      if (noWorker) (window as { Worker?: unknown }).Worker = undefined;
+      // Stands in for Fathom: counts the events the page's counter sends.
+      (window as unknown as { __fathom: number }).__fathom = 0;
+      if (stub) {
+        (window as unknown as { fathom: unknown }).fathom = {
+          trackEvent: () => {
+            (window as unknown as { __fathom: number }).__fathom++;
+          },
+        };
       }
-    }).observe({ type: "measure" });
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) perf.longtasks.push(e.duration);
-    }).observe({ type: "longtask" });
-    new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) perf.events.push(e.duration);
-    }).observe({ type: "event", durationThreshold: 16 } as PerformanceObserverInit);
-  }, mode === "inthread");
+      const perf: PagePerf = { events: [], renders: [], results: [], longtasks: [] };
+      (window as unknown as { __perf: PagePerf }).__perf = perf;
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) {
+          if (e.name === "whichlei:render") perf.renders.push(e.duration);
+          else if (e.name === "whichlei:results") {
+            const key = ((e as PerformanceMeasure).detail as { key: number }).key;
+            perf.results.push({ key, d: e.duration });
+          }
+        }
+      }).observe({ type: "measure" });
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) perf.longtasks.push(e.duration);
+      }).observe({ type: "longtask" });
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) perf.events.push(e.duration);
+      }).observe({ type: "event", durationThreshold: 16 } as PerformanceObserverInit);
+    },
+    [mode === "inthread", args.stats === "on"] as [boolean, boolean],
+  );
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate });
   const settle = () =>
@@ -252,6 +295,8 @@ async function runPage(mode: PageMode, queries: string[]) {
   };
 
   const out: { query: string; keys: KeyResult[]; longtasks: number[] }[] = [];
+  /** Events the stub `window.fathom` received over the run, one per settled query. */
+  let fathomEvents = 0;
   for (const query of queries) {
     await page.goto(`${pageServer.origin}/`);
     await page.locator("#meta").getByText("index:").waitFor();
@@ -284,6 +329,9 @@ async function runPage(mode: PageMode, queries: string[]) {
         });
       }
     }
+    // The counter sends once the results have held still for 2 s: wait for it, and count.
+    if (Number(args["settle-ms"]) > 0) await page.waitForTimeout(Number(args["settle-ms"]));
+    fathomEvents += await page.evaluate(() => (window as unknown as { __fathom: number }).__fathom);
     out.push({ query, keys, longtasks });
   }
   await page.close();
@@ -321,6 +369,9 @@ async function runPage(mode: PageMode, queries: string[]) {
       perQuery: summary(out.map((q) => q.longtasks.length)),
     },
     renderPerKey: renders.length > 0 ? summary(renders) : null,
+    stats: args.stats,
+    settleMs: Number(args["settle-ms"]),
+    fathomEvents,
   };
   log(
     `page at ${rate}x, ${mode}, ${out.length} queries, ${keyCount} keys (${summaryOf.withResults} with results):` +
@@ -329,7 +380,8 @@ async function runPage(mode: PageMode, queries: string[]) {
       ` slowest ${fmt(summaryOf.finalSlowestPerQuery, 0)}, last key ${fmt(summaryOf.lastKeyFinal, 0)};` +
       ` key to next paint over 16 ms on ${(summaryOf.eventOverFloor * 100).toFixed(1)}% of keys, slowest per query ${fmt(summaryOf.eventSlowestPerQuery, 0)};` +
       ` long tasks >50 ms: ${(summaryOf.longTasks.queriesWith * 100).toFixed(1)}% of queries, ${summaryOf.longTasks.total} in all, longest ${summaryOf.longTasks.longest.toFixed(0)} ms` +
-      (renders.length > 0 ? `; DOM update per key ${fmt(summary(renders), 1)}` : ""),
+      (renders.length > 0 ? `; DOM update per key ${fmt(summary(renders), 1)}` : "") +
+      `; counter ${args.stats}, ${fathomEvents} events reached the stub`,
   );
   return summaryOf;
 }
