@@ -9,6 +9,10 @@ compact.tsv, 2026-09-16) and the level 2 relationships, and records what it foun
 whether the entity has an accounting parent in GLEIF (a group's top entity has none).
 A target that is missing or not ACTIVE fails the build.
 
+A query whose target or alternative is a target of the evaluation set (head, torso, tail,
+typo, b1_sample: target_lei or alt_leis) is left out, so the two sets share no entity.
+The candidates list below keeps them; the script says which it dropped.
+
 kind:
   name      the query is a word of the legal name ("BP" -> BP P.L.C.)
   initials  the query is the initials of the legal name's words, legal form left out
@@ -117,8 +121,30 @@ def assign_split(leis):
     return {lei: ('train' if i < half else 'test') for i, lei in enumerate(order)}
 
 
+def eval_leis():
+    """Every target and alternative LEI of the evaluation set's files."""
+    out = set()
+    for name in ('head', 'torso', 'tail', 'typo', 'b1_sample'):
+        path = os.path.join(EVAL, f'{name}.tsv')
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding='utf8') as f:
+            for row in csv.DictReader(f, delimiter='\t'):
+                out.add(row.get('target_lei', ''))
+                out.update(x for x in (row.get('alt_leis') or '').split('|') if x)
+    out.discard('')
+    return out
+
+
 def main():
-    want = {lei for _, _, t, alt in SET for lei in [t, *filter(None, alt.split('|'))]}
+    taken = eval_leis()
+    kept = []
+    for query, kind, lei, alt in SET:
+        if {lei, *filter(None, alt.split('|'))} & taken:
+            print(f'left out, its entity is in the evaluation set: {query}')
+        else:
+            kept.append((query, kind, lei, alt))
+    want = {lei for _, _, t, alt in kept for lei in [t, *filter(None, alt.split('|'))]}
     found = {}
     with open(os.path.join(DATA_DIR, 'compact.tsv'), encoding='utf8') as f:
         for line in f:
@@ -136,18 +162,18 @@ def main():
     if missing:
         raise SystemExit(f'not in the golden copy: {missing}')
     out = os.path.join(EVAL, 'acronyms.tsv')
-    split = assign_split([lei for _, _, lei, _ in SET])
+    split = assign_split([lei for _, _, lei, _ in kept])
     with open(out, 'w', encoding='utf8', newline='') as f:
         w = csv.writer(f, delimiter='\t', lineterminator='\n')
         w.writerow(['query', 'target_lei', 'stratum', 'split', 'qtype', 'alt_leis', 'entity_name', 'verified'])
-        for query, kind, lei, alt in SET:
+        for query, kind, lei, alt in kept:
             x = found[lei]
             if x[4] != 'ACTIVE':
                 raise SystemExit(f'{query}: {lei} is {x[4]}')
             top = 'has a parent' if parent.get(lei) else 'no parent'
             verified = f'golden copy 2026-09-16: {x[2]}, {x[4]}/{x[5]}, {x[6]}, {top}'
             w.writerow([query, lei, 'acronym', split[lei], kind, alt, x[1], verified])
-    print(f'wrote {out}: {len(SET)} queries')
+    print(f'wrote {out}: {len(kept)} of {len(SET)} queries')
 
 
 if __name__ == '__main__':
