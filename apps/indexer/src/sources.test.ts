@@ -9,6 +9,7 @@ import {
   downloadInputs,
   ELF_PAGE,
   findMapping,
+  getJson,
   type Http,
   localInputs,
   MAPPING_API,
@@ -375,5 +376,17 @@ describe("localInputs", () => {
     expect((await localInputs(dir)).ra).toBeUndefined();
     rmSync(join(dir, "signals", "bic-lei.zip"));
     await expect(localInputs(dir)).rejects.toThrow(/bic-lei\.zip is not in/);
+  });
+});
+
+describe("getJson", () => {
+  test("asks for JSON:API, which the mapping API requires", async () => {
+    let accept: string | null = null;
+    const fetch = async (_url: string | URL | Request, init?: RequestInit) => {
+      accept = new Headers(init?.headers).get("accept");
+      return new Response("{}", { status: 200 });
+    };
+    await getJson("https://mapping.gleif.org/api/v2/isin-lei", { fetch });
+    expect(accept).toContain("application/vnd.api+json");
   });
 });
