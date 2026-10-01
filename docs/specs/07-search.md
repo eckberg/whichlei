@@ -1,6 +1,6 @@
 # 07 · Search
 
-Status: approved
+Status: done
 
 ## Goal
 The real search page. Typing a name searches all 3.4 million LEI records in the browser,
@@ -70,7 +70,8 @@ prototype's 2,924 records encoded with `format.ts`.
 
 ## Differences from the prototype
 - No ISIN, BIC or register-number examples, and the placeholder says "name or lei": those
-  lookups are slice 8. A valid LEI shows one row; the preview says the index has no data for it.
+  lookups are slice 8 (done there). A valid LEI shows one row; the preview says the index has
+  no data for it, until slice 8's lookup names it.
 - The record view is not in the page: → and "open record" go to `/lei/<code>` (slice 9).
 - `about` names the index it reads and its date, from the manifest.
 

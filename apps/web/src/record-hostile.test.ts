@@ -64,7 +64,11 @@ const hostile: LeiRecord = {
 
 const page = renderRecordPage(hostile, { canonicalOrigin: "https://whichlei.test" });
 const jsonLd = /<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
-const outsideJsonLd = page.replace(/<script type="application\/ld\+json">.*?<\/script>/s, "");
+const recordJson =
+  /<script type="application\/json" id="record-json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
+const outsideJsonLd = page
+  .replace(/<script type="application\/ld\+json">.*?<\/script>/s, "")
+  .replace(/<script type="application\/json" id="record-json">.*?<\/script>/s, "");
 
 describe("a record whose every string is hostile", () => {
   it("lets no markup through outside JSON-LD", () => {
@@ -149,6 +153,14 @@ describe("a record whose every string is hostile", () => {
     expect(jsonLd).not.toContain("<");
     expect(jsonLd).not.toContain(">");
     expect(jsonLd).not.toContain("&");
+  });
+
+  it("puts the whole record in the JSON data block as data, for the copy json button", () => {
+    expect(JSON.parse(recordJson)).toEqual(JSON.parse(JSON.stringify(hostile)));
+    expect(recordJson).not.toContain("<");
+    expect(recordJson).not.toContain(">");
+    expect(recordJson).not.toContain("&");
+    expect(page.match(/<\/script>/g)).toHaveLength(3); // JSON-LD, the record and the copy script
   });
 
   it("escapes a hostile message page", () => {

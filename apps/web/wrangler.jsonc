@@ -5,6 +5,9 @@
   "name": "whichlei-site",
   "main": "src/worker.ts",
   "compatibility_date": "2026-09-29",
+  // The Worker reads the index host, another Worker on this account. Without this flag that
+  // fetch fails (error 1042) on workers.dev, and on one zone it would skip the other Worker.
+  "compatibility_flags": ["global_fetch_strictly_public"],
   "workers_dev": true,
   "send_metrics": false,
   "assets": {
@@ -21,6 +24,10 @@
     // The site's own origin, such as "https://whichlei.com". Canonical links, JSON-LD and
     // redirects point at it. Empty until launch: they use the request's own origin. The
     // Cache API also needs a custom domain.
-    "CANONICAL_ORIGIN": ""
+    "CANONICAL_ORIGIN": "",
+    // Where the published index is served from, for the names of legal form and registration
+    // authority codes (<build>/codes.json). The same value as INDEX_ORIGIN in deploy-site.yml
+    // (a test checks). Empty: record pages show the codes.
+    "INDEX_ORIGIN": "https://whichlei-index.lumenspring.workers.dev"
   }
 }

@@ -1,4 +1,8 @@
+import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
+import { parseCodes } from "../src/codes.ts";
+import { renderRecordPage } from "../src/record.ts";
+import { parsedRecord } from "../src/test-helpers.ts";
 
 const ERICSSON = "549300W9JLPW15XIFM52";
 
@@ -44,6 +48,61 @@ test("leaves the home page to the static assets", async ({ request }) => {
   expect(style.headers()["content-type"]).toContain("text/css");
 });
 
+// The page the Worker renders, served from a route: its stylesheet and scripts are the site's.
+// The Worker's own calls to GLEIF cannot be mocked from the browser, so these tests give the
+// browser the page the renderer makes from a recorded record and the fixture codes.
+test.describe("record page with names and copy json", () => {
+  const codes = parseCodes(
+    JSON.parse(readFileSync(new URL("../fixtures/codes.json", import.meta.url), "utf8")),
+  );
+
+  async function open(page: import("@playwright/test").Page) {
+    const record = await parsedRecord("record-ericsson");
+    await page.route(`**/lei/${ERICSSON}`, async (route) => {
+      await route.fulfill({
+        contentType: "text/html; charset=utf-8",
+        body: renderRecordPage(record, { canonicalOrigin: "http://localhost:8787", codes }),
+      });
+    });
+    await page.goto(`/lei/${ERICSSON}`);
+    return record;
+  }
+
+  test("shows the legal form and the register by name, with the codes beside them", async ({
+    page,
+  }) => {
+    await open(page);
+    await expect(page.locator('[data-field="legal-form"]')).toHaveText("Aktiebolag XJHM");
+    await expect(page.locator('[data-field="register"]')).toHaveText(
+      "556016-0680 Bolagsverket · RA000544",
+    );
+  });
+
+  test("copies the normalised record as JSON", async ({ browser }) => {
+    const context = await browser.newContext({
+      permissions: ["clipboard-read", "clipboard-write"],
+    });
+    const page = await context.newPage();
+    const record = await open(page);
+    await page.getByRole("button", { name: "copy json" }).click();
+    await expect(page.getByRole("status")).toHaveText("copied json");
+    const copied = await page.evaluate("navigator.clipboard.readText()");
+    expect(JSON.parse(copied as string)).toEqual(JSON.parse(JSON.stringify(record)));
+    // Readable: indented, one field to a line.
+    expect(copied).toContain('\n  "lei": "549300W9JLPW15XIFM52"');
+    await context.close();
+  });
+
+  test("shows no copy json button without JavaScript", async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await open(page);
+    await expect(page.getByRole("button", { name: "copy json" })).toBeHidden();
+    await expect(page.locator("h1")).toHaveText(ERICSSON);
+    await context.close();
+  });
+});
+
 // A real record needs the real GLEIF API, so this runs only against a deployed site
 // (BASE_URL, as in the deploy workflow).
 test.describe("live record", () => {
@@ -59,6 +118,9 @@ test.describe("live record", () => {
     await expect(page.getByText("Telefonaktiebolaget LM Ericsson").first()).toBeVisible();
     await expect(page.locator('[data-field="status"]')).toContainText("active");
     await expect(page.locator('[data-field="golden-copy"]')).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
+    // The names of the codes come from the published index.
+    await expect(page.locator('[data-field="legal-form"]')).toContainText("Aktiebolag");
+    await expect(page.locator('[data-field="register"]')).toContainText("Bolagsverket");
     await expect(page.getByRole("button", { name: "copy lei" })).toBeHidden();
     await context.close();
   });

@@ -52,6 +52,9 @@ function tinyIndex() {
   return { manifest, files, x, y };
 }
 
+/** An LEI in groups of four: "5493 00W9 JLPW 15XI FM52". */
+const grouped = (lei: string) => lei.match(/.{4}/g)?.join(" ") ?? lei;
+
 describe("readInput", () => {
   it("reads every input as a name, and notes what else it is", () => {
     expect(readInput("")).toEqual({ kind: "empty" });
@@ -62,9 +65,15 @@ describe("readInput", () => {
       badLei: false,
       nameFirst: false,
     });
+    // In groups of four, as printed; any other spacing is a name.
+    expect(readInput(` ${grouped(ERICSSON.toLowerCase())} `)).toMatchObject({
+      kind: "name",
+      lei: { entry: { lei: ERICSSON } },
+      nameFirst: true,
+    });
     expect(
       readInput(` ${ERICSSON.toLowerCase().slice(0, 10)} ${ERICSSON.toLowerCase().slice(10)} `),
-    ).toMatchObject({ kind: "name", lei: { entry: { lei: ERICSSON } }, nameFirst: true });
+    ).toMatchObject({ kind: "name", lei: null, nameFirst: true });
     expect(readInput("549300W9JLPW15XIFM51")).toMatchObject({ lei: null, badLei: true });
     expect(readInput("ericsson")).toMatchObject({ kind: "name", tokens: ["ericsson"], lei: null });
   });
@@ -331,11 +340,7 @@ describe("Search", () => {
 
   it("shows only the row for a valid LEI that no name matches", async () => {
     const { search } = withServer();
-    for (const text of [
-      ERICSSON,
-      ERICSSON.toLowerCase(),
-      ` ${ERICSSON.slice(0, 8)} ${ERICSSON.slice(8)}`,
-    ]) {
+    for (const text of [ERICSSON, ERICSSON.toLowerCase(), ` ${grouped(ERICSSON)}`]) {
       await search.input(text);
       await search.pause();
       expect(search.state).toMatchObject({ phase: "done", lei: "valid" });

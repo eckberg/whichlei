@@ -13,6 +13,8 @@ export const MAX_RECORD_TTL = DAY;
 /** Used when the record does not say which golden copy it came from. */
 export const UNDATED_RECORD_TTL = HOUR;
 export const NOT_FOUND_TTL = HOUR;
+/** A record page that lacks the names of its codes, because the index host did not answer. */
+export const DEGRADED_TTL = MIN_RECORD_TTL;
 
 /** Seconds to keep a record that came from the golden copy published at `goldenCopyDate`. */
 export function recordTtl(goldenCopyDate: string | null, now: Date): number {
