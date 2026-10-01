@@ -255,12 +255,16 @@ export function infoLine(
       return line("not a valid lei: the check digits don’t match (iso 7064 mod 97-10)", "bad");
     case "no-match":
       return instead(line(state.message || "no matches", ""));
-    case "error":
-      return {
-        html: html`<span class="bad">${state.message}</span><button class="btn" type="button" data-act="${state.reload ? "reload" : "retry"}">${state.reload ? "reload" : "retry"}</button>`,
-        text: state.message,
-        tone: "bad",
-      };
+    case "error": {
+      // The index failed; what the lookups found, or could not do, is still worth saying.
+      const own: [Html, string][] = [
+        [
+          html`<span class="bad">${state.message}</span><button class="btn" type="button" data-act="${state.reload ? "reload" : "retry"}">${state.reload ? "reload" : "retry"}</button>`,
+          state.message,
+        ],
+      ];
+      return { ...joined([...own, ...extra]), tone: "bad" };
+    }
     case "done": {
       const parts: [Html, string][] = [];
       if (state.lei === "valid" && !lookups.leiMissing) {

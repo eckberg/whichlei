@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadFixture } from "../test-helpers.ts";
-import { LOOKUP_DEBOUNCE_MS, type LookupState, Lookups } from "./lookups.ts";
+import { LOOKUP_DEBOUNCE_MS, type LookupState, Lookups, REGISTER_DEBOUNCE_MS } from "./lookups.ts";
 import { fakeGleif, held, json } from "./test-helpers.ts";
 
 const ERICSSON = "549300W9JLPW15XIFM52";
@@ -155,7 +155,7 @@ describe("one request per reading", () => {
       return json(body, url.includes("registeredAs") ? 200 : 404);
     });
     lookups.input(" HRB  30000 ");
-    await settle();
+    await settle(REGISTER_DEBOUNCE_MS);
     expect(gleif.calls).toHaveLength(1);
     expect(gleif.calls[0]?.url).toContain("filter%5Bentity.registeredAs%5D=HRB+30000");
     const reading = lookups.state.readings[0];
@@ -169,7 +169,7 @@ describe("one request per reading", () => {
   it("asks once for each reading of an input that has two", async () => {
     const { gleif, lookups } = setup();
     lookups.input("1234DE56");
-    await settle();
+    await settle(REGISTER_DEBOUNCE_MS);
     expect(gleif.calls).toHaveLength(2);
     expect(phases(lookups)).toEqual({ bic: "done", "reg.no": "done" });
   });
@@ -307,7 +307,7 @@ describe("failures", () => {
         : new Response("", { status: 429 }),
     );
     lookups.input("1234DE56");
-    await settle();
+    await settle(REGISTER_DEBOUNCE_MS);
     expect(phases(lookups)).toEqual({ bic: "done", "reg.no": "busy" });
   });
 
@@ -320,7 +320,7 @@ describe("failures", () => {
         : new Response("", { status: 429 });
     });
     lookups.input("1234DE56");
-    await settle();
+    await settle(REGISTER_DEBOUNCE_MS);
     expect(gleif.calls).toHaveLength(2);
     up = true;
     lookups.retry();
@@ -337,5 +337,104 @@ describe("failures", () => {
     lookups.retry();
     await settle(2000);
     expect(gleif.calls).toHaveLength(1);
+  });
+});
+
+describe("a register number waits for typing to be over", () => {
+  it("fires 800 ms after the last key, and an ISIN or BIC beside it after 350", async () => {
+    const { gleif, lookups } = setup();
+    lookups.input("1234DE56");
+    await settle(LOOKUP_DEBOUNCE_MS);
+    expect(gleif.calls).toHaveLength(1);
+    expect(gleif.calls[0]?.url).toContain("filter%5Bbic%5D");
+    await settle(REGISTER_DEBOUNCE_MS - LOOKUP_DEBOUNCE_MS - 1);
+    expect(gleif.calls).toHaveLength(1);
+    await settle(1);
+    expect(gleif.calls).toHaveLength(2);
+    expect(gleif.calls[1]?.url).toContain("entity.registeredAs");
+  });
+
+  it("sends one request for a register number typed at 400 ms a key", async () => {
+    const { gleif, lookups } = setup();
+    const typed = "556016-0680";
+    for (let i = 1; i <= typed.length; i++) {
+      lookups.input(typed.slice(0, i));
+      await settle(400);
+    }
+    await settle(REGISTER_DEBOUNCE_MS);
+    expect(gleif.calls).toHaveLength(1);
+    expect(gleif.calls[0]?.url).toContain("entity.registeredAs%5D=556016-0680");
+  });
+});
+
+describe("a request that does not answer", () => {
+  it("ends as offline after the timeout, with a retry that asks again", async () => {
+    vi.useRealTimers();
+    let hang = true;
+    const gleif = fakeGleif((_url, init) =>
+      hang
+        ? new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener("abort", () => reject(init.signal?.reason));
+          })
+        : json(loadFixture("lookup-isin").body),
+    );
+    const lookups = new Lookups({ fetch: gleif.fetch, debounceMs: 1, timeoutMs: 40 });
+    lookups.input(ISIN);
+    await new Promise((resolve) => setTimeout(resolve, 15));
+    expect(phases(lookups)).toEqual({ isin: "loading" });
+    await new Promise((resolve) => setTimeout(resolve, 120));
+    expect(phases(lookups)).toEqual({ isin: "offline" });
+    hang = false;
+    lookups.retry();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(phases(lookups)).toEqual({ isin: "done" });
+    expect(gleif.calls).toHaveLength(2);
+  });
+});
+
+describe("Retry-After", () => {
+  const busy = (seconds: number | null) => () =>
+    new Response("", {
+      status: 429,
+      ...(seconds === null ? {} : { headers: { "retry-after": String(seconds) } }),
+    });
+
+  it("holds every lookup until it has passed, showing the busy state", async () => {
+    const { gleif, lookups } = setup(busy(30));
+    lookups.input(ISIN);
+    await settle();
+    expect(phases(lookups)).toEqual({ isin: "busy" });
+    expect(gleif.calls).toHaveLength(1);
+
+    // Another input, and a retry: nothing is asked while GLEIF has asked for time.
+    lookups.input("tomcjp22");
+    await settle();
+    expect(phases(lookups)).toEqual({ bic: "busy" });
+    lookups.retry();
+    expect(phases(lookups)).toEqual({ bic: "busy" });
+    await settle(28_000);
+    lookups.retry();
+    expect(gleif.calls).toHaveLength(1);
+
+    // Past it, a retry asks.
+    await settle(3000);
+    lookups.retry();
+    expect(phases(lookups)).toEqual({ bic: "loading" });
+    expect(gleif.calls).toHaveLength(2);
+  });
+
+  it("does not believe an absurd wait, and holds nothing without the header", async () => {
+    const absurd = setup(busy(86_400));
+    absurd.lookups.input(ISIN);
+    await settle();
+    await settle(301_000);
+    absurd.lookups.retry();
+    expect(absurd.gleif.calls).toHaveLength(2);
+
+    const none = setup(busy(null));
+    none.lookups.input(ISIN);
+    await settle();
+    none.lookups.retry();
+    expect(none.gleif.calls).toHaveLength(2);
   });
 });

@@ -57,9 +57,15 @@ export function parseCodes(value: unknown): Codes | null {
 export function createCodesReader(deps: CodesDeps) {
   const memory = new Map<string, { codes: Codes | null; until: number }>();
   const reading = new Map<string, Promise<Codes | null>>();
+  /**
+   * Parsed names by origin and build. A build's file never changes, so a warm Worker parses it
+   * once, however often `index.json` is looked at again. Two builds are kept: the live one and
+   * the one before.
+   */
+  const byBuild = new Map<string, Codes>();
 
   /** A JSON file from the Cache API, else from the index host (and then into the cache). */
-  async function json(url: string, seconds: number): Promise<unknown> {
+  async function json(url: string, seconds: number, signal: AbortSignal): Promise<unknown> {
     const cache = deps.cache();
     const key = new Request(url);
     try {
@@ -70,7 +76,7 @@ export function createCodesReader(deps: CodesDeps) {
     }
     const response = await deps.fetch(url, {
       headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(deps.timeoutMs),
+      signal,
     });
     if (!response.ok) throw new Error(`${url}: ${response.status}`);
     const text = await response.text();
@@ -90,11 +96,24 @@ export function createCodesReader(deps: CodesDeps) {
   }
 
   async function read(origin: string): Promise<Codes | null> {
-    const manifest = await json(`${origin}/index.json`, MANIFEST_CACHE_SECONDS);
+    // One deadline for both files: a slow host costs the page `timeoutMs`, not twice that.
+    const signal = AbortSignal.timeout(deps.timeoutMs);
+    const manifest = await json(`${origin}/index.json`, MANIFEST_CACHE_SECONDS, signal);
     const build = (manifest as { build?: unknown } | null)?.build;
     if (typeof build !== "string" || !BUILD.test(build)) throw new Error("no build in index.json");
+    const known = byBuild.get(`${origin}/${build}`);
+    if (known) return known;
     // A build's files never change.
-    return parseCodes(await json(`${origin}/${build}/codes.json`, 365 * 24 * 3600));
+    const codes = parseCodes(await json(`${origin}/${build}/codes.json`, 365 * 24 * 3600, signal));
+    if (codes) {
+      byBuild.set(`${origin}/${build}`, codes);
+      while (byBuild.size > 2) {
+        const oldest = byBuild.keys().next().value;
+        if (oldest === undefined) break;
+        byBuild.delete(oldest);
+      }
+    }
+    return codes;
   }
 
   /**

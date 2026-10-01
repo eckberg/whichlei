@@ -72,9 +72,16 @@ export interface IdentifierReadings {
   bic?: string;
 }
 
+// A BIC written in its groups: party (4), country (2), location (2), branch (3, optional),
+// one space between groups. Any other spacing is not a BIC: "Sony Corp" and "Barclays PLC" are
+// names that become BIC shapes once their spaces are gone.
+const BIC_GROUPED = /^\S{4} \S{2} \S{2}( \S{3})?$/;
+
 /**
  * Every identifier an input could be, normalised: spaces removed, upper case. More than one
- * reading is possible; an input with none is a name or a register number.
+ * reading is possible; an input with none is a name or a register number. Spaces are ignored
+ * for an LEI and an ISIN, whose check digits keep names out. A BIC has none, so it may have
+ * spaces only between its groups (4, 2, 2 and 3 characters, all of them).
  */
 export function identifierReadings(input: string): IdentifierReadings {
   // Upper-case a-z only: toUpperCase() would turn "ß" into "SS" and "ı" into "I".
@@ -82,6 +89,7 @@ export function identifierReadings(input: string): IdentifierReadings {
   const readings: IdentifierReadings = {};
   if (isValidLei(code)) readings.lei = code;
   if (isValidIsin(code)) readings.isin = code;
-  if (isValidBic(code)) readings.bic = code;
+  const trimmed = input.trim();
+  if ((!/\s/.test(trimmed) || BIC_GROUPED.test(trimmed)) && isValidBic(code)) readings.bic = code;
   return readings;
 }

@@ -172,7 +172,7 @@ async function lookup(
   lei: string,
   origin: string,
   deps: Deps,
-  codes: Promise<Codes | null>,
+  codes: () => Promise<Codes | null>,
   expectCodes: boolean,
 ): Promise<{
   answer: Answer;
@@ -188,20 +188,22 @@ async function lookup(
     // A record for another LEI is an answer we cannot trust: never show or cache it.
     if (record.lei !== lei)
       throw new GleifError("failed", `GLEIF answered ${record.lei} for ${lei}`);
-    // Read alongside the record, so it adds no waiting when the index host is quick. It never
-    // rejects: a page without names is still a page.
-    const names = await codes;
+    // Only for a record that is going to be shown: an unknown LEI costs the index host nothing.
+    // It never rejects: a page without names is still a page.
+    const names = await codes();
+    // Names that should have been there and were not: no browser keeps the page for an hour.
+    const degraded = expectCodes && names === null;
     const answer = {
       status: 200,
       body: renderRecordPage(record, { canonicalOrigin: origin, codes: names }),
-      cacheControl: publicFor(BROWSER_MAX_AGE),
+      cacheControl: publicFor(degraded ? DEGRADED_TTL : BROWSER_MAX_AGE),
     };
     return {
       answer,
       outcome: "found",
       goldenCopyDate: record.source.goldenCopyDate,
-      // Names that should have been there and were not: do not keep the page for a day.
-      degraded: expectCodes && names === null,
+      // And do not keep it in the cache for a day either.
+      degraded,
     };
   } catch (error) {
     if (error instanceof GleifError && error.kind === "not-found") {
@@ -228,10 +230,15 @@ async function fromCache(cache: CacheLike | null, key: Request): Promise<Answer 
   try {
     const hit = await cache.match(key);
     if (hit === undefined) return null;
+    // A browser never keeps a page longer than the cache does: a page stored for 5 minutes
+    // (names missing) is kept by browsers for 5 minutes too.
+    const stored = Number(/max-age=(\d+)/.exec(hit.headers.get("cache-control") ?? "")?.[1]);
     return {
       status: hit.status,
       body: await hit.text(),
-      cacheControl: publicFor(BROWSER_MAX_AGE),
+      cacheControl: publicFor(
+        Number.isFinite(stored) ? Math.min(BROWSER_MAX_AGE, stored) : BROWSER_MAX_AGE,
+      ),
       headers: { "x-cache": "HIT" },
     };
   } catch {
@@ -314,7 +321,7 @@ async function serveLei(
     asked.lei,
     origin,
     deps,
-    readCodes(env.INDEX_ORIGIN),
+    () => readCodes(env.INDEX_ORIGIN),
     (env.INDEX_ORIGIN ?? "").trim() !== "",
   );
   toCache(cache, key, answer, outcome, goldenCopyDate, degraded, deps, ctx);

@@ -15,10 +15,19 @@ import {
   type LeiRecord,
   type LeiSummary,
 } from "@whichlei/gleif";
-import { type LookupReading, lookupReadings, readingKey } from "./readings.ts";
+import { type LookupReading, lookupReadings, type ReadingKind, readingKey } from "./readings.ts";
 
 /** Quiet time after the last key before the lookups fire. */
 export const LOOKUP_DEBOUNCE_MS = 350;
+/**
+ * The same for a register number, which has no check digit: every prefix of "556016-0680" is
+ * one too, so it waits for typing to be over, not just paused.
+ */
+export const REGISTER_DEBOUNCE_MS = 800;
+/** How long one request may take before it counts as not answered. */
+export const LOOKUP_TIMEOUT_MS = 8000;
+/** The longest wait a Retry-After is believed for, in seconds. */
+const MAX_HOLD_SECONDS = 300;
 
 /** What a lookup shows per hit: what the result row and the preview need. */
 export interface LookupHit {
@@ -58,6 +67,12 @@ export interface LookupOptions {
   /** Defaults to the global `fetch`. */
   fetch?: Fetch;
   debounceMs?: number;
+  /** Quiet time for a register number. */
+  registerDebounceMs?: number;
+  /** Milliseconds before a request that has not answered is given up. */
+  timeoutMs?: number;
+  /** Milliseconds, like `Date.now`: for the wait a 429 asks for. */
+  now?: () => number;
 }
 
 interface Answer {
@@ -86,16 +101,24 @@ const EMPTY: LookupState = { text: "", readings: [] };
 export class Lookups {
   readonly #fetch: Fetch | undefined;
   readonly #debounceMs: number;
+  readonly #registerDebounceMs: number;
+  readonly #timeoutMs: number;
+  readonly #now: () => number;
   readonly #listeners = new Set<(state: LookupState) => void>();
   #state: LookupState = EMPTY;
   /** Answers by reading, for the page session. Failures are not kept: they are retried. */
   readonly #cache = new Map<string, Answer>();
   readonly #inflight = new Map<string, AbortController>();
-  #timer: ReturnType<typeof setTimeout> | undefined;
+  #timers: ReturnType<typeof setTimeout>[] = [];
+  /** No request until this time: GLEIF said 429 and when to come back. */
+  #heldUntil = 0;
 
   constructor(options: LookupOptions = {}) {
     this.#fetch = options.fetch;
     this.#debounceMs = options.debounceMs ?? LOOKUP_DEBOUNCE_MS;
+    this.#registerDebounceMs = options.registerDebounceMs ?? REGISTER_DEBOUNCE_MS;
+    this.#timeoutMs = options.timeoutMs ?? LOOKUP_TIMEOUT_MS;
+    this.#now = options.now ?? Date.now;
   }
 
   get state(): LookupState {
@@ -109,7 +132,7 @@ export class Lookups {
 
   /** The text in the search box changed. */
   input(text: string): void {
-    clearTimeout(this.#timer);
+    this.#clearTimers();
     const readings = lookupReadings(text);
     const keys = new Set(readings.map(readingKey));
     // A request for something no longer in the box is stale.
@@ -130,20 +153,42 @@ export class Lookups {
       return { ...reading, phase, hits: [], total: 0 };
     });
     this.#publish({ text, readings: states });
-    if (states.some((state) => state.phase === "waiting")) {
-      this.#timer = setTimeout(() => this.#fire(["waiting"]), this.#debounceMs);
+    // Each kind waits its own time; the readings that share one are fired together.
+    const waits = new Set(
+      states.filter((state) => state.phase === "waiting").map((state) => this.#waitFor(state.kind)),
+    );
+    for (const ms of waits) {
+      this.#timers.push(
+        setTimeout(() => this.#fire(["waiting"], (kind) => this.#waitFor(kind) === ms), ms),
+      );
     }
+  }
+
+  #waitFor(kind: ReadingKind): number {
+    return kind === "reg.no" ? this.#registerDebounceMs : this.#debounceMs;
+  }
+
+  #clearTimers() {
+    for (const timer of this.#timers) clearTimeout(timer);
+    this.#timers = [];
   }
 
   /** Ask again for every reading that failed, now. */
   retry(): void {
-    clearTimeout(this.#timer);
-    this.#fire(["busy", "offline"]);
+    this.#clearTimers();
+    this.#fire(["busy", "offline"], () => true);
   }
 
-  #fire(from: LookupPhase[]) {
-    const due = this.#state.readings.filter((state) => from.includes(state.phase));
+  #fire(from: LookupPhase[], wanted: (kind: ReadingKind) => boolean) {
+    const due = this.#state.readings.filter(
+      (state) => from.includes(state.phase) && wanted(state.kind),
+    );
     if (due.length === 0) return;
+    if (this.#now() < this.#heldUntil) {
+      // GLEIF asked for time: no request until it has passed.
+      for (const reading of due) this.#set(reading, { phase: "busy", hits: [], total: 0 });
+      return;
+    }
     for (const reading of due) this.#set(reading, { phase: "loading" });
     for (const reading of due) void this.#run(reading);
   }
@@ -154,7 +199,8 @@ export class Lookups {
     this.#inflight.set(key, controller);
     try {
       const answer = await query(reading, {
-        signal: controller.signal,
+        // Stale (the box moved on) or too slow: either ends the request.
+        signal: AbortSignal.any([controller.signal, AbortSignal.timeout(this.#timeoutMs)]),
         ...(this.#fetch ? { fetch: this.#fetch } : {}),
       });
       this.#cache.set(key, answer);
@@ -162,6 +208,11 @@ export class Lookups {
     } catch (error) {
       if (controller.signal.aborted) return;
       const busy = error instanceof GleifError && error.kind === "rate-limited";
+      if (busy) {
+        // Browsers hide Retry-After from another origin; when it is there, it is believed.
+        const seconds = Math.min((error as GleifError).retryAfter ?? 0, MAX_HOLD_SECONDS);
+        this.#heldUntil = Math.max(this.#heldUntil, this.#now() + seconds * 1000);
+      }
       this.#set(reading, { phase: busy ? "busy" : "offline", hits: [], total: 0 });
     } finally {
       if (this.#inflight.get(key) === controller) this.#inflight.delete(key);

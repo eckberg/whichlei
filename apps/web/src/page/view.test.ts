@@ -260,6 +260,21 @@ describe("infoLine with lookups", () => {
     expect(out.html.value).not.toContain('data-act="retry"');
   });
 
+  it("keeps the lookups' news and retry beside an error of the index", () => {
+    const error = state({ phase: "error", hits: [], message: "could not reach the index" });
+    const out = infoLine(error, {
+      ...none,
+      found: [{ kind: "isin", shown: 1, total: 1 }],
+      failure: "busy",
+    });
+    expect(out.text).toBe(
+      "could not reach the index · isin · 1 hit · GLEIF is busy, try again in a minute",
+    );
+    expect(out.html.value).toContain('data-act="retry"');
+    expect(out.html.value).toContain('data-act="retry-lookup"');
+    expect(out.tone).toBe("bad");
+  });
+
   it("keeps the names' count beside a failure", () => {
     const out = infoLine(state(), { ...none, failure: "offline" });
     expect(out.text).toBe("1 match · could not reach GLEIF");

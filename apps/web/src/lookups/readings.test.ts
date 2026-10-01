@@ -35,20 +35,39 @@ describe("lookupReadings", () => {
   it("can read an input as a BIC and as a register number, the BIC first", () => {
     expect(kinds("1234DE56")).toEqual(["bic", "reg.no"]);
     // No such country in a BIC, so only the register number is left.
-    expect(kinds("ZZ12QQ34")).toEqual(["reg.no"]);
+    expect(kinds("ZZ123QQ34")).toEqual(["reg.no"]);
   });
 
   it.each([
     ["a name", "telefonaktiebolaget lm ericsson"],
     ["a name with a year", "AST Bond Portfolio 2021"],
     ["too short", "1234"],
-    ["too few digits", "AB123"],
+    ["too few digits", "AB1234"],
+    ["a fund and a year", "Fund 2021"],
+    ["a bond and a year", "Bond 2021"],
+    ["an ETF and a year", "ETF 2025"],
+    ["a ticker, a number and a year", "AP7 2021"],
+    ["only years", "1999 2021"],
+    ["names that become BIC shapes", "Sony Corp"],
+    ["a name of one BIC-shaped word and a suffix", "Sanofi SA"],
+    ["an LEI with its last character missing", "HWUPKR0MPOU8FGXBT39"],
+    ["an LEI with a character missing, in groups", "HWUP KR0M POU8 FGXB T39"],
+    ["more than any identifier holds", "1234567890123456789012345678901234567"],
     ["punctuation a register number does not have", "5560160680!"],
     ["an LEI with the check digits wrong", "HWUPKR0MPOU8FGXBT395"],
     ["an ISIN with the check digit wrong", "US0378331006"],
     ["nothing", "   "],
   ])("reads %s as nothing", (_, input) => {
     expect(lookupReadings(input)).toEqual([]);
+  });
+
+  it("keeps register numbers that look unlike a name", () => {
+    // A Chinese unified social credit code: 18 characters.
+    expect(kinds("91350100M000100Y43")).toEqual(["reg.no"]);
+    expect(kinds("HRB 12345")).toEqual(["reg.no"]);
+    expect(kinds("B 1999 12345")).toEqual(["reg.no"]);
+    expect(kinds("12345678901234567890123456789012345")).toEqual(["reg.no"]);
+    expect(kinds("1234567890123456789012345678901234567")).toEqual([]);
   });
 
   it("does not read the shape of an ISIN or an LEI as a register number", () => {

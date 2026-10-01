@@ -16,6 +16,10 @@ API. Opening a result shows the full record with its source and date, and copies
   in the search page. It gains the names of legal form and registration authority codes (from
   the published index's `codes.json`) and a copy json button. Parents stay linked LEIs, with no
   extra request for their names.
+- Changed from the approved scope: the record view moved from the search page to slice 9's
+  server-rendered page, and parents no longer get names. Reason: slice 9 already renders every
+  record at `/lei/<code>`, so a second view would duplicate it, and a name per parent would cost
+  GLEIF requests (one per parent, per view) against its per-IP limit.
 - Errors: not found, rate limited, offline. Each says what happened and what to do.
 
 ## Not in scope
@@ -30,13 +34,18 @@ pause, not per keystroke: GLEIF limits requests per IP.
 
 ## Lookups in the page
 `apps/web/src/lookups/`, no DOM, tested with a fake `fetch`. The readings of an input are
-`identifierReadings` plus a register number (at least 5 characters of letters, digits, spaces
-and `. - /`, at least 4 digits, digits at least half of the letters and digits, and not the
-shape of an LEI or ISIN: "AST Bond Portfolio 2021" is a name). Each reading fires its lookup
-after 350 ms without a key, once per distinct reading, cached for the page session; a request for
-a reading no longer in the box is aborted. Hits are rows above the names, tagged `isin`, `bic`
-or `reg.no`. An LEI row gains its legal name and status when `fetchRecord` answers, and goes
-("no such LEI at GLEIF") when GLEIF says not found. A 429 is "GLEIF is busy, try again in a
+`identifierReadings` plus a register number. Only what looks like a code is looked up, because
+every lookup sends the input to GLEIF (DESIGN.md decision 25): a BIC has spaces only between
+all its groups; a register number has at least 5 characters of letters, digits, spaces and
+`. - /`, at least 5 digits, digits at least half of the letters and digits, a run of digits that
+is not a year ("Fund 2021" is a name), and is not 19 or 20 characters in one piece; an input of
+more than 35 characters has no reading. Each reading fires its lookup after 350 ms without a
+key (800 ms for a register number, which has no check digit, so every prefix is one too), once per
+distinct reading, cached for the page session; a request for a reading no longer in the box is
+aborted, and one that takes over 8 s ends as "could not reach GLEIF". After a 429 with a
+Retry-After, no lookup is sent until it has passed. Hits are rows above the names, tagged `isin`,
+`bic` or `reg.no`. An LEI row gains its legal name and status when `fetchRecord` answers, and
+goes ("no such LEI at GLEIF") when GLEIF says not found. A 429 is "GLEIF is busy, try again in a
 minute", anything else "could not reach GLEIF", each with a retry; the names never wait.
 
 ## Record page

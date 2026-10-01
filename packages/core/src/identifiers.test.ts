@@ -150,6 +150,25 @@ describe("identifierReadings", () => {
     expect(identifierReadings("Volvo")).toEqual({});
   });
 
+  test("reads a BIC with spaces only between all its groups", () => {
+    expect(identifierReadings("TEER SE SS XXX")).toEqual({ bic: "TEERSESSXXX" });
+    expect(identifierReadings(" teer se ss ")).toEqual({ bic: "TEERSESS" });
+    expect(identifierReadings("TEERSESSXXX")).toEqual({ bic: "TEERSESSXXX" });
+  });
+
+  test.each([
+    "Sony Corp",
+    "Sanofi SA",
+    "Barclays PLC",
+    "Nokia Oyj",
+    "TEERSE SS",
+    "TEERSESS XXX",
+    "TEER  SE SS",
+    "TEER SE SS XX X",
+  ])("does not read %s as a BIC: the spaces are not between its groups", (input) => {
+    expect(identifierReadings(input).bic).toBeUndefined();
+  });
+
   test("upper-cases only ASCII letters", () => {
     expect(identifierReadings("ericßon")).toEqual({});
   });

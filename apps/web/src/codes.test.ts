@@ -99,16 +99,34 @@ describe("the codes reader", () => {
     expect(host.calls).toEqual([]);
   });
 
-  it("keeps what it read for a few minutes, then looks at index.json again", async () => {
+  it("looks at index.json again after a few minutes, but parses a build only once", async () => {
     const host = indexHost();
     const { codes, clock } = reader(host);
-    await codes(ORIGIN);
+    const first = await codes(ORIGIN);
     clock.advance(CODES_TTL_MS - 1);
     await codes(ORIGIN);
     expect(host.calls).toHaveLength(2);
     clock.advance(2);
+    const again = await codes(ORIGIN);
+    // index.json only: the build is the same, so its file is neither fetched nor parsed again.
+    expect(host.calls).toHaveLength(3);
+    expect(host.calls[2]).toBe(`${ORIGIN}/index.json`);
+    expect(again).toBe(first);
+  });
+
+  it("gives both requests one deadline", async () => {
+    const signals: (AbortSignal | null | undefined)[] = [];
+    const host = indexHost();
+    const { codes } = reader({
+      fetch: (url, init) => {
+        signals.push(init?.signal);
+        return host.fetch(url, init);
+      },
+    });
     await codes(ORIGIN);
-    expect(host.calls).toHaveLength(4);
+    expect(signals).toHaveLength(2);
+    expect(signals[0]).toBeDefined();
+    expect(signals[1]).toBe(signals[0]);
   });
 
   it("shares one read between requests that come together", async () => {

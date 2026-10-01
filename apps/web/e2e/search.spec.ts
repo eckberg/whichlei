@@ -602,13 +602,36 @@ test.describe("search", () => {
       await expect(page.locator("#status")).toHaveText("no such LEI at GLEIF");
     });
 
-    test("sends one request when an LEI is typed, however slowly", async ({ page }) => {
+    test("sends one request when an LEI is typed slower than the pause", async ({ page }) => {
       await open(page);
-      await box(page).pressSequentially(ERICSSON, { delay: 25 });
+      // 400 ms a key: longer than the 350 ms that counts as a pause.
+      await box(page).pressSequentially(ERICSSON, { delay: 400 });
       await expect(page.locator("#opt-0 .nm")).toContainText("Telefonaktiebolaget LM Ericsson");
-      await page.waitForTimeout(800);
+      await page.waitForTimeout(1000);
       expect(gleif.requests).toHaveLength(1);
       expect(gleif.requests[0]).toContain(`/lei-records/${ERICSSON}`);
+    });
+
+    test("sends at most two requests when a register number is typed at 400 ms a key", async ({
+      page,
+    }) => {
+      await open(page);
+      await box(page).pressSequentially(KNOWN.register, { delay: 400 });
+      await expect(page.locator("#opt-0 .via")).toHaveText("reg.no");
+      await page.waitForTimeout(1200);
+      expect(gleif.requests.length).toBeLessThanOrEqual(2);
+      expect(gleif.requests.at(-1)).toContain("filter%5Bentity.registeredAs%5D=HRB+30000");
+    });
+
+    test("sends nothing for names that are shaped like identifiers once spaces go", async ({
+      page,
+    }) => {
+      await open(page);
+      for (const name of ["Sony Corp", "Sanofi SA", "Nokia Oyj", "Fund 2021", "AP7 2021"]) {
+        await box(page).fill(name);
+        await page.waitForTimeout(1200);
+      }
+      expect(gleif.requests).toEqual([]);
     });
 
     test("sends nothing for a name, and one request for a name that is also a BIC", async ({

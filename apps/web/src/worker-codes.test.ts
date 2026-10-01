@@ -110,6 +110,11 @@ describe("when the index host fails", () => {
     expect(field(page, "register")).toBe("556016-0680 RA000544");
     // The names may be there next time: do not keep this page for a day.
     expect(t.cache.puts[0]?.cacheControl).toBe("public, max-age=300");
+    // Nor does a browser, on the first view or from the cache.
+    expect(response.headers.get("cache-control")).toBe("public, max-age=300");
+    const hit = await t.get(`/lei/${ERICSSON}`, undefined, env);
+    expect(hit.headers.get("x-cache")).toBe("HIT");
+    expect(hit.headers.get("cache-control")).toBe("public, max-age=300");
   });
 
   it("does not wait long for a host that does not answer", async () => {
@@ -135,5 +140,23 @@ describe("when the index host fails", () => {
   it("never turns a record into an error page", async () => {
     const t = harness({ gleif: world(() => Promise.reject(new Error("x"))).gleif });
     expect((await t.get(`/lei/${ERICSSON}`, undefined, env)).status).toBe(200);
+  });
+
+  it("does not read the names for an LEI GLEIF does not have, or cannot answer for", async () => {
+    const w = world();
+    const t = harness({ gleif: w.gleif });
+    expect((await t.get("/lei/549300ZZZZZZZZZZZZ46", undefined, env)).status).toBe(404);
+    expect(w.indexCalls()).toEqual([]);
+
+    const down = world();
+    const failing = harness({
+      gleif: {
+        calls: [],
+        fetch: (url, init) =>
+          url.startsWith(INDEX) ? down.gleif.fetch(url, init) : Promise.reject(new Error("down")),
+      },
+    });
+    expect((await failing.get(`/lei/${ERICSSON}`, undefined, env)).status).toBe(503);
+    expect(down.indexCalls()).toEqual([]);
   });
 });
