@@ -180,7 +180,8 @@ async function request(
 
 export async function getJson(url: string, http: Http = {}): Promise<unknown> {
   return withRetries(`GET ${url}`, http, async (idle) => {
-    const response = await request(url, http, idle, "application/json");
+    // GLEIF's APIs speak JSON:API; the mapping API answers 406 to plain application/json.
+    const response = await request(url, http, idle, "application/vnd.api+json, application/json");
     return response.json();
   });
 }
