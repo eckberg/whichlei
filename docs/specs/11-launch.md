@@ -1,6 +1,6 @@
 # 11 · Launch
 
-Status: approved
+Status: done, except the owner's Fathom dashboard check (below)
 
 ## Goal
 whichlei is live on https://whichlei.com. Search engines may index it there and only
@@ -192,3 +192,30 @@ Each with its evidence in the PR or this spec.
   `window.fathom`: within the spread of two baseline runs in the same session.
 - Owner: a Fathom dashboard screenshot with views on `/` and `/lei/` and a `search` event.
 - README and about page merged; DESIGN.md decisions 27–32 and 23 updated.
+
+## Result (2026-10-01)
+Live on https://whichlei.com. Deploy run 36872209597 is green, including the live check
+against the apex: no cookie in the jar or on the wire from our hosts or Fathom, no CSP
+violation, a record page with names (`max-age=3600`, "Aktiebolag"), Fathom page views on `/`
+and `/lei/`, and one `search` event.
+
+| Check | Result |
+|---|---|
+| `https://whichlei.com/` | 200 |
+| `http://whichlei.com/` | 301 to `https://whichlei.com/` |
+| `https://www.whichlei.com/lei/549300W9JLPW15XIFM52?x=1` | 301 to `https://whichlei.com/lei/549300W9JLPW15XIFM52?x=1` |
+| `https://index.whichlei.com/index.json` | 200, `access-control-allow-origin: *` |
+| `robots.txt` | `Allow: /` on the apex, `Disallow: /` on workers.dev |
+| Record page canonical | `https://whichlei.com/lei/…` on both hosts; workers.dev also sends `x-robots-tag: noindex` |
+| Cache API on the apex | the same LEI twice: `x-cache: MISS`, then `HIT` |
+
+What the first live runs caught, and what changed:
+- GLEIF's load balancer sends `Set-Cookie` on lookups. The browser stored nothing; the page now
+  fetches GLEIF and the index with `credentials: "omit"` (PR #19).
+- Cloudflare Web Analytics and RUM injected `static.cloudflareinsights.com/beacon.min.js` into
+  every HTML page, for browsers only. The CSP blocked it. The owner turned both off in the
+  dashboard; the live check fails if they come back.
+
+Owner settings done: Always Use HTTPS, Web Analytics off (EU and non-EU), RUM off. Still to
+confirm: minimum TLS 1.2, Bot Fight Mode off, Fathom allowed domains, and a Fathom dashboard
+screenshot showing `/`, `/lei/` and a `search` event.
