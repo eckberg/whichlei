@@ -145,6 +145,10 @@ Names for the codes a record carries, so a page shows "Aktiebolag" and "Bolagsve
 
 A code that is missing from the file is shown as the code.
 
+The record page Worker reads it: `index.json` for the current `build`, then
+`<build>/codes.json`, each cached for a few minutes (a Worker variable and the Cache API), and
+shows the codes if either read fails (`apps/web/src/codes.ts`).
+
 ## Report: `<build>/report.json`
 
 Added by publishing (slice 6), not by the indexer. It is the indexer's `build.json` plus what

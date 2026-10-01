@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { indexOrigin, pageCsp } from "./site.ts";
 
@@ -33,5 +34,19 @@ describe("pageCsp", () => {
 
   it("leaves the index out when there is none", () => {
     expect(pageCsp("")).toContain("connect-src 'self' https://api.gleif.org;");
+  });
+});
+
+describe("the index origin of the Worker", () => {
+  it("is the one the site is built with", () => {
+    const wrangler = readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8");
+    const workflow = readFileSync(
+      new URL("../../../.github/workflows/deploy-site.yml", import.meta.url),
+      "utf8",
+    );
+    const worker = /"INDEX_ORIGIN":\s*"([^"]*)"/.exec(wrangler)?.[1];
+    const built = /INDEX_ORIGIN:\s*(\S+)/.exec(workflow)?.[1];
+    expect(worker).toMatch(/^https:\/\//);
+    expect(worker).toBe(built);
   });
 });

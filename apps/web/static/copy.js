@@ -36,12 +36,33 @@
     }
   };
 
+  // The record as JSON: the page carries it in a data block, and the button copies it with
+  // line breaks and indentation. Null when the block is missing or is not JSON.
+  const recordJson = (id) => {
+    try {
+      return JSON.stringify(JSON.parse(document.getElementById(id).textContent), null, 2);
+    } catch {
+      return null;
+    }
+  };
+
   for (const button of document.querySelectorAll("[data-copy]")) {
     button.hidden = false;
     button.addEventListener("click", async () => {
       const text = button.getAttribute("data-copy");
       const ok = await copy(text);
       say(ok ? `copied ${text}` : "copying is blocked here: select the text and copy it");
+    });
+  }
+
+  for (const button of document.querySelectorAll("[data-copy-json]")) {
+    const text = recordJson(button.getAttribute("data-copy-json"));
+    // No data to copy: the button stays hidden.
+    if (text === null) continue;
+    button.hidden = false;
+    button.addEventListener("click", async () => {
+      const ok = await copy(text);
+      say(ok ? "copied json" : "copying is blocked here: select the text and copy it");
     });
   }
 })();

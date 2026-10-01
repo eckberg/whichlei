@@ -432,10 +432,12 @@ describe("security headers", () => {
     const csp = response.headers.get("content-security-policy") ?? "";
     expect(csp).not.toMatch(/script-src[^;]*unsafe-inline/);
     const page = await response.text();
-    // Only the JSON-LD data block and the static copy script.
+    // Only the two JSON data blocks (JSON-LD, and the record for copy json) and the static copy
+    // script.
     const scripts = [...page.matchAll(/<script\b([^>]*)>/g)].map((match) => match[1]);
     expect(scripts.sort()).toEqual([
       ' src="/scripts/copy.js" defer',
+      ' type="application/json" id="record-json"',
       ' type="application/ld+json"',
     ]);
     expect(page).not.toMatch(/\son[a-z]+=/);

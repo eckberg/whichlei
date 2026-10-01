@@ -7,8 +7,9 @@
 
 import { isValidLei } from "@whichlei/core";
 import { type Fetch, fetchRecord, GleifError } from "@whichlei/gleif";
+import { type Codes, createCodesReader } from "./codes.ts";
 import { renderMessagePage, renderRecordPage } from "./record.ts";
-import { type CacheOutcome, cacheTtl } from "./ttl.ts";
+import { type CacheOutcome, cacheTtl, DEGRADED_TTL } from "./ttl.ts";
 
 // The parts of the Workers runtime used here. Declared locally so no extra types package is
 // needed, and so tests can fake them.
@@ -36,16 +37,24 @@ export interface Env {
    * no host is indexable.
    */
   CANONICAL_ORIGIN?: string;
+  /**
+   * Where the published index is served from: the same value as INDEX_ORIGIN in deploy-site.yml.
+   * Its `codes.json` gives names to legal form and registration authority codes. Empty or
+   * unreachable: a record page shows the codes.
+   */
+  INDEX_ORIGIN?: string;
 }
 
 export interface Deps {
   /** The Cache API's default cache. Null where there is none: nothing is cached then. */
   cache(): CacheLike | null;
-  /** Used for GLEIF. */
+  /** Used for GLEIF and for the index host. */
   fetch: Fetch;
   now(): Date;
   /** How long to wait for GLEIF before answering 503. */
   gleifTimeoutMs: number;
+  /** How long to wait for the index host (index.json, then codes.json). Defaults to 2000. */
+  indexTimeoutMs?: number;
 }
 
 const BROWSER_MAX_AGE = 3600;
@@ -163,7 +172,14 @@ async function lookup(
   lei: string,
   origin: string,
   deps: Deps,
-): Promise<{ answer: Answer; outcome: CacheOutcome; goldenCopyDate: string | null }> {
+  codes: Promise<Codes | null>,
+  expectCodes: boolean,
+): Promise<{
+  answer: Answer;
+  outcome: CacheOutcome;
+  goldenCopyDate: string | null;
+  degraded: boolean;
+}> {
   try {
     const record = await fetchRecord(lei, {
       fetch: deps.fetch,
@@ -172,12 +188,21 @@ async function lookup(
     // A record for another LEI is an answer we cannot trust: never show or cache it.
     if (record.lei !== lei)
       throw new GleifError("failed", `GLEIF answered ${record.lei} for ${lei}`);
+    // Read alongside the record, so it adds no waiting when the index host is quick. It never
+    // rejects: a page without names is still a page.
+    const names = await codes;
     const answer = {
       status: 200,
-      body: renderRecordPage(record, { canonicalOrigin: origin }),
+      body: renderRecordPage(record, { canonicalOrigin: origin, codes: names }),
       cacheControl: publicFor(BROWSER_MAX_AGE),
     };
-    return { answer, outcome: "found", goldenCopyDate: record.source.goldenCopyDate };
+    return {
+      answer,
+      outcome: "found",
+      goldenCopyDate: record.source.goldenCopyDate,
+      // Names that should have been there and were not: do not keep the page for a day.
+      degraded: expectCodes && names === null,
+    };
   } catch (error) {
     if (error instanceof GleifError && error.kind === "not-found") {
       const answer = message(
@@ -186,10 +211,15 @@ async function lookup(
         "No such LEI",
         `GLEIF has no record for ${lei}. The code is well formed, but no entity has it.`,
       );
-      return { answer, outcome: "not-found", goldenCopyDate: null };
+      return { answer, outcome: "not-found", goldenCopyDate: null, degraded: false };
     }
     const retryAfter = error instanceof GleifError ? error.retryAfter : null;
-    return { answer: unavailable(retryAfter), outcome: "failure", goldenCopyDate: null };
+    return {
+      answer: unavailable(retryAfter),
+      outcome: "failure",
+      goldenCopyDate: null,
+      degraded: false,
+    };
   }
 }
 
@@ -215,10 +245,12 @@ function toCache(
   answer: Answer,
   outcome: CacheOutcome,
   goldenCopyDate: string | null,
+  degraded: boolean,
   deps: Deps,
   ctx: ExecutionContext,
 ) {
-  const ttl = cacheTtl(outcome, deps.now(), goldenCopyDate);
+  const full = cacheTtl(outcome, deps.now(), goldenCopyDate);
+  const ttl = degraded ? Math.min(full, DEGRADED_TTL) : full;
   if (cache === null || ttl === 0) return;
   const stored = new Response(answer.body, {
     status: answer.status,
@@ -227,7 +259,13 @@ function toCache(
   ctx.waitUntil(cache.put(key, stored).catch(() => {}));
 }
 
-async function serveLei(request: Request, env: Env, ctx: ExecutionContext, deps: Deps) {
+async function serveLei(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+  deps: Deps,
+  readCodes: (origin: string | undefined) => Promise<Codes | null>,
+) {
   const url = new URL(request.url);
   const asked = readLeiPath(url.pathname);
   const origin = canonicalOrigin(env, url);
@@ -272,8 +310,14 @@ async function serveLei(request: Request, env: Env, ctx: ExecutionContext, deps:
   const cached = await fromCache(cache, key);
   if (cached !== null) return respond(request, env, cached);
 
-  const { answer, outcome, goldenCopyDate } = await lookup(asked.lei, origin, deps);
-  toCache(cache, key, answer, outcome, goldenCopyDate, deps, ctx);
+  const { answer, outcome, goldenCopyDate, degraded } = await lookup(
+    asked.lei,
+    origin,
+    deps,
+    readCodes(env.INDEX_ORIGIN),
+    (env.INDEX_ORIGIN ?? "").trim() !== "",
+  );
+  toCache(cache, key, answer, outcome, goldenCopyDate, degraded, deps, ctx);
   return respond(request, env, { ...answer, headers: { ...answer.headers, "x-cache": "MISS" } });
 }
 
@@ -288,6 +332,13 @@ function serveRobots(request: Request, env: Env): Response {
 }
 
 export function createWorker(deps: Deps) {
+  // The names of codes, kept for a few minutes by this Worker (and in the Cache API).
+  const readCodes = createCodesReader({
+    fetch: deps.fetch,
+    cache: deps.cache,
+    now: () => deps.now().getTime(),
+    timeoutMs: deps.indexTimeoutMs ?? 2000,
+  });
   return {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
       const { pathname } = new URL(request.url);
@@ -303,7 +354,7 @@ export function createWorker(deps: Deps) {
         });
       }
       if (pathname === "/robots.txt") return serveRobots(request, env);
-      return serveLei(request, env, ctx, deps);
+      return serveLei(request, env, ctx, deps, readCodes);
     },
   };
 }
