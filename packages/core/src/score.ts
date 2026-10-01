@@ -128,28 +128,18 @@ export interface MatchFeatures {
   baseExact: boolean;
 }
 
-/** What scoring needs of a name beyond its tokens, worked out once per name. */
-interface Shape {
-  formStart: number;
-  initials: string[] | undefined;
-}
-const shapes = new WeakMap<NameTokens, Shape>();
-function shapeOf(name: NameTokens): Shape {
-  let shape = shapes.get(name);
-  if (shape === undefined) {
-    shape = { formStart: formStart(name.seq), initials: undefined };
-    shapes.set(name, shape);
-  }
-  return shape;
-}
-
-/** Whether the query is one word that equals the initials of the name. */
-function isInitials(query: readonly string[], name: NameTokens, shape: Shape): boolean {
+/**
+ * Whether the query is one word that equals the initials of the name. Most names fail on
+ * the first letter, before any initials are made: this runs for every candidate name.
+ */
+function isInitials(query: readonly string[], seq: readonly string[]): boolean {
   const q = query[0];
   if (query.length !== 1 || q === undefined) return false;
   if (q.length < INITIALS_LENGTH.min || q.length > INITIALS_LENGTH.max) return false;
-  shape.initials ??= nameInitials(name.seq, QUERY_STOP);
-  return shape.initials.includes(q);
+  let first = 0;
+  while (first < seq.length && QUERY_STOP.has(seq[first] as string)) first++;
+  if ((seq[first] ?? "").charCodeAt(0) !== q.charCodeAt(0)) return false;
+  return nameInitials(seq, QUERY_STOP).includes(q);
 }
 
 /** A match level function: matchLevel, or a memo of it. */
@@ -176,11 +166,9 @@ export function memoLevel(): Level {
 /** Features of one name against the query tokens. The last query token may be partial. */
 export function matchFeatures(
   query: string[],
-  name: NameTokens,
+  { seq, extras }: NameTokens,
   level: Level = matchLevel,
 ): MatchFeatures {
-  const { seq, extras } = name;
-  const shape = shapeOf(name);
   // Plain loops, no closures or temporary arrays: this runs for every candidate name on
   // every keystroke.
   const n = query.length;
@@ -229,8 +217,9 @@ export function matchFeatures(
     exact: n === seq.length && same === n,
     prefix: n <= seq.length && same >= n - 1 && (seq[n - 1] ?? "").startsWith(query[n - 1] ?? ""),
     coverage: matched.length / Math.max(1, seq.length),
-    initials: isInitials(query, name, shape),
-    baseExact: shape.formStart < seq.length && n === shape.formStart && same === n,
+    initials: isInitials(query, seq),
+    // The query is the name's leading words, and the rest is its legal form.
+    baseExact: same === n && n < seq.length && formStart(seq) === n,
   };
 }
 
