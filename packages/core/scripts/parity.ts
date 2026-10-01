@@ -14,6 +14,7 @@ import {
   type NameTokens,
   nameTokens,
   queryTokens,
+  REFERENCE_MATCH_WEIGHTS,
   topK,
 } from "../src/index.ts";
 
@@ -70,7 +71,9 @@ function checkTopTen(): boolean {
   };
   const differences: string[] = [];
   for (const { q, cand, top } of cases.queries) {
-    const ids = topK(queryTokens(q), cand.map(candidate)).map((c) => c.id);
+    const ids = topK(queryTokens(q), cand.map(candidate), 10, REFERENCE_MATCH_WEIGHTS).map(
+      (c) => c.id,
+    );
     if (!same(ids, top))
       differences.push(`${JSON.stringify(q)}: ${ids.slice(0, 3)} vs ${top.slice(0, 3)}`);
   }

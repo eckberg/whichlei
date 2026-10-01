@@ -24,22 +24,28 @@ export {
 export { type RouteOptions, type RoutingTable, route } from "./route.ts";
 export {
   type Candidate,
+  INITIALS_MIN_PROMINENCE,
   MATCH_WEIGHTS,
   type MatchFeatures,
   type MatchWeights,
   matchFeatures,
   matchLevel,
   matchScore,
+  memoLevel,
   prefixEditLe1,
   QUERY_STOP,
+  REFERENCE_MATCH_WEIGHTS,
   scoreCandidate,
   topK,
 } from "./score.ts";
 export {
   fold,
+  formStart,
   indexTerms,
+  LEGAL_FORMS,
   lastIsPrefix,
   type NameTokens,
+  nameInitials,
   nameTokens,
   queryTokens,
 } from "./tokens.ts";

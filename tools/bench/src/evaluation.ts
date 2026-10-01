@@ -13,28 +13,39 @@ export interface EvalQuery {
   targets: Set<string>;
 }
 
-/** The evaluation set, one row per query and stratum, as evaluate.load_eval reads it. */
-export function loadEval(): EvalQuery[] {
+function readSet(file: string, stratumOf: (file: string, qtype: string) => string): EvalQuery[] {
   const out: EvalQuery[] = [];
-  for (const file of ["head", "torso", "tail", "typo"]) {
-    const [header, ...rows] = readFileSync(join(REPO, `research/ranking/eval/${file}.tsv`), "utf8")
-      .split("\n")
-      .filter((line) => line !== "");
-    const columns = (header ?? "").split("\t");
-    for (const row of rows) {
-      const d = Object.fromEntries(row.split("\t").map((v, i) => [columns[i], v]));
-      const qtype = d.qtype ?? "";
-      const stratum =
-        file === "head" ? `head_${qtype}` : file === "typo" ? (qtype.split(":")[0] ?? "") : file;
-      out.push({
-        query: d.query ?? "",
-        split: d.split === "test" ? "test" : "train",
-        stratum,
-        targets: new Set([d.target_lei ?? "", ...(d.alt_leis ?? "").split("|").filter(Boolean)]),
-      });
-    }
+  const [header, ...rows] = readFileSync(join(REPO, `research/ranking/eval/${file}.tsv`), "utf8")
+    .split("\n")
+    .filter((line) => line !== "");
+  const columns = (header ?? "").split("\t");
+  for (const row of rows) {
+    const d = Object.fromEntries(row.split("\t").map((v, i) => [columns[i], v]));
+    out.push({
+      query: d.query ?? "",
+      split: d.split === "test" ? "test" : "train",
+      stratum: stratumOf(file, d.qtype ?? ""),
+      targets: new Set([d.target_lei ?? "", ...(d.alt_leis ?? "").split("|").filter(Boolean)]),
+    });
   }
   return out;
+}
+
+/** The evaluation set, one row per query and stratum, as evaluate.load_eval reads it. */
+export function loadEval(): EvalQuery[] {
+  return ["head", "torso", "tail", "typo"].flatMap((file) =>
+    readSet(file, (f, qtype) =>
+      f === "head" ? `head_${qtype}` : f === "typo" ? (qtype.split(":")[0] ?? "") : f,
+    ),
+  );
+}
+
+/**
+ * Well-known acronyms and short names with verified targets (research/ranking/
+ * build_acronyms.py), stratum "acronym". Not part of the objective.
+ */
+export function loadAcronyms(): EvalQuery[] {
+  return readSet("acronyms", () => "acronym");
 }
 
 /** Median, 90th percentile (numpy's linear interpolation) and maximum. */

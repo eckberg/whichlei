@@ -1,7 +1,12 @@
 // Scoring time in Node, keystroke by keystroke, for quick comparisons of scorer changes.
 // The browser harness (browser.ts) gives the numbers that count.
 //
-//   pnpm --filter @whichlei/bench score [--every 1]
+//   pnpm --filter @whichlei/bench score [--every 1] [--reference] [--index <dir>]
+//
+// --reference scores with the reference weights (REFERENCE_MATCH_WEIGHTS). The top 10 is checked
+// against top10.json (replay.ts: MATCH_WEIGHTS, the reference index), so it differs with
+// --reference or --index.
+// --index: a built index directory instead of $DATA_DIR/format/lines.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
@@ -9,7 +14,9 @@ import {
   type Candidate,
   decodeEntries,
   filePath,
+  MATCH_WEIGHTS,
   parseManifest,
+  REFERENCE_MATCH_WEIGHTS,
   routingTable,
   toCandidate,
   topK,
@@ -18,8 +25,15 @@ import { loadEval, summary } from "../src/evaluation.ts";
 import { keystrokes } from "../src/session.ts";
 import { OUT_DIR } from "./data.ts";
 
-const { values: args } = parseArgs({ options: { every: { type: "string", default: "1" } } });
-const dir = join(OUT_DIR, "lines");
+const { values: args } = parseArgs({
+  options: {
+    every: { type: "string", default: "1" },
+    reference: { type: "boolean", default: false },
+    index: { type: "string", default: join(OUT_DIR, "lines") },
+  },
+});
+const weights = args.reference ? REFERENCE_MATCH_WEIGHTS : MATCH_WEIGHTS;
+const dir = args.index;
 const manifest = parseManifest(JSON.parse(readFileSync(join(dir, "index.json"), "utf8")));
 const table = routingTable(manifest);
 const queries = [...new Set(loadEval().map((r) => r.query))].filter(
@@ -46,7 +60,7 @@ for (const q of queries) {
       .flatMap(file)
       .filter((c) => !seen.has(c.id) && seen.add(c.id) !== undefined);
     const t0 = performance.now();
-    const top = topK(s.tokens, candidates);
+    const top = topK(s.tokens, candidates, 10, weights);
     const ms = performance.now() - t0;
     worst = Math.max(worst, ms);
     total += ms;
