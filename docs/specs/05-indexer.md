@@ -1,6 +1,6 @@
 # 05 · Indexer
 
-Status: approved
+Status: done
 
 ## Goal
 One command builds the full index from GLEIF's published files, in the format of slice 4,
@@ -75,7 +75,11 @@ research/data/index --eval`.
   swaps of two entities and one rotation of five, all within 1e-6 of prominence of each
   other. Cause below. `check --reference` reports such files as expected (same entities,
   order differing only within 1e-6) and exits 0; any other difference exits 1.
-- Workflow run on a GitHub runner: not run yet (the branch is not pushed).
+- measured: **workflow run on a GitHub runner**, [run 36811947580](https://github.com/eckberg/whichlei/actions/runs/36811947580),
+  golden copy 2026-10-01: **13 min 31 s in all**, of which the level 1 download took 637 s
+  (GLEIF serves about 0.8 MB/s) and the level 2 file 30 s; build about 3 min, **peak RSS
+  2.0 GB**, `check --eval` 62 s. 6,471 files (771 capped), 3,333,850 of 3,448,694 entities
+  reachable (96.67%), 221.5 MB gzip, objective .6517 on the test half, .6566 on all.
 
 ### Differences from the reference, and why
 1. **Float32 log, 12 files.** numpy computes `ln(name length)` in float32 with its own

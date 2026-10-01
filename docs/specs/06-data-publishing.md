@@ -49,6 +49,10 @@ a reviewed commit, not a silent pass.
   copied, 6,440 downloaded from a local server in 21 s; 12,881 files, 1,048 MB);
   `wrangler deploy --dry-run` 6 s. Not measured here: the download of GLEIF's files, the
   download from workers.dev, and the upload by `wrangler deploy`. First real run.
+  Estimate from slice 5's runner build (13 min 31 s with the 637 s download of GLEIF's
+  level 1 file, peak RSS 2.0 GB, check 62 s) plus `index checks` and `assemble` (under a
+  minute): about 15 minutes before the live download and the upload, so the 60-minute target
+  leaves room for both; the job's timeout is 120 minutes.
 - Whether Cloudflare compresses `text/plain` assets as slice 4 assumed. Checked on the live
   index: `content-encoding` and transferred bytes for a few files.
 - Whether re-enabling the workflow resets GitHub's 60-day clock. Documented by GitHub for
