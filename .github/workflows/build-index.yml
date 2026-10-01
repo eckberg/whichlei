@@ -32,6 +32,8 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: GNU time
+        run: test -x /usr/bin/time || sudo apt-get install -y time
       - name: Build
         run: |
           /usr/bin/time -v -o "$RUNNER_TEMP/build-time.txt" \
