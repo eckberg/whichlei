@@ -144,6 +144,8 @@ export class Search {
   #reading: Reading = { kind: "empty" };
   #text = "";
   /** What the last finished pass answered: which words, from which files. */
+  /** The candidates of the last file set, merged by LEI: typing on in a word reads the same files. */
+  #merged: { key: string; candidates: Parsed } | null = null;
   #answer: { key: string; phase: Phase; hits: readonly Hit[]; message: string } | null = null;
   stats: PassStats | null = null;
 
@@ -351,22 +353,41 @@ export class Search {
       }
       const parseMs = this.#now() - parseStart;
 
-      const seen = new Set<string>();
-      const candidates: Parsed = [];
+      // Touched: the least recently used file goes first.
       for (const name of wanted) {
         const parsed = this.#parsed.get(name);
         if (!parsed) continue;
-        // Touched: the least recently used file goes first.
         this.#parsed.delete(name);
         this.#parsed.set(name, parsed);
-        for (const candidate of parsed) {
-          if (!seen.has(candidate.id)) {
-            seen.add(candidate.id);
-            candidates.push(candidate);
+      }
+      // The same files as the last pass hold the same candidates (a build's files never
+      // change), so they are merged once: typing on in a word asks for the same files.
+      const filesKey = `${manifest.build}:${files.join(",")}`;
+      let candidates: Parsed;
+      if (this.#merged?.key === filesKey) {
+        candidates = this.#merged.candidates;
+      } else {
+        const seen = new Set<string>();
+        candidates = [];
+        for (const name of wanted) {
+          for (const candidate of this.#parsed.get(name) ?? []) {
+            if (!seen.has(candidate.id)) {
+              seen.add(candidate.id);
+              candidates.push(candidate);
+            }
           }
         }
+        this.#merged = { key: filesKey, candidates };
       }
-      const hits: Hit[] = topK(tokens, candidates, this.#limit).map(({ entry }) => ({ entry }));
+      const top = topK(tokens, candidates, this.#limit);
+      // The same entries in the same order for the same words (a pause pass over files that
+      // add nothing to the top): keep the array the page holds, so it has nothing to redraw.
+      const held = this.#state.hits;
+      const same =
+        held.length === top.length &&
+        this.#state.tokens.join(" ") === tokens.join(" ") &&
+        top.every((c, i) => c.entry === held[i]?.entry);
+      const hits: readonly Hit[] = same ? held : top.map(({ entry }) => ({ entry }));
       const phase = hits.length > 0 ? "done" : "no-match";
       const message =
         hits.length === 0 && reading.partialLei > 0
@@ -386,6 +407,7 @@ export class Search {
       if (error instanceof IndexChangedError && !retried) {
         // Republished while the page was open: drop what belongs to the old build, route again.
         this.#parsed.clear();
+        this.#merged = null;
         this.#answer = null;
         this.#manifest = null;
         this.#table = null;

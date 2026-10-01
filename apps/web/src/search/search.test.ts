@@ -173,6 +173,37 @@ describe("Search", () => {
     expect(fileRequests(server)).toHaveLength(1);
   });
 
+  it("answers the same typed on as asked fresh, while reusing the merged files", async () => {
+    vi.useFakeTimers();
+    const typed = withServer();
+    for (const text of [
+      "telefonaktiebolaget lm ericsson",
+      "ericsson",
+      "volvo cars",
+      "bank of america",
+      "h&m",
+    ]) {
+      for (let k = 1; k <= text.length; k++) {
+        const prefix = text.slice(0, k);
+        await typed.search.input(prefix);
+        await typed.search.pause();
+        const fresh = withServer();
+        await fresh.search.input(prefix);
+        await fresh.search.pause();
+        expect(leis(typed.search), prefix).toEqual(leis(fresh.search));
+        expect(typed.search.state.phase, prefix).toBe(fresh.search.state.phase);
+      }
+    }
+  });
+
+  it("keeps the array the page holds when the pause pass changes nothing at the top", async () => {
+    const { search } = withServer();
+    await search.input("ericsson");
+    const first = search.state.hits;
+    await search.pause();
+    expect(search.state.hits).toBe(first);
+  });
+
   it("holds results while loading, then replaces them", async () => {
     const { manifest, files } = fixture();
     const server = fakeServer(ORIGIN, manifest, files);
