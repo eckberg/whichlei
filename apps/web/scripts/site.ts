@@ -17,6 +17,7 @@ export function pageCsp(origin: string): string {
     "default-src 'self'",
     `connect-src ${["'self'", origin, "https://api.gleif.org"].filter(Boolean).join(" ")}`,
     "script-src 'self'",
+    "worker-src 'self'",
     "style-src 'self'",
     "font-src 'self'",
     "img-src 'self' data:",

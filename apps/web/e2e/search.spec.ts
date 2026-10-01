@@ -78,6 +78,47 @@ test.describe("search", () => {
     await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
   });
 
+  test("searches in a worker, and on the page itself where there is none", async ({ page }) => {
+    await open(page);
+    await box(page).fill("ericsson");
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    expect(page.workers().map((w) => new URL(w.url()).pathname)).toEqual(["/search-worker.js"]);
+
+    const bare = await page.context().newPage();
+    await bare.addInitScript(() => {
+      (window as { Worker?: unknown }).Worker = undefined;
+    });
+    await bare.goto("/");
+    await expect(bare.locator("#meta")).toContainText("index:");
+    await bare.getByRole("combobox").fill("ericsson");
+    await expect(bare.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    expect(bare.workers()).toEqual([]);
+  });
+
+  test("ends on the right result after fast typing, with no older answer after it", async ({
+    page,
+  }) => {
+    await open(page);
+    // Every change of the first result, as the page draws it.
+    await page.evaluate(() => {
+      const seen: string[] = [];
+      (window as unknown as { __seen: string[] }).__seen = seen;
+      new MutationObserver(() => {
+        seen.push(document.querySelector("#opt-0 .lei")?.textContent ?? "");
+      }).observe(document.querySelector("#list") as Element, { childList: true, subtree: true });
+    });
+    await box(page).pressSequentially("telefonaktiebolaget", { delay: 10 });
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    await expect(page.locator("body")).not.toHaveAttribute("data-phase", "loading");
+    await page.waitForTimeout(500);
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    const seen = await page.evaluate(() => (window as unknown as { __seen: string[] }).__seen);
+    expect(seen.at(-1)).toBe(ERICSSON);
+    // Once Ericsson is first, it stays first: nothing older is drawn over it.
+    const first = seen.indexOf(ERICSSON);
+    expect(seen.slice(first).every((lei) => lei === ERICSSON || lei === "")).toBe(true);
+  });
+
   test("moves the selection and the preview with the arrow keys", async ({ page }) => {
     await open(page);
     await box(page).fill("ericsson");

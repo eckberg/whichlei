@@ -26,18 +26,28 @@ mkdirSync(new URL("styles/", dist), { recursive: true });
 mkdirSync(new URL("scripts/", dist), { recursive: true });
 cpSync(new URL("fonts/", statics), new URL("fonts/", dist), { recursive: true });
 
-// One bundle, with a source map. No inline script or style anywhere: the CSP forbids both.
-await build({
-  entryPoints: [new URL("../src/page/index.ts", import.meta.url).pathname],
-  outfile: new URL("app.js", dist).pathname,
+// The page and the search worker, each one file with a source map. No inline script or style
+// anywhere: the CSP forbids both. The worker is a module worker (`worker-src 'self'`).
+const common = {
   bundle: true,
-  format: "iife",
   target: "es2024",
   minify: true,
   sourcemap: "linked",
   legalComments: "none",
-  define: { __INDEX_ORIGIN__: JSON.stringify(origin) },
   logLevel: "warning",
+} as const;
+await build({
+  ...common,
+  entryPoints: [new URL("../src/page/index.ts", import.meta.url).pathname],
+  outfile: new URL("app.js", dist).pathname,
+  format: "iife",
+  define: { __INDEX_ORIGIN__: JSON.stringify(origin) },
+});
+await build({
+  ...common,
+  entryPoints: [new URL("../src/page/worker.ts", import.meta.url).pathname],
+  outfile: new URL("search-worker.js", dist).pathname,
+  format: "esm",
 });
 
 // The search page and the record pages share the fonts and the theme; each adds its own.
@@ -66,5 +76,5 @@ write(
 
 const size = (name: string) => readFileSync(new URL(name, dist)).length.toLocaleString("en-US");
 console.log(
-  `dist: app.js ${size("app.js")} bytes, app.css ${size("styles/app.css")} bytes; index ${origin || "not configured"}`,
+  `dist: app.js ${size("app.js")} bytes, search-worker.js ${size("search-worker.js")} bytes, app.css ${size("styles/app.css")} bytes; index ${origin || "not configured"}`,
 );

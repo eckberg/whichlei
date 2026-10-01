@@ -3,8 +3,9 @@
 // a browser: focus, history, the clipboard and the live region.
 import { IndexClient } from "../search/client.ts";
 import type { Hit } from "../search/entry.ts";
-import { Search, type SearchState } from "../search/search.ts";
+import { initialState, Search, type SearchPort, type SearchState } from "../search/search.ts";
 import { type KeyContext, keyAction } from "./keys.ts";
+import { RemoteSearch } from "./remote.ts";
 import {
   aboutHtml,
   announcement,
@@ -29,6 +30,22 @@ function element<T extends HTMLElement>(id: string): T {
   return found as T;
 }
 
+/**
+ * The search runs in a Web Worker, so typing never waits on scoring (DESIGN.md decision 20).
+ * Where there is none, or no index is set up, the same `Search` runs on this thread.
+ */
+function createSearch(origin: string): SearchPort {
+  if (origin !== "" && typeof Worker !== "undefined") {
+    try {
+      const worker = new Worker("/search-worker.js", { type: "module", name: "whichlei-search" });
+      return new RemoteSearch(worker, origin, initialState(true));
+    } catch {
+      // Falls through to the same code on this thread.
+    }
+  }
+  return new Search(origin === "" ? null : new IndexClient(origin));
+}
+
 export function start(): void {
   const q = element<HTMLInputElement>("q");
   const info = element("info");
@@ -42,7 +59,7 @@ export function start(): void {
   const touch = matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   const origin = __INDEX_ORIGIN__;
-  const search = new Search(origin === "" ? null : new IndexClient(origin));
+  const search = createSearch(origin);
 
   let view: View = "search";
   let selected = 0;
@@ -53,6 +70,8 @@ export function start(): void {
   /** What the list and preview were last built from. */
   let shown: { hits: SearchState["hits"]; tokens: SearchState["tokens"] } | null = null;
   let shownDoc = "";
+  /** When the last change of the box happened, for the keystroke-to-results measure. */
+  let inputAt = 0;
   /** Entries this page added to the history, so "back" never leaves the page. */
   let pushed = 0;
 
@@ -143,6 +162,24 @@ export function start(): void {
       detail: { phase: s.phase, hits: s.hits.length },
     });
     performance.clearMeasures("whichlei:render");
+    if (view === "search" && s.phase !== "loading" && s.text !== "" && s.text === q.value) {
+      measureResults(inputAt, s);
+    }
+  }
+
+  /** From the key press to the next frame after its results were drawn (user timing). */
+  function measureResults(from: number, s: SearchState) {
+    requestAnimationFrame(() => {
+      // After the frame: the work of the frame is done by the time this task runs.
+      setTimeout(() => {
+        performance.measure("whichlei:results", {
+          start: from,
+          end: performance.now(),
+          detail: { text: s.text, phase: s.phase, hits: s.hits.length },
+        });
+        performance.clearMeasures("whichlei:results");
+      }, 0);
+    });
   }
 
   function showDoc(name: string, markup: string) {
@@ -227,7 +264,8 @@ export function start(): void {
     setSelected(Math.max(0, Math.min(n - 1, selected + by)));
   }
 
-  function setQuery(text: string) {
+  function setQuery(text: string, at: number = performance.now()) {
+    inputAt = at;
     flash = null;
     if (view !== "search" && location.hash) {
       history.replaceState(null, "", location.pathname + location.search);
@@ -278,7 +316,7 @@ export function start(): void {
     }
   });
 
-  q.addEventListener("input", () => setQuery(q.value));
+  q.addEventListener("input", (event) => setQuery(q.value, event.timeStamp));
 
   document.addEventListener("click", (event) => {
     const target = (event.target as Element).closest<HTMLElement>(

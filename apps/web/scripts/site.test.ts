@@ -25,6 +25,7 @@ describe("pageCsp", () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("connect-src 'self' https://index.whichlei.com https://api.gleif.org");
     expect(csp).toContain("font-src 'self'");
+    expect(csp).toContain("worker-src 'self'");
     expect(csp).toContain("img-src 'self' data:");
     expect(csp).not.toContain("unsafe-inline");
     expect(csp).not.toContain("google");

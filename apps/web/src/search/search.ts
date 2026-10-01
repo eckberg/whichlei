@@ -115,15 +115,33 @@ export function readInput(text: string): Reading {
   };
 }
 
-const EMPTY: SearchState = {
-  text: "",
-  phase: "empty",
-  hits: [],
-  tokens: [],
-  message: "",
-  reload: false,
-  index: null,
-};
+/** The state before anything is typed. `configured`: an index origin was set at build time. */
+export function initialState(configured: boolean): SearchState {
+  return {
+    text: "",
+    phase: configured ? "empty" : "unconfigured",
+    hits: [],
+    tokens: [],
+    message: "",
+    reload: false,
+    index: null,
+  };
+}
+
+/**
+ * What the page needs of a search: the `Search` itself, or a stand-in that runs it in a Web
+ * Worker (page/remote.ts). Answers come through `subscribe`, never as return values.
+ */
+export interface SearchPort {
+  readonly state: SearchState;
+  subscribe(listener: (state: SearchState) => void): () => void;
+  /** The text in the search box changed. */
+  input(text: string): unknown;
+  /** Fetch the manifest now. */
+  load(): unknown;
+  /** Try again after an error. */
+  retry(): unknown;
+}
 
 type Parsed = (Candidate<string> & { entry: Entry })[];
 
@@ -155,7 +173,7 @@ export class Search {
     this.#debounceMs = options.debounceMs ?? DEBOUNCE_MS;
     this.#limit = options.limit ?? RESULT_LIMIT;
     this.#now = options.now ?? (() => performance.now());
-    this.#state = { ...EMPTY, phase: source ? "empty" : "unconfigured" };
+    this.#state = initialState(source !== null);
   }
 
   get state(): SearchState {
