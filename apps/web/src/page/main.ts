@@ -5,7 +5,7 @@ import { IndexClient } from "../search/client.ts";
 import type { Hit } from "../search/entry.ts";
 import { initialState, Search, type SearchPort, type SearchState } from "../search/search.ts";
 import { type KeyContext, keyAction } from "./keys.ts";
-import { RemoteSearch } from "./remote.ts";
+import { ResilientSearch } from "./resilient.ts";
 import {
   aboutHtml,
   announcement,
@@ -35,15 +35,17 @@ function element<T extends HTMLElement>(id: string): T {
  * Where there is none, or no index is set up, the same `Search` runs on this thread.
  */
 function createSearch(origin: string): SearchPort {
+  const local = () => new Search(origin === "" ? null : new IndexClient(origin));
   if (origin !== "" && typeof Worker !== "undefined") {
     try {
-      const worker = new Worker("/search-worker.js", { type: "module", name: "whichlei-search" });
-      return new RemoteSearch(worker, origin, initialState(true));
+      const spawn = () =>
+        new Worker("/search-worker.js", { type: "module", name: "whichlei-search" });
+      return new ResilientSearch(spawn, local, origin, initialState(true));
     } catch {
       // Falls through to the same code on this thread.
     }
   }
-  return new Search(origin === "" ? null : new IndexClient(origin));
+  return local();
 }
 
 export function start(): void {
@@ -72,6 +74,8 @@ export function start(): void {
   let shownDoc = "";
   /** When the last change of the box happened, for the keystroke-to-results measure. */
   let inputAt = 0;
+  /** How many times the box has changed: names a keystroke in the timeline, not its text. */
+  let inputs = 0;
   /** Entries this page added to the history, so "back" never leaves the page. */
   let pushed = 0;
 
@@ -102,6 +106,12 @@ export function start(): void {
     info.innerHTML = infoLine(state()).html.value;
   }
 
+  /** Names the option the screen reader is on, or none: the attribute is absent, not empty. */
+  function setActive(id: string | null) {
+    if (id === null) q.removeAttribute("aria-activedescendant");
+    else q.setAttribute("aria-activedescendant", id);
+  }
+
   function setSelected(next: number) {
     const rows = list.children;
     const before = rows[selected];
@@ -116,7 +126,7 @@ export function start(): void {
       (after.firstElementChild as HTMLElement).textContent = ">";
       after.scrollIntoView({ block: "nearest" });
     }
-    q.setAttribute("aria-activedescendant", after ? `opt-${next}` : "");
+    setActive(after ? `opt-${next}` : null);
     preview.innerHTML = previewHtml(hit());
   }
 
@@ -150,7 +160,7 @@ export function start(): void {
       showDoc(usage ? "usage" : "", usage ? usageHtml() : "");
       keys.innerHTML = keysHtml("search", searching());
       q.setAttribute("aria-expanded", String(has));
-      q.setAttribute("aria-activedescendant", has ? `opt-${selected}` : "");
+      setActive(has ? `opt-${selected}` : null);
     }
     scheduleAnnounce();
     const end = performance.now();
@@ -161,19 +171,22 @@ export function start(): void {
     });
     performance.clearMeasures("whichlei:render");
     if (view === "search" && s.phase !== "loading" && s.text !== "" && s.text === q.value) {
-      measureResults(inputAt, s);
+      measureResults(inputAt, inputs, s);
     }
   }
 
-  /** From the key press to the next frame after its results were drawn (user timing). */
-  function measureResults(from: number, s: SearchState) {
+  /**
+   * From the key press to the next frame after its results were drawn (user timing). Nothing
+   * typed goes into the timeline: the measure has a fixed name and the number of the keystroke.
+   */
+  function measureResults(from: number, key: number, s: SearchState) {
     requestAnimationFrame(() => {
       // After the frame: the work of the frame is done by the time this task runs.
       setTimeout(() => {
         performance.measure("whichlei:results", {
           start: from,
           end: performance.now(),
-          detail: { text: s.text, phase: s.phase, hits: s.hits.length },
+          detail: { key, phase: s.phase, hits: s.hits.length },
         });
         performance.clearMeasures("whichlei:results");
       }, 0);
@@ -264,10 +277,18 @@ export function start(): void {
 
   function setQuery(text: string, at: number = performance.now()) {
     inputAt = at;
+    inputs++;
     flash = null;
-    if (view !== "search" && location.hash) {
-      history.replaceState(null, "", location.pathname + location.search);
+    if (view !== "search") {
       view = "search";
+      // Typing leaves the about page. If this page opened it, take its history entry off, so
+      // Back from the search leaves the site in one press; else replace the address.
+      if (pushed > 0) {
+        pushed--;
+        history.back();
+      } else if (location.hash) {
+        history.replaceState(null, "", location.pathname + location.search);
+      }
     }
     // The answer, now or when the files arrive, comes through the subscription.
     void search.input(text);
@@ -301,13 +322,17 @@ export function start(): void {
 
   search.subscribe(render);
   // A page that cannot read the index's format is out of date: reload it once by itself,
-  // then leave the message and its button. The mark is cleared when the index loads.
+  // then leave the message and its button. The mark is cleared when a search is answered.
   search.subscribe((s) => {
     try {
-      if (s.index) sessionStorage.removeItem(RELOADED);
-      else if (s.phase === "error" && s.reload && !sessionStorage.getItem(RELOADED)) {
-        sessionStorage.setItem(RELOADED, "1");
-        location.reload();
+      if (s.phase === "error") {
+        if (s.reload && !sessionStorage.getItem(RELOADED)) {
+          sessionStorage.setItem(RELOADED, "1");
+          location.reload();
+        }
+      } else if (s.phase === "done" || s.phase === "no-match") {
+        // A search was answered: the next failure is a new one, and may reload once again.
+        sessionStorage.removeItem(RELOADED);
       }
     } catch {
       // No storage, no automatic reload: the button is still there.

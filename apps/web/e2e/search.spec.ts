@@ -6,6 +6,10 @@ const ERICSSON = "549300W9JLPW15XIFM52";
 // Valid check digits, and the same code with the last digit changed.
 const VALID_LEI = "HWUPKR0MPOU8FGXBT394";
 const BAD_LEI = "HWUPKR0MPOU8FGXBT395";
+// Bad check digits, and no name in the fixture is that code.
+const UNKNOWN_BAD_LEI = "549300W9JLPW15XIFM51";
+// A legal name that is twenty characters of LEI shape once its spaces are gone.
+const LEI_SHAPED_NAME = "AST Bond Portfolio 2021";
 
 test("serves the page with security headers", async ({ request }) => {
   const response = await request.get("/");
@@ -58,7 +62,7 @@ test.describe("search", () => {
     await expect(box(page)).toBeFocused();
     await expect(page.getByRole("button", { name: "ericsson" })).toBeVisible();
     await expect(page.locator("#list")).toBeHidden();
-    await expect(page.locator("#meta")).toContainText("2,924 entities");
+    await expect(page.locator("#meta")).toContainText("2,927 entities");
     await expect(page.locator("#meta")).toContainText("gleif 2026-09-16");
   });
 
@@ -95,6 +99,57 @@ test.describe("search", () => {
     expect(bare.workers()).toEqual([]);
   });
 
+  test("runs the search on the page when the worker script cannot load", async ({ page }) => {
+    await page.route("**/search-worker.js", (route) => route.abort());
+    await open(page);
+    await box(page).fill("ericsson");
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    expect(page.workers()).toEqual([]);
+  });
+
+  /** A worker that answers `init` and then throws on the first input. */
+  const FAILING_WORKER = `
+    onmessage = (e) => {
+      if (e.data.type === "init") {
+        postMessage({ type: "state", seq: 0, stats: null, state: { text: "", phase: "empty",
+          hits: [], tokens: [], message: "", reload: false, lei: null,
+          index: { asOf: "2026-09-16", entities: 1 } } });
+      }
+      if (e.data.type === "input") throw new Error("boom");
+    };`;
+
+  test("starts the worker once more when it fails after answering, and goes on", async ({
+    page,
+  }) => {
+    let scripts = 0;
+    await page.route("**/search-worker.js", (route) => {
+      scripts++;
+      if (scripts === 1) {
+        return route.fulfill({ body: FAILING_WORKER, contentType: "text/javascript" });
+      }
+      return route.continue();
+    });
+    await page.goto("/");
+    await expect(page.locator("#meta")).toContainText("index:");
+    await box(page).fill("ericsson");
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    expect(scripts).toBe(2);
+  });
+
+  test("shows an error when the restarted worker fails too", async ({ page }) => {
+    await page.route("**/search-worker.js", (route) =>
+      route.fulfill({ body: FAILING_WORKER, contentType: "text/javascript" }),
+    );
+    await page.goto("/");
+    await expect(page.locator("#meta")).toContainText("index:");
+    // The page reloads itself once, as it does for an index it cannot read.
+    await Promise.all([page.waitForEvent("load"), box(page).fill("ericsson")]);
+    await expect(page.locator("#meta")).toContainText("index:");
+    await box(page).fill("ericsson");
+    await expect(page.locator("#info")).toContainText("the search could not start");
+    await expect(page.getByRole("button", { name: "reload" })).toBeVisible();
+  });
+
   test("ends on the right result after fast typing, with no older answer after it", async ({
     page,
   }) => {
@@ -123,6 +178,11 @@ test.describe("search", () => {
     await open(page);
     await box(page).fill("ericsson");
     await expect(page.locator("#opt-1")).toBeVisible();
+    // Final results: the typing pass and the pause pass (150 ms) have both drawn, so nothing
+    // redraws the list after the key is pressed.
+    await expect(page.locator("body")).toHaveAttribute("data-phase", "done");
+    await page.waitForTimeout(300);
+    await expect(box(page)).toHaveAttribute("aria-activedescendant", "opt-0");
     const first = await page.locator("#preview .label").innerText();
     await page.keyboard.press("ArrowDown");
     await expect(page.locator("#opt-1")).toHaveAttribute("aria-selected", "true");
@@ -137,6 +197,11 @@ test.describe("search", () => {
     // The top of the list stays put.
     await page.keyboard.press("ArrowUp");
     await expect(page.locator("#opt-0")).toHaveAttribute("aria-selected", "true");
+    await expect(box(page)).toHaveAttribute("aria-activedescendant", "opt-0");
+    // With no results there is no active option, and the attribute is absent, not empty.
+    await box(page).fill("zzzqqqxxx");
+    await expect(page.locator("#info")).toHaveText("no matches");
+    expect(await box(page).getAttribute("aria-activedescendant")).toBeNull();
   });
 
   test("numbers the results for screen readers", async ({ page }) => {
@@ -251,7 +316,41 @@ test.describe("search", () => {
     await page.goto("/#about");
     await expect(page.locator("#man")).toBeVisible();
     await expect(page.locator("#meta")).toContainText("gleif 2026-09-16");
-    await expect(page.locator("#man")).toContainText("2,924 entities");
+    await expect(page.locator("#man")).toContainText("2,927 entities");
+  });
+
+  test("leaves the site in one Back press from the search after the about page", async ({
+    page,
+  }) => {
+    await open(page);
+    await page.getByRole("button", { name: "about" }).click();
+    await expect(page.locator("#man")).toBeVisible();
+    // Typing leaves the about page, and its history entry goes with it.
+    await page.keyboard.type("e");
+    await expect(page.locator("#man")).toBeHidden();
+    await expect(page).not.toHaveURL(/#about/);
+    await expect(box(page)).toHaveValue("e");
+    await page.goBack();
+    expect(page.url()).toBe("about:blank");
+  });
+
+  test("keeps what was typed out of the performance timeline", async ({ page }) => {
+    await page.addInitScript(() => {
+      const seen: string[] = [];
+      (window as unknown as { __measures: string[] }).__measures = seen;
+      new PerformanceObserver((list) => {
+        for (const e of list.getEntries()) seen.push(JSON.stringify(e));
+      }).observe({ type: "measure" });
+    });
+    await open(page);
+    await box(page).pressSequentially("ericsson", { delay: 30 });
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    await page.waitForTimeout(400);
+    const seen = await page.evaluate(
+      () => (window as unknown as { __measures: string[] }).__measures,
+    );
+    expect(seen.some((entry) => entry.includes("whichlei:results"))).toBe(true);
+    expect(seen.join()).not.toMatch(/ericsson|eric/i);
   });
 
   test("does not take the question mark while there is text in the box", async ({ page }) => {
@@ -262,45 +361,64 @@ test.describe("search", () => {
     await expect(page).not.toHaveURL(/#about/);
   });
 
-  test("shows one row for a valid LEI, without asking the index", async ({ page }) => {
+  test("puts the row of a valid LEI first, with the names that are that code below it", async ({
+    page,
+  }) => {
     await open(page);
-    const requests: string[] = [];
-    page.on("request", (request) => requests.push(request.url()));
     await box(page).fill(VALID_LEI.toLowerCase());
     await expect(page.locator("#opt-0 .lei")).toHaveText(VALID_LEI);
-    await expect(page.locator("#list [role=option]")).toHaveCount(1);
     await expect(page.locator("#info")).toContainText("check digits ok");
     await expect(page.getByRole("link", { name: "open record" })).toHaveAttribute(
       "href",
       `/lei/${VALID_LEI}`,
     );
-    expect(requests.filter((url) => url.startsWith(FIXTURE_ORIGIN))).toEqual([]);
+    // The fixture has an entity whose legal name is this code (and one a character away): a
+    // name search runs too, and the exact one is first among the names.
+    await expect(page.locator("#opt-1 .nm")).toHaveText(VALID_LEI);
+    await expect(page.locator("#list [role=option]")).toHaveCount(3);
+    await expect(page.locator("#info")).toContainText("2 matches");
   });
 
-  test("says the check digits are wrong before any request", async ({ page }) => {
+  test("shows only the row for a valid LEI that no name has", async ({ page }) => {
     await open(page);
-    const requests: string[] = [];
-    page.on("request", (request) => requests.push(request.url()));
-    // Pasted whole: nothing is asked of the index.
-    await box(page).fill(BAD_LEI);
+    await box(page).fill(ERICSSON);
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    await expect(page.locator("body")).not.toHaveAttribute("data-phase", "loading");
+    await expect(page.locator("#list [role=option]")).toHaveCount(1);
+  });
+
+  test("says the check digits are wrong when no name matches either", async ({ page }) => {
+    await open(page);
+    await box(page).fill(UNKNOWN_BAD_LEI);
     await expect(page.locator("#info")).toContainText("not a valid lei");
     await expect(page.locator("#info")).toContainText("check digits");
     await expect(page.locator("#list")).toBeHidden();
-    await page.waitForTimeout(400);
-    expect(requests.filter((url) => url.startsWith(FIXTURE_ORIGIN))).toEqual([]);
   });
 
-  test("says it on the last key of a typed LEI, with no request for that key", async ({ page }) => {
+  test("searches names for an input that is an LEI's shape with bad check digits", async ({
+    page,
+  }) => {
     await open(page);
-    // Nineteen characters are still a name, which the index may be asked about.
-    await box(page).fill(BAD_LEI.slice(0, 19));
-    await expect(page.locator("body")).not.toHaveAttribute("data-phase", "loading");
-    const requests: string[] = [];
-    page.on("request", (request) => requests.push(request.url()));
-    await page.keyboard.type(BAD_LEI.slice(19));
+    // The fixture has an entity whose legal name is this code: it is found, with a quiet note.
+    await box(page).fill(BAD_LEI);
+    await expect(page.locator("#opt-0 .nm")).toHaveText(BAD_LEI);
+    await expect(page.locator("#info")).toContainText("2 matches");
     await expect(page.locator("#info")).toContainText("not a valid lei");
-    await page.waitForTimeout(400);
-    expect(requests.filter((url) => url.startsWith(FIXTURE_ORIGIN))).toEqual([]);
+  });
+
+  test("says it on the last key of a typed LEI too", async ({ page }) => {
+    await open(page);
+    await box(page).pressSequentially(BAD_LEI, { delay: 20 });
+    await expect(page.locator("#opt-0 .nm")).toHaveText(BAD_LEI);
+    await expect(page.locator("#info")).toContainText("not a valid lei");
+  });
+
+  test("finds a name that is an LEI's shape once its spaces are gone", async ({ page }) => {
+    await open(page);
+    await box(page).pressSequentially(LEI_SHAPED_NAME, { delay: 15 });
+    await expect(page.locator("#opt-0 .nm")).toHaveText(LEI_SHAPED_NAME);
+    await expect(page.locator("#info")).not.toContainText("not a valid lei");
+    await expect(page.locator("#info")).toContainText("match");
   });
 
   test("says so when nothing matches", async ({ page }) => {
@@ -422,7 +540,7 @@ test.describe("search", () => {
 
       test("an error message has no violations", async ({ page }) => {
         await open(page);
-        await box(page).fill(BAD_LEI);
+        await box(page).fill(UNKNOWN_BAD_LEI);
         await expect(page.locator("#info .bad")).toBeVisible();
         expect(await violations(page)).toEqual([]);
       });

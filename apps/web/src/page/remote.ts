@@ -22,23 +22,31 @@ const sameHits = (a: SearchState["hits"], b: SearchState["hits"]) =>
 
 export class RemoteSearch implements SearchPort {
   readonly #worker: WorkerLike;
+  #answered = false;
   readonly #listeners = new Set<(state: SearchState) => void>();
   #state: SearchState;
   #seq = 0;
   stats: PassStats | null = null;
 
-  constructor(worker: WorkerLike, origin: string, initial: SearchState) {
+  /**
+   * `onFailure` hears of a worker that could not load or threw, and whether it had answered
+   * before. Without it the failure is shown as an error, with a reload button.
+   */
+  constructor(
+    worker: WorkerLike,
+    origin: string,
+    initial: SearchState,
+    onFailure?: (answered: boolean) => void,
+  ) {
     this.#worker = worker;
     this.#state = initial;
-    worker.addEventListener("message", ({ data }) => this.#receive(data));
-    // Nothing will ever answer: say so, and offer the reload that may fix an old page.
+    worker.addEventListener("message", ({ data }) => {
+      this.#answered = true;
+      this.#receive(data);
+    });
     worker.addEventListener("error", () => {
-      this.#publish({
-        ...this.#state,
-        phase: "error",
-        message: "the search could not start",
-        reload: true,
-      });
+      if (onFailure) onFailure(this.#answered);
+      else this.fail();
     });
     worker.postMessage({ type: "init", origin });
   }
@@ -50,6 +58,16 @@ export class RemoteSearch implements SearchPort {
   subscribe(listener: (state: SearchState) => void): () => void {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
+  }
+
+  /** Show that nothing will answer: the search could not start, and a reload may fix it. */
+  fail(): void {
+    this.#publish({
+      ...this.#state,
+      phase: "error",
+      message: "the search could not start",
+      reload: true,
+    });
   }
 
   input(text: string): void {

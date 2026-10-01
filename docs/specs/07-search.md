@@ -14,8 +14,12 @@ screen reader, and in light and dark.
 - Search: `queryTokens` → `route` (typing vs paused) → fetch the routed files → decode →
   merge by LEI → `topK`. Files are cached per page load; stale fetches are aborted.
   Results stay on screen while new files load. The manifest's `asOf` is shown.
-- Identifiers: a valid LEI shows one row that opens its record; bad check digits say so
-  before any request (decision 9). ISIN, BIC and register lookups are slice 8.
+- Identifiers: a valid LEI shows its row first, at once, and opens its record; the name search
+  runs for every input, and its hits follow the row (before it, if the input has spaces). An input
+  of LEI shape with bad check digits is searched as a name too: it says so only when nothing
+  matches, and otherwise as a quiet note beside the count (decisions 8 and 9: 621 legal names are an
+  LEI's shape without their spaces). ISIN, BIC and register lookups are slice 8, and a 12-, 8- or
+  11-character code is not called a partial LEI meanwhile.
 - Opening a result goes to `/lei/<code>` (slice 9). The preview shows what the index has:
   LEI, names, country, status.
 - Keys: ↑ ↓ select, enter copies the LEI, → opens the record, esc clears, / focuses the
@@ -43,7 +47,15 @@ prototype's 2,924 records encoded with `format.ts`.
   sends `{ seq, text }` for every input; `SearchHost` (`src/search/host.ts`) works on the newest
   only and answers only while it is the newest; `RemoteSearch` (`src/page/remote.ts`) drops answers
   to older inputs and keeps the hits array when nothing changed. Without `Worker` the same
-  `Search` runs on the page. CSP: `worker-src 'self'`.
+  `Search` runs on the page. CSP: `worker-src 'self'`. A worker that never answers (script missing,
+  syntax error, CSP) is replaced by the same `Search` on the page (`ResilientSearch`); one that
+  throws after answering is started once more and sent the newest input, and if that fails too the
+  error is shown.
+- `IndexClient.file(build, n)` takes the build the caller routed with and rejects with
+  `IndexChangedError` if it is no longer current, so file numbers of one build are never read from
+  another; `Search` drops what it holds and routes again.
+- The timeline gets one user-timing measure per results frame with a fixed name and the number of
+  the keystroke; nothing typed goes into it.
 - `apps/web/src/search/`: `IndexClient` (manifest, files cached by `<build>/<n>.txt`, aborts a
   request nobody waits for, one manifest reload on a 404, `parseManifest`) and `Search` (the
   state machine; no DOM). `apps/web/src/page/`: `view.ts` (HTML strings, tested), `keys.ts` (what a
@@ -124,7 +136,9 @@ Writes `$DATA_DIR/format/search-4x.json`. `--skip bytes,timing,page` leaves part
 ## Measured with the worker
 One locked session on this host (slice 4's harness, the page in three modes, the harness again,
 bytes), 4×. Chromium does not throttle workers, so the bench bundles the production worker with a
-self-slowdown (after a pass of P ms it spins 3·P ms before it answers; `throttled-worker.ts`). The
+self-slowdown (after a pass of P ms it spins 3·P ms before it answers; `throttled-worker.ts`). The slowdown
+applies to the passes whose answers are posted: a pass whose answer is dropped as stale is not
+slowed, so the worker gets a little more idle time than a slower CPU would give it. The
 page runs under the 4× throttle. Real key presses into the built page, a fresh page per query,
 390 px wide with touch. Median / p90 / max. `inthread` is the same page with `Worker` removed.
 
@@ -182,9 +196,9 @@ Met:
   32 / 48 / 120 ms against 120 / 168 / 304 ms with search on the page's thread; the main thread runs
   no search code. Stale queries are dropped (tested, and measured: with keys 50 ms apart most keys are
   replaced before they run).
-- **e2e:** 45 tests (find by name, keys, copy, open, escape, about, LEI good and bad, errors, format
-  reload, worker and fallback, fast typing, result numbering, dark mode, phone width). axe reports
-  no violations in light or dark on empty, results, error and about states. 348 unit tests, lint
+- **e2e:** 53 tests (find by name, keys, copy, open, escape, about, LEI good and bad, errors, format
+  reload, worker, fallback and restart, fast typing, LEI-shaped names, result numbering, Back after about, a timeline without typed text, dark mode, phone width). axe reports
+  no violations in light or dark on empty, results, error and about states. unit tests (all), lint
   and typecheck pass.
 
 Not met:

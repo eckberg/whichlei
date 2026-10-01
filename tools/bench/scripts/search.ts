@@ -200,7 +200,7 @@ interface KeyResult {
 interface PagePerf {
   events: number[];
   renders: number[];
-  results: { text: string; d: number }[];
+  results: { key: number; d: number }[];
   longtasks: number[];
 }
 
@@ -215,8 +215,8 @@ async function runPage(mode: PageMode, queries: string[]) {
       for (const e of list.getEntries()) {
         if (e.name === "whichlei:render") perf.renders.push(e.duration);
         else if (e.name === "whichlei:results") {
-          const text = ((e as PerformanceMeasure).detail as { text: string }).text;
-          perf.results.push({ text, d: e.duration });
+          const key = ((e as PerformanceMeasure).detail as { key: number }).key;
+          perf.results.push({ key, d: e.duration });
         }
       }
     }).observe({ type: "measure" });
@@ -241,8 +241,9 @@ async function runPage(mode: PageMode, queries: string[]) {
         longtasks: perf.longtasks.splice(0),
       };
     });
-  const keyOf = (taken: { results: PagePerf["results"]; events: number[] }, text: string) => {
-    const mine = taken.results.filter((r) => r.text === text);
+  // The page numbers its keystrokes (it keeps the text out of the timeline): this is key `k`.
+  const keyOf = (taken: { results: PagePerf["results"]; events: number[] }, k: number) => {
+    const mine = taken.results.filter((r) => r.key === k);
     return {
       first: mine[0]?.d ?? null,
       final: mine.at(-1)?.d ?? null,
@@ -266,7 +267,7 @@ async function runPage(mode: PageMode, queries: string[]) {
       const taken = await take();
       longtasks.push(...taken.longtasks);
       for (let k = 1; k <= query.length; k++) {
-        keys.push({ ...keyOf(taken, query.slice(0, k)), event: 0, render: null });
+        keys.push({ ...keyOf(taken, k), event: 0, render: null });
       }
     } else {
       for (let k = 1; k <= query.length; k++) {
@@ -278,7 +279,7 @@ async function runPage(mode: PageMode, queries: string[]) {
         const taken = await take();
         longtasks.push(...taken.longtasks);
         keys.push({
-          ...keyOf(taken, query.slice(0, k)),
+          ...keyOf(taken, k),
           render: taken.renders.reduce((a, b) => a + b, 0),
         });
       }
