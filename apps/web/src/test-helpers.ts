@@ -123,7 +123,12 @@ export interface Harness {
 }
 
 export function harness(
-  options: { gleif?: FakeGleif; origin?: string; gleifTimeoutMs?: number } = {},
+  options: {
+    gleif?: FakeGleif;
+    origin?: string;
+    gleifTimeoutMs?: number;
+    indexTimeoutMs?: number;
+  } = {},
 ): Harness {
   const gleif = options.gleif ?? fakeGleif();
   const cache = fakeCache();
@@ -134,6 +139,7 @@ export function harness(
     fetch: gleif.fetch,
     now: () => now,
     gleifTimeoutMs: options.gleifTimeoutMs ?? 8000,
+    ...(options.indexTimeoutMs === undefined ? {} : { indexTimeoutMs: options.indexTimeoutMs }),
   };
   const worker = createWorker(deps);
   const origin = options.origin ?? "https://whichlei.test";

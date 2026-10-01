@@ -128,6 +128,14 @@ main.single {
 .row .aka {
   color: var(--dim);
 }
+/* The reading a lookup at GLEIF found the entity by: isin, bic, reg.no. */
+.row .via {
+  margin-right: 0.3ch;
+  padding-inline: 0.6ch;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: var(--fs-small);
+}
 .row mark {
   background: none;
   color: var(--accent);
@@ -281,6 +289,10 @@ main.single {
   }
 }
 @media (max-width: 640px) {
+  /* The message and the retry button of a failed lookup are longer than the line. */
+  .info {
+    white-space: normal;
+  }
   .row {
     grid-template-columns: 2ch minmax(0, 1fr) auto;
     grid-template-areas: "p n c" "p l s";

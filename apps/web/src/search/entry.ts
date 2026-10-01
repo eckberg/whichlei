@@ -29,8 +29,15 @@ export function statusOf(status: Status): { label: string; tone: Tone } {
 /** A result: an index entry, or the row a valid LEI typed in full makes. */
 export interface Hit {
   entry: Entry;
-  /** The input is itself an LEI with valid check digits; there is no index data for it. */
+  /**
+   * The input is itself an LEI with valid check digits. Until GLEIF has confirmed it, the
+   * entry is empty: the index has no data for it.
+   */
   typed?: true;
+  /** Found by a lookup at GLEIF, not in the index: the reading that found it, "isin" and so on. */
+  via?: string;
+  /** The state as GLEIF's status codes give it. A lookup has these, not the index's letter. */
+  status?: { label: string; tone: Tone };
 }
 
 /** Legal name first, then the other names that are not the same text. */

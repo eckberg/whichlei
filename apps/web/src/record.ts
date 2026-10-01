@@ -3,20 +3,24 @@
 // escapes. The styles (fonts included) and the copy script are static assets (see scripts/build.ts).
 
 import type { Address, LeiRecord, ParentLink } from "@whichlei/gleif";
+import type { Codes } from "./codes.ts";
 import { type Html, html, raw } from "./html.ts";
+import { stateOf, type Tone, words } from "./status.ts";
 
 export interface RecordPageContext {
   /** Origin of the canonical URL, such as `https://whichlei.com`, without a trailing slash. */
   canonicalOrigin: string;
+  /**
+   * Names for legal form and registration authority codes, from the published index. Without
+   * them, or for a code they lack, the page shows the code.
+   */
+  codes?: Codes | null | undefined;
 }
 
 const leiPath = (lei: string) => `/lei/${encodeURIComponent(lei)}`;
 
 /** The date part of an ISO 8601 timestamp, `2026-09-30`. */
 const day = (iso: string | null): string | null => (iso === null ? null : iso.slice(0, 10));
-
-/** GLEIF codes such as `NO_KNOWN_PERSON` and `FULLY_CORROBORATED`, in plain lower case. */
-const words = (code: string): string => code.toLowerCase().replace(/[_-]/g, " ");
 
 /** ` lang="sv"`, only when GLEIF's code looks like a language code. */
 const langAttr = (code: string | null): Html =>
@@ -25,18 +29,11 @@ const langAttr = (code: string | null): Html =>
 /** Only http(s) links from GLEIF are followed. */
 const safeUrl = (url: string): string | null => (/^https?:\/\//i.test(url) ? url : null);
 
-export type Tone = "active" | "lapsed" | "retired";
+export type { Tone };
 
 /** One word for the state of the record, as the prototype shows it. */
 export function statusOf(record: LeiRecord): { label: string; tone: Tone } {
-  const { entityStatus, registrationStatus } = record;
-  if (entityStatus === "INACTIVE") return { label: "inactive", tone: "retired" };
-  if (registrationStatus === "LAPSED") return { label: "lapsed", tone: "lapsed" };
-  if (["ISSUED", "PENDING_TRANSFER", "PENDING_ARCHIVAL"].includes(registrationStatus)) {
-    return { label: "active", tone: "active" };
-  }
-  if (registrationStatus === "NULL") return { label: "unknown", tone: "lapsed" };
-  return { label: words(registrationStatus), tone: "retired" };
+  return stateOf(record.entityStatus, record.registrationStatus);
 }
 
 function addressText(address: Address | null): string | null {
@@ -71,9 +68,26 @@ function parentCell(link: ParentLink): Html {
   }
 }
 
+/** The form's name: GLEIF's own text for "other", else the code's name, else the code. */
+function legalFormName(form: LeiRecord["legalForm"], codes: Codes | null): string {
+  if (form.other) return form.other;
+  const code = form.code ?? "";
+  return codes?.elf[code] ?? code;
+}
+
+/** "Bolagsverket · RA000544", or the code alone when the register has no name here. */
+function registerKeeper(
+  authority: LeiRecord["registrationAuthority"],
+  codes: Codes | null,
+): string {
+  if (authority.id === null) return authority.other ?? "";
+  const name = codes?.ra[authority.id];
+  return name ? `${name} · ${authority.id}` : authority.id;
+}
+
 type Row = [label: string, field: string, value: Html];
 
-function rows(record: LeiRecord): Row[] {
+function rows(record: LeiRecord, codes: Codes | null): Row[] {
   const status = statusOf(record);
   const legal = addressText(record.legalAddress);
   const hq = addressText(record.headquartersAddress);
@@ -122,7 +136,7 @@ function rows(record: LeiRecord): Row[] {
       ? null
       : html`${record.registerNumber ?? ""}${
           authority.id || authority.other
-            ? html` <span class="none">${authority.id ?? authority.other}</span>`
+            ? html` <span class="none">${registerKeeper(authority, codes)}</span>`
             : ""
         }`,
   );
@@ -131,8 +145,10 @@ function rows(record: LeiRecord): Row[] {
     "legal-form",
     legalForm.code === null && legalForm.other === null
       ? null
-      : html`${legalForm.other ?? legalForm.code}${
-          legalForm.other && legalForm.code && legalForm.code !== "8888"
+      : html`${legalFormName(legalForm, codes)}${
+          legalForm.code &&
+          legalForm.code !== "8888" &&
+          legalFormName(legalForm, codes) !== legalForm.code
             ? html` <span class="none">${legalForm.code}</span>`
             : ""
         }`,
@@ -209,12 +225,12 @@ function jsonLd(record: LeiRecord, canonicalUrl: string): string {
       ...(address.country ? { addressCountry: address.country } : {}),
     };
   }
-  // Keep the data from closing the script element or starting a comment.
-  return JSON.stringify(data).replace(
-    JSON_UNSAFE,
-    (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`,
-  );
+  return scriptSafe(JSON.stringify(data));
 }
+
+/** JSON text that cannot close a script element or start a comment inside one. */
+const scriptSafe = (json: string): string =>
+  json.replace(JSON_UNSAFE, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
 
 function shell(parts: { title: string; head?: Html; body: Html; copyScript?: boolean }): string {
   return html`<!doctype html>
@@ -265,14 +281,16 @@ export function renderRecordPage(record: LeiRecord, context: RecordPageContext):
 </div>
 <div class="actions">
 <button class="btn" type="button" data-copy="${record.lei}" hidden>copy lei</button>
+<button class="btn" type="button" data-copy-json="record-json" hidden>copy json</button>
 ${webUrl ? html`<a class="btn" href="${webUrl}" rel="noopener">gleif.org</a>` : ""}
 <span class="copied" role="status" data-copy-status></span>
 </div>
 <dl class="kv">
-${rows(record).map(
+${rows(record, context.codes ?? null).map(
   ([label, field, value]) => html`<dt>${label}</dt><dd data-field="${field}">${value}</dd>
 `,
 )}</dl>
+<script type="application/json" id="record-json">${raw(scriptSafe(JSON.stringify(record)))}</script>
 <p class="src">source: ${apiUrl ? html`<a href="${apiUrl}" rel="noopener">GLEIF API</a>` : "GLEIF API"} · golden copy <time data-field="golden-copy">${golden ?? "unknown"}</time> · permalink: ${canonicalUrl}</p>
 </div>
 </main>`;

@@ -1,6 +1,8 @@
 // The search page: wires the search state machine (../search) to the DOM and the keys. The
 // markup is built in view.ts, the key meanings are in keys.ts; this file holds only what needs
 // a browser: focus, history, the clipboard and the live region.
+import { Composer } from "../lookups/compose.ts";
+import { Lookups } from "../lookups/lookups.ts";
 import { IndexClient } from "../search/client.ts";
 import type { Hit } from "../search/entry.ts";
 import { initialState, Search, type SearchPort, type SearchState } from "../search/search.ts";
@@ -62,6 +64,10 @@ export function start(): void {
 
   const origin = __INDEX_ORIGIN__;
   const search = createSearch(origin);
+  // Identifiers in the box are also looked up at GLEIF (../lookups). Search and lookups answer on
+  // their own; the page shows them together.
+  const lookups = new Lookups();
+  const composer = new Composer();
 
   let view: View = "search";
   let selected = 0;
@@ -79,7 +85,8 @@ export function start(): void {
   /** Entries this page added to the history, so "back" never leaves the page. */
   let pushed = 0;
 
-  const state = (): SearchState => search.state;
+  const composed = () => composer.compose(search.state, lookups.state);
+  const state = (): SearchState => composed().state;
   const hit = (): Hit | undefined => state().hits[selected];
   const searching = () => state().phase !== "empty" && state().phase !== "unconfigured";
 
@@ -103,7 +110,7 @@ export function start(): void {
       info.append(span);
       return;
     }
-    info.innerHTML = infoLine(state()).html.value;
+    info.innerHTML = infoLine(state(), composed().lookups).html.value;
   }
 
   /** Names the option the screen reader is on, or none: the attribute is absent, not empty. */
@@ -207,7 +214,7 @@ export function start(): void {
     if (flash) return;
     clearTimeout(announceTimer);
     announceTimer = setTimeout(() => {
-      const text = view === "about" ? "about whichlei" : announcement(state());
+      const text = view === "about" ? "about whichlei" : announcement(state(), composed().lookups);
       if (text === null || text === spoken) return;
       spoken = text;
       say(text);
@@ -290,8 +297,9 @@ export function start(): void {
         history.replaceState(null, "", location.pathname + location.search);
       }
     }
-    // The answer, now or when the files arrive, comes through the subscription.
+    // The answers, now or when the files arrive, come through the subscriptions.
     void search.input(text);
+    lookups.input(text);
   }
 
   function showAbout() {
@@ -321,6 +329,7 @@ export function start(): void {
   // ---- Events ------------------------------------------------------------------------
 
   search.subscribe(render);
+  lookups.subscribe(render);
   // A page that cannot read the index's format is out of date: reload it once by itself,
   // then leave the message and its button. The mark is cleared when a search is answered.
   search.subscribe((s) => {
@@ -379,7 +388,10 @@ export function start(): void {
     }
     if (target.dataset.act === "copy") copyLei();
     else if (target.dataset.act === "reload") location.reload();
-    else if (target.dataset.act === "retry") {
+    else if (target.dataset.act === "retry-lookup") {
+      lookups.retry();
+      q.focus();
+    } else if (target.dataset.act === "retry") {
       void search.retry();
       q.focus();
     }
