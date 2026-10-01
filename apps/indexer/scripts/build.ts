@@ -12,6 +12,8 @@
 //   --out           the index directory (default dist). Emptied first if it holds an earlier build.
 //   --now-year      registration age is measured to this year fraction. Default: the publish
 //                   date. `--now-year 2026.74` reproduces the research's 2026-09-16 numbers.
+//   --research-split  split other names at " | " as the research did (see entities.ts), for
+//                   `check --reference`
 //   --dump-prominence  also write <out>/prominence.tsv for `check --reference`
 import { parseArgs } from "node:util";
 import { buildIndex, peakRssMb } from "../src/build.ts";
@@ -25,6 +27,7 @@ const { values } = parseArgs({
     out: { type: "string", default: "dist" },
     "now-year": { type: "string" },
     "dump-prominence": { type: "boolean", default: false },
+    "research-split": { type: "boolean", default: false },
   },
 });
 
@@ -46,6 +49,7 @@ const report = await buildIndex({
   inputs,
   out: values.out as string,
   dumpProminence: values["dump-prominence"] as boolean,
+  researchSplit: values["research-split"] as boolean,
   log,
   ...(nowYear === undefined ? {} : { nowYear }),
 });

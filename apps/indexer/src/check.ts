@@ -10,6 +10,7 @@ import {
   type Entry,
   filePath,
   type Manifest,
+  parseManifest,
   queryTokens,
   route,
   routingTable,
@@ -28,9 +29,11 @@ const KB = 1024;
 
 /** An index directory, read file by file. */
 export class IndexDir {
+  readonly dir: string;
   readonly manifest: Manifest;
-  constructor(readonly dir: string) {
-    this.manifest = JSON.parse(readFileSync(join(dir, "index.json"), "utf8")) as Manifest;
+  constructor(dir: string) {
+    this.dir = dir;
+    this.manifest = parseManifest(JSON.parse(readFileSync(join(dir, "index.json"), "utf8")));
   }
 
   get fileCount(): number {
@@ -106,18 +109,16 @@ export function checkIndex(index: IndexDir, records: number | undefined, report:
     entries += list.length;
     if (list.length === 0) problems.push(`file ${n} is empty`);
     if (list.length > CAP) problems.push(`file ${n} has ${list.length} entries, over ${CAP}`);
-    if (cappedSet.has(n) !== (list.length === CAP)) {
-      problems.push(
-        `file ${n} has ${list.length} entries and is ${cappedSet.has(n) ? "" : "not "}capped`,
-      );
+    // Capped means cut to the cap. A file that holds exactly the cap was not cut.
+    if (cappedSet.has(n) && list.length !== CAP) {
+      problems.push(`file ${n} is capped and has ${list.length} entries, not ${CAP}`);
     }
     list.forEach((e, i) => {
       seen.add(e.lei);
       const prev = list[i - 1];
-      if (
-        prev !== undefined &&
-        (prev.prominence < e.prominence || (prev.prominence === e.prominence && prev.lei >= e.lei))
-      ) {
+      // Lines go by full-precision prominence, which the file does not hold: within one
+      // stored value only the reference can tell the order.
+      if (prev !== undefined && prev.prominence < e.prominence) {
         problems.push(`file ${n} is out of order at ${e.lei}`);
       }
     });

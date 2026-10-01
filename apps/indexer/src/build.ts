@@ -26,6 +26,8 @@ export interface BuildOptions {
    * research used 2026.74 for the 2026-09-16 copy; pass that to reproduce its numbers.
    */
   nowYear?: number;
+  /** Split other names at " | " as the research did, for comparing with its index. */
+  researchSplit?: boolean;
   /** Also write prominence.tsv. */
   dumpProminence?: boolean;
   log?: (message: string) => void;
@@ -95,7 +97,7 @@ function prepare(out: string): void {
 }
 
 export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
-  const { inputs, out, dumpProminence = false, log = () => {} } = options;
+  const { inputs, out, dumpProminence = false, researchSplit = false, log = () => {} } = options;
   const nowYear = options.nowYear ?? yearFraction(inputs.asOf);
   const seconds: Record<string, number> = {};
   const step = async <T>(name: string, run: () => Promise<T> | T): Promise<T> => {
@@ -116,7 +118,7 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   log(`  ${isins.size.toLocaleString()} LEIs with ISINs, ${bics.size.toLocaleString()} with a BIC`);
 
   const { entities, postings, stats } = await step("entities", () =>
-    readEntities(inputs.lei2, { relationships, isins, bics, nowYear }, (rows) =>
+    readEntities(inputs.lei2, { relationships, isins, bics, nowYear, researchSplit }, (rows) =>
       log(`  ${rows.toLocaleString()} rows, rss ${peakRssMb().toFixed(0)} MB`),
     ),
   );

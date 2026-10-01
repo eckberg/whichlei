@@ -197,9 +197,9 @@ export function writeInputs(dir: string, golden: Golden, asOf = "2026-09-16"): I
 export const LEI = {
   maersk: "MAERSK00000000000001",
   ericsson: "ERICSSON000000000002",
-  ericssonSweden: "ERICSSON000000000003",
+  ericssonSweden: "ERICSSWEDEN000000003",
   fund: "FUND0000000000000004",
-  inactive: "INACTIVE0000000000005",
+  inactive: "INACTIVE000000000005",
   quoted: "QUOTED00000000000006",
   noTerm: "NOTERM00000000000007",
   gazprom: "GAZPROM0000000000008",

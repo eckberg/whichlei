@@ -48,6 +48,12 @@ export interface EntityInputs {
   bics: ReadonlySet<string>;
   /** The golden copy's date as a year fraction, for registration age. */
   nowYear: number;
+  /**
+   * Split other names at " | " as the research did, by writing them to a TSV joined with
+   * that string and reading them back. A name that holds it becomes two, and its types
+   * shift. For comparing with the research index; off, a name stays whole.
+   */
+  researchSplit?: boolean;
 }
 
 // Python's str.strip() removes Unicode whitespace; JavaScript's trim() removes a slightly
@@ -59,6 +65,30 @@ const STRIP = new RegExp(`^[${PY_SPACE}]+|[${PY_SPACE}]+$`, "g");
 /** A name as the research cleaned it: separators become spaces, the ends are stripped. */
 export function cleanName(name: string): string {
   return name.replace(/[\t\r\n]/g, " ").replace(STRIP, "");
+}
+
+/**
+ * The research wrote the names of an entity joined with " | " and split them again, pairing
+ * them with the types by position and dropping what had no type. Reproduced exactly.
+ */
+function researchSplit(
+  others: [name: string, type: string][],
+  translit: string[],
+): [[name: string, type: string][], string[]] {
+  const JOIN = " | ";
+  const names = others.map(([name]) => name).join(JOIN);
+  const types = others.map(([, type]) => type).join(JOIN);
+  let pairs: [string, string][] = [];
+  if (names !== "") {
+    const typeList = types.split(JOIN);
+    pairs = names
+      .split(JOIN)
+      .flatMap((name, i): [string, string][] =>
+        i < typeList.length ? [[name, typeList[i] as string]] : [],
+      );
+  }
+  const joined = translit.join(JOIN);
+  return [pairs, joined === "" ? [] : joined.split(JOIN)];
 }
 
 /** Registration status letters, in the research's order. A status not listed reads as MERGED. */
@@ -158,22 +188,32 @@ export async function readEntities(
     }
 
     const name = cleanName(row[k["Entity.LegalName"]] as string);
-    // Variants: the legal name, then the other names by type, then the transliterated ones.
-    const variants: [type: number, name: string][] = [];
-    const listed: string[] = [];
+    // The other names and their types, then the transliterated names, as the file has them.
+    let others: [name: string, type: string][] = [];
+    let translit: string[] = [];
     for (let i = 0; i < OTHER_NAMES.length; i++) {
       const raw = row[otherName[i] as number] as string;
       if (raw === "") continue;
-      const other = cleanName(raw);
-      const type = nameType(cleanName(row[otherType[i] as number] as string));
+      others.push([cleanName(raw), cleanName(row[otherType[i] as number] as string)]);
+    }
+    for (const column of transliterated) {
+      const raw = row[column] as string;
+      if (raw !== "") translit.push(cleanName(raw));
+    }
+    if (inputs.researchSplit === true) {
+      [others, translit] = researchSplit(others, translit);
+    }
+
+    // Variants: the other names by type, then the transliterated ones.
+    const variants: [type: number, name: string][] = [];
+    const listed: string[] = [];
+    for (const [other, typeName] of others) {
+      const type = nameType(typeName);
       variants.push([type, other]);
       // Only trading and alternative-language names are listed with the entity.
       if ((type === 1 || type === 2) && other !== "") listed.push(other);
     }
-    for (const column of transliterated) {
-      const raw = row[column] as string;
-      if (raw === "") continue;
-      const other = cleanName(raw);
+    for (const other of translit) {
       variants.push([3, other]);
       if (other !== "") listed.push(other);
     }

@@ -195,6 +195,41 @@ describe("build, end to end on a tiny golden copy", () => {
     expect(top("acme holdings 7 limited")[0]).toBe(fillerLei(7));
   });
 
+  test("a name that holds ' | ' stays whole, unless the research's split is asked for", async () => {
+    const golden = {
+      specs: [
+        {
+          lei: "PIPE0000000000000001",
+          name: "Pipe Holding",
+          others: [
+            ["Alpha | Beta", "TRADING_OR_OPERATING_NAME"],
+            ["Gamma", "ALTERNATIVE_LANGUAGE_LEGAL_NAME"],
+          ] as [string, string][],
+        },
+      ],
+      relations: [],
+      isins: {},
+      bics: [],
+    };
+    const inputs = writeInputs(join(root, "pipe"), golden);
+    const read = async (researchSplit: boolean) => {
+      const result = await readEntities(inputs.lei2, {
+        relationships: await readRelationships(inputs.rr),
+        isins: new Map(),
+        bics: new Set(),
+        nowYear: 2026.74,
+        researchSplit,
+      });
+      return { names: result.entities.otherNames[0], stats: result.stats };
+    };
+    const whole = await read(false);
+    expect(whole.names).toEqual(["Alpha | Beta", "Gamma"]);
+    expect(whole.stats.pipeNames).toBe(1);
+    // The research split it in two, paired the pieces with the two types by position and
+    // so dropped "Gamma".
+    expect((await read(true)).names).toEqual(["Alpha", "Beta"]);
+  });
+
   test("codes.json names legal forms and registration authorities", () => {
     const text = readFileSync(join(out, manifest.build, "codes.json"), "utf8");
     expect(JSON.parse(text)).toEqual({
