@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { CsvParser, columnsOf, parseCsv, parseCsvStream } from "./csv.ts";
+import { CsvParser, columnsOf, MAX_RECORD_BYTES, parseCsv, parseCsvStream } from "./csv.ts";
 
 describe("csv", () => {
   test("reads plain fields and rows", () => {
@@ -113,6 +113,26 @@ describe("csv", () => {
 
   test("reads an unterminated quote to the end of the data", () => {
     expect(parseCsv('a,b\n1,"open').rows).toEqual([["1", "open"]]);
+  });
+
+  test("a record over the size limit is an error, and an unterminated quote fails fast", async () => {
+    expect(() => parseCsv(`a,b\n1,"${"x".repeat(MAX_RECORD_BYTES + 10)}`)).toThrow(
+      /longer than 1048576 bytes \(after 0 rows\)/,
+    );
+    // Streamed in 64 KB chunks, it stops at the limit, not at the end of the file.
+    let chunks = 0;
+    async function* endless() {
+      yield Buffer.from('a,b\n1,2\n3,"never closed');
+      for (;;) {
+        chunks++;
+        if (chunks > 1000) throw new Error("read the whole file");
+        yield Buffer.alloc(64 * 1024, "x");
+      }
+    }
+    await expect(parseCsvStream(endless(), () => {})).rejects.toThrow(/after 1 rows/);
+    expect(chunks).toBeLessThan(40);
+    // A long record under the limit is fine.
+    expect(parseCsv(`a\n"${"y".repeat(500_000)}"\n`).rows[0]?.[0]).toHaveLength(500_000);
   });
 
   test("reads a stream of chunks", async () => {

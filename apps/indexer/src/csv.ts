@@ -13,6 +13,13 @@ const CR = 0x0d;
 const LF = 0x0a;
 const BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 
+/**
+ * The longest record the parser will hold. A golden copy row is a few KB. A quote that is
+ * never closed would otherwise swallow the rest of the file, 3 GB in memory, so a record
+ * this long is an error.
+ */
+export const MAX_RECORD_BYTES = 1024 * 1024;
+
 export interface CsvOptions {
   /**
    * Called once with the header row. Returns the columns to decode in the rows that
@@ -29,6 +36,7 @@ export interface CsvOptions {
 export class CsvParser {
   #pending: Buffer | null = null;
   #bomChecked = false;
+  #rows = 0;
   #header: string[] | null = null;
   /** 1 for the columns to decode. */
   #wanted: Uint8Array = new Uint8Array(0);
@@ -55,6 +63,12 @@ export class CsvParser {
       if (buffer.subarray(0, BOM.length).equals(BOM)) buffer = buffer.subarray(BOM.length);
     }
     const used = this.#scan(buffer, false);
+    if (buffer.length - used > MAX_RECORD_BYTES) {
+      throw new Error(
+        `a CSV record is longer than ${MAX_RECORD_BYTES} bytes (after ${this.#rows} rows); ` +
+          "a quote that is never closed, or not a CSV file",
+      );
+    }
     if (used < buffer.length) this.#pending = Buffer.from(buffer.subarray(used));
   }
 
@@ -171,7 +185,10 @@ export class CsvParser {
     }
 
     if (isHeader) this.#start(row);
-    else this.#onRow(row);
+    else {
+      this.#rows++;
+      this.#onRow(row);
+    }
     return p;
   }
 
