@@ -36,7 +36,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | The search index is **static files on a CDN**. No search server | 6,438 files, 221 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
+| 1 | The search index is **static files on a CDN**. No search server | 6,445 files, 221 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
 | 2 | An opened record is **fetched live** from the GLEIF API | The API is too slow for typeahead (~0.5 s median, per-IP rate limit) but right for one deliberate lookup, and always current. |
 | 3 | The index is **rebuilt nightly** from GLEIF's daily files | The only compute in the system. Runs on free CI. |
 | 4 | Ranking adds a **prominence** score to **name match**, with weights fitted on an evaluation set | Name match alone ranked Telefonaktiebolaget LM Ericsson 335th for "ericsson". Fitted, the mean reciprocal rank on held-out queries goes from .23 to .65. See §4. |
@@ -60,6 +60,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 22 | Each publish **keeps the build it replaces** and **a build that fails a check publishes nothing**. The checks compare the new build with the live one, with bounds in one reviewed file, `apps/index/checks.json` | A page that loaded the old `index.json` keeps working, and a rollback has something to return to. A bad night of GLEIF data, or a bug in the indexer, must not reach the live index unseen; a legitimate big change is a reviewed commit to the bounds. See [slice 6](docs/specs/06-data-publishing.md). |
 | 23 | **The font is self-hosted** (Red Hat Mono, SIL OFL, `apps/web/static/fonts/`) and the **CSP allows only the site, the index host and the GLEIF API**, with no inline script or style | A Google Fonts request tells a third party about every visit, against the privacy promise of decision 12. Without inline code the policy stops injected script from running. |
 | 24 | **Search runs in a Web Worker**: the index client, routing, decoding and scoring. The page sends every input with a sequence number, the worker works on the newest only, and answers to older inputs are dropped | Typing never waits on scoring, which took up to 300 ms of the main thread at 4× CPU slowdown (slice 7 spec). A pass cannot be interrupted, so what the user typed meanwhile replaces the queue rather than lining up behind it. Where `Worker` is missing the same code runs on the page. |
+| 26 | **Acronyms are searchable**: entities with prominence ≥ 1 also index the initials of their names ("Skandinaviska Enskilda Banken AB" → "seb"), and a one-word query equal to a name's initials matches it | 31 of 32 well-known acronyms found nothing: no index term held them. On a set of 79 acronyms and short names, held-out half, the right entity first .48 → .70, for +7 index files (+0.16% bytes). Two-letter initials and a lower threshold cost more, for no better objective on the fitting half. [Slice 10](docs/specs/10-ranking-gaps.md). |
 
 ## 3. Architecture
 
@@ -77,10 +78,10 @@ Two paths, split by latency.
 |---|---|
 | Records | 3,431,742 |
 | Reachable through the index | 96.7% |
-| Index files | 6,438 |
+| Index files | 6,445 |
 | Index size, gzipped | 221 MB |
 | File size, gzipped | median 36 KB, max 82 KB |
-| Fetched while typing, debounce fires on every key | median 148 KB, p90 272 KB, max 463 KB |
+| Fetched while typing, debounce fires on every key | median 148 KB, p90 272 KB, max 465 KB |
 | Fetched while typing, debounce fires on the last key | median 64 KB, p90 105 KB, max 225 KB |
 | Parsing and scoring, slowest keystroke per query (Chromium, 4× CPU slowdown) | median 45 ms, p90 74 ms, max 222 ms |
 | Manifest with the routing table, gzipped | 21 KB |
@@ -101,8 +102,10 @@ Each candidate's score is its prominence plus its best name match.
   status, consolidated subsidiaries, top-parent status, BIC, ISINs, registration age, name
   length. It orders each file and decides what survives a file's cap.
 - **Match** is computed in the browser: words matched, exact or fuzzy (one edit), share of
-  the name's words matched, exact name.
-- 19 weights, fitted on half of the evaluation set. The other half is only used to report.
+  the name's words matched, exact name, the name less its legal form, the name's initials.
+- 21 weights: 19 fitted on half of the evaluation set, then the two for the legal form and
+  initials (slice 10) chosen on the same half with the 19 fixed. The other half is only
+  used to report.
 
 The evaluation set covers well-known entities by common name and brand (from Wikidata),
 mid-tier entities by their first words, obscure entities by full legal name, and typos.
@@ -120,9 +123,16 @@ On 100 of the well-known queries, GLEIF's own autocomplete puts the right entity
 of the time; this ranking 56%. The held-out half was scored more than once while fixing
 bugs, so these numbers may be slightly optimistic.
 
-Known gaps: acronyms ("seb" finds SEB SA, not the bank), short queries of two to four
-letters ("bp", "sas"), ~92k names with no Latin-script form, typos in the first three or
-four characters, previous names.
+Slice 10 added acronyms and names less their legal form ("bp" finds BP P.L.C., not BPCE).
+Held-out half, the right entity first: well-known entities .557 → .570, the other strata
+unchanged or up; 79 well-known acronyms and short names .48 → .70; the evaluation set's
+one-word queries of two to four characters .26 → .29 (named entities .38 → .45).
+
+Known gaps: two-letter acronyms ("ge", "db"), acronyms of entities with prominence under 1
+("klm", "hbo"), acronyms that are not the legal name's initials ("anz", "iag"); "seb" still
+finds SEB SA first (more prominent, and named exactly that); "sas" and "sca" rank second
+behind companies with that legal form; ~92k names with no Latin-script form, typos in the
+first three or four characters, previous names.
 
 Method, code and full results: [`research/ranking/`](research/ranking/).
 
