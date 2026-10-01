@@ -14,8 +14,9 @@ import {
   toCandidate,
   topK,
 } from "@whichlei/core";
+import { loadEval, summary } from "../src/evaluation.ts";
 import { keystrokes } from "../src/session.ts";
-import { loadEval, OUT_DIR, summary } from "./data.ts";
+import { OUT_DIR } from "./data.ts";
 
 const { values: args } = parseArgs({ options: { every: { type: "string", default: "1" } } });
 const dir = join(OUT_DIR, "lines");

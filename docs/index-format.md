@@ -11,6 +11,7 @@ index.json              the manifest; the only file that changes in place
 <build>/0.txt           index file 0
 <build>/1.txt           ...
 <build>/<n-1>.txt
+<build>/codes.json      names for legal form and registration authority codes
 ```
 
 `<build>` is unique per build: `YYYYMMDD-<hex>`, the golden-copy date (the manifest's
@@ -113,6 +114,39 @@ Example:
 ```
 
 `decodeEntries` parses a file; `toCandidate` tokenises an entry's names for `topK`.
+
+## Code names: `<build>/codes.json`
+
+Names for the codes a record carries, so a page shows "Aktiebolag" and "Bolagsverket", not
+`XJHM` and `RA000544`. Compact JSON, keys in order, part of the build's content hash:
+
+```json
+{
+  "elf": { "2HBR": "Gesellschaft mit beschränkter Haftung", "XJHM": "Aktiebolag" },
+  "ra": { "RA000544": "Bolagsverket", "RA000585": "Companies House" }
+}
+```
+
+- `elf`: ISO 20275 entity legal form code to the form's name in its own language (the local
+  name of the code's first row in GLEIF's list; else the transliterated name; else the
+  abbreviation). Codes with no name are left out.
+- `ra`: registration authority code to the name of the organisation that keeps the
+  register (its local name; else its international name; else the register's name).
+  Codes with no name are left out. Absent when the build had no registration authorities
+  list (a local input directory without `ra-list.csv`).
+
+A code that is missing from the file is shown as the code.
+
+## The index directory the indexer writes
+
+```
+index.json  <build>/…      the index, as above: what slice 6 publishes
+build.json                 the build's own report (records, reachable entities, seconds, peak memory)
+prominence.tsv             only with `build --dump-prominence`: LEI, full-precision prominence,
+                           registration age. Used by `check --reference`
+```
+
+`build.json` and `prominence.tsv` are not part of the index and are never published.
 
 ## What the page gets from the GLEIF API instead
 

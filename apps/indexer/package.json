@@ -1,0 +1,19 @@
+{
+  "name": "@whichlei/indexer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node --max-old-space-size=8000 scripts/build.ts",
+    "check": "node --max-old-space-size=6000 scripts/check.ts",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@whichlei/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@whichlei/bench": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -2,6 +2,9 @@
   "name": "@whichlei/bench",
   "private": true,
   "type": "module",
+  "exports": {
+    "./evaluation": "./src/evaluation.ts"
+  },
   "scripts": {
     "typecheck": "tsc",
     "build-index": "node --max-old-space-size=12000 scripts/build.ts",
