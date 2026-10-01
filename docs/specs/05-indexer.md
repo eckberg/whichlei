@@ -51,13 +51,16 @@ On the 2026-09-16 golden copy and the mapping files in `research/data`:
 ## Measured
 On the 2026-09-16 golden copy and the mapping files in `research/data`, this sandbox (4
 vCPU, one build at a time). Build: `pnpm --filter @whichlei/indexer build --input-dir …
---now-year 2026.74 --research-split --dump-prominence`; check: `check <dir> --reference
+--now-year 2026.74 --research-split --dump-prominence` (research/data has no
+`ra-list.csv`, so that command warns and writes a `codes.json` without `ra`; the measurements
+above used a copy of the directory with the list from gleif.org); check: `check <dir> --reference
 research/data/index --eval`.
 
-- measured: **build 2 min 49 s** wall (entities 105 s, grouping 5 s, packing 8 s, writing
-  37 s; the inputs are read from disk, so a runner's download time comes on top). **Peak
-  RSS 1.79 GB** (`process.resourceUsage().maxRSS`; `/usr/bin/time -v` is not installed here,
-  the workflow uses it). Check with reference and evaluation: 3 min 8 s.
+- measured: **build 2 min 53 s** wall with the research flags (entities 107 s, grouping 6 s,
+  packing 10 s, writing 37 s; the inputs are read from disk, so a runner's download time
+  comes on top); 2 min 41 s by default. **Peak RSS 1.84 GB with the research flags, 1.62 GB
+  by default** (`process.resourceUsage().maxRSS`; `/usr/bin/time -v` is not installed here,
+  the workflow uses it). Check with reference and evaluation: 3 min 27 s, exit 0.
 - measured: **6,438 files, 767 capped, 3,317,220 of 3,431,742 entities reachable (96.66%)**,
   1,301,799 terms, 7,495,587 entries (the reference's number). 523.9 MB raw, **220.6 MB
   gzip level 6** (slice 4: 221 MB); per file gzip median 36.3 KB, p90 43.3 KB, max 81.6 KB.
@@ -68,15 +71,17 @@ research/data/index --eval`.
   a different tenth** (list: none).
 - measured: **evaluation objective 0.6516 on the test half (1,613 rows), 0.6571 on all
   3,229 queries**, replayed over the built files: slice 4's .6516.
-- measured: **files, 12 of 6,438 differ from `files.tsv` in 26 positions**, each an adjacent
-  swap of two entities whose prominence differs by one float32 step. Cause below.
+- measured: **files, 12 of 6,438 differ from `files.tsv` in 26 positions**: 11 adjacent
+  swaps of two entities and one rotation of five, all within 1e-6 of prominence of each
+  other. Cause below. `check --reference` reports such files as expected (same entities,
+  order differing only within 1e-6) and exits 0; any other difference exits 1.
 - Workflow run on a GitHub runner: not run yet (the branch is not pushed).
 
 ### Differences from the reference, and why
 1. **Float32 log, 12 files.** numpy computes `ln(name length)` in float32 with its own
    routine, which differs from the correctly rounded value in the last bit for about 3% of
    lengths (7, 37, 47, 217 …). The port rounds `Math.log` to float32. A prominence then
-   differs by one step (≤ 9.54e-7), and two entities that tie to within a step swap places.
+   differs by one step (≤ 9.54e-7), and entities that tie to within a step swap places.
    The reference's own order depends on the CPU's numpy kernel. No effect on the
    objective.
 2. **Names with " | " (64 in the golden copy).** The research wrote an entity's other names
@@ -89,7 +94,16 @@ research/data/index --eval`.
    uses the publish date, 2026-09-16 = 2026.708. `--now-year 2026.74` reproduces the
    reference. Default build, same inputs: same 6,438 files, 3,317,220 reachable,
    objective 0.6515 test, 0.6570 all.
-4. **Download of the code lists.** The page links are looked up at build time:
+4. **Mapping files by golden copy time.** A download takes the newest `valid` and
+   `processed` ISIN and BIC upload from before the golden copy was published, not the
+   newest (the research took the newest on the day it fetched). Local inputs are whatever
+   the directory holds. The BIC file is uploaded about monthly, so the match can be weeks
+   older than the golden copy.
+5. **Bad records are skipped and counted** (bad LEI or country, unknown registration status,
+   empty legal name; `build.json` lists counts and 20 examples), and the build fails above
+   1,000 rows or 0.1%. The golden copy has none. The research read an unknown status as
+   MERGED.
+6. **Download of the code lists.** The page links are looked up at build time:
    `lei-data/code-lists/iso-20275-entity-legal-forms-code-list` (the research's
    `about-lei/…` URL moved) and `…/gleif-registration-authorities-list`; 3,597 legal forms
    and 1,135 registration authorities in `codes.json`.
