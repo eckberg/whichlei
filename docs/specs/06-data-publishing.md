@@ -67,7 +67,27 @@ a reviewed commit, not a silent pass.
 
 ## Done when
 - A scheduled run publishes on its own, and the live `index.json` names the new build.
-  Link to run.
-- A run with a check forced to fail publishes nothing. Link to run.
-- A rollback run restores the previous build. Link to run.
-- The live index serves compressed files with the right headers. `curl -I` output.
+  Link to run. *Open: the first scheduled run is 2026-10-02 02:47 UTC.* Runs by hand so
+  far: first publish [36815400906](https://github.com/eckberg/whichlei/actions/runs/36815400906)
+  (golden copy 2026-09-30), second publish
+  [36816367009](https://github.com/eckberg/whichlei/actions/runs/36816367009) (2026-10-01,
+  build `20261001-567e5041`, previous build's files still served).
+- A run with a check forced to fail publishes nothing. Done:
+  [36817310915](https://github.com/eckberg/whichlei/actions/runs/36817310915) failed at
+  the checks; assemble and deploy were skipped and the live build stayed `20261001-567e5041`.
+- A rollback run restores the previous build. Done:
+  [36818228173](https://github.com/eckberg/whichlei/actions/runs/36818228173) restored
+  `20260930-fb13c541`; a publish afterwards
+  ([36818298691](https://github.com/eckberg/whichlei/actions/runs/36818298691)) brought
+  `20261001-567e5041` back.
+- The live index serves compressed files with the right headers. Done (Cloudflare chose
+  brotli, so slice 4's gzip assumption holds or better):
+
+  ```
+  GET /index.json            200  application/json  content-encoding: br
+                             cache-control: no-cache  access-control-allow-origin: *
+  GET /20260930-fb13c541/100.txt
+                             200  text/plain  content-encoding: br
+                             cache-control: public, max-age=31536000, immutable
+                             access-control-allow-origin: *  x-content-type-options: nosniff
+  ```
