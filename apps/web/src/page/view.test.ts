@@ -47,8 +47,12 @@ describe("rowsHtml", () => {
     const hits: Hit[] = [{ entry: entry() }, { entry: entry({ lei: `${"B".repeat(18)}01` }) }];
     const out = rowsHtml(hits, ["ericsson"], 1);
     expect(out.match(/role="option"/g)).toHaveLength(2);
-    expect(out).toContain('id="opt-0" data-k="0" aria-selected="false"');
-    expect(out).toContain('id="opt-1" data-k="1" aria-selected="true"');
+    expect(out).toContain(
+      'id="opt-0" data-k="0" aria-setsize="2" aria-posinset="1" aria-selected="false"',
+    );
+    expect(out).toContain(
+      'id="opt-1" data-k="1" aria-setsize="2" aria-posinset="2" aria-selected="true"',
+    );
     expect(out).toContain('<span class="ptr" aria-hidden="true">&gt;</span>');
     expect(out).toContain("Telefonaktiebolaget LM <mark>Ericsson</mark>");
     expect(out).toContain('<span class="st st-active">active</span>');

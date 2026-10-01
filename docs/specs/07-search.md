@@ -156,26 +156,21 @@ Slice 4's harness, in the same session, before and after: slowest keystroke 71 /
 - Keys 50 ms apart: 5,065 of 12,327 keys get results of their own, the rest are replaced by a
   newer key before they run, which is the point of the newest-only queue.
 
-## Measured with rows drawn in parts
-The first 20 rows and the preview are drawn at once, the rest 15 at a time in the next frames.
-Same bench, page phase only (worker, 4×, the self-slowed worker; median / p90 / max):
-
-| | every key (202 queries) | last key (808 queries) |
-|---|---|---|
-| Key to first results painted (typing pass) | 107 / 296 / 622 ms | 121 / 202 / 487 ms |
-| Slowest per query | 339 / 384 / 622 ms | 210 / 331 / 487 ms |
-| Last key to final results (after the pause pass) | 165 / 268 / 415 ms | 300 / 374 / 537 ms |
-| Key to next paint, slowest per query | 24 / 47 / 80 ms | under 16 ms |
-| Queries with a long task over 50 ms | 93.6% | 78.5% |
-| Long tasks over 50 ms, total / longest | 758 / 117 ms | 1,628 / 172 ms |
-| DOM update per key | 16 / 30 / 57 ms | n/a |
-
-The DOM update fell (24 / 47 / 93 to 16 / 30 / 57 ms) but long tasks did not: 91% and 60% of queries
-before, 94% and 79% now. A trace of one query shows why. The long tasks are the browser's own work
-for a frame at 4×: layout 20-65 ms and paint 15-30 ms, around 8-18 ms of our script. Drawing 8, 20
-or 50 rows first gave 17, 27 and 19 long tasks in 34 keys, so row count is not what sets them, and
-the extra frames of the later parts add some in last-key mode. Not solved: it needs a cheaper layout
-and paint of the list on a phone, not less script.
+## What was tried against the render long tasks
+Long tasks over 50 ms remain on the main thread at 4× (91% of queries with the debounce on every key,
+60% with it on the last; table above). A trace of one query shows what they are: the frame after a
+result update, with layout 20-65 ms (about 500 objects, the whole list), paint 15-30 ms and 6-18 ms
+of our script. Each was tried in the same locked sessions and kept only if it lowered long tasks:
+- Drawing the first 20 rows and the rest in later frames: DOM update 24 / 47 / 93 to 16 / 30 / 57 ms,
+  but long tasks did not fall (94% and 79% of queries, more frames) and 8, 20 or 50 rows first gave
+  17, 27 and 19 in a 34-key trace. Reverted.
+- `contain: content` on the list and preview and `contain: layout` on the main area: 51 and 51 long
+  tasks against 43 to 53 for the base, in the same session. Not kept.
+- Writing the info line, key bar, footer and attributes only when they changed: 57, 58 and 48 long
+  tasks against 49, 54 and 58 for the base. Not kept.
+- Kept earlier: `content-visibility: auto` on rows (layout of 50 rows at 4× on a phone, 25-35 to 5 ms).
+Per frame the work is about 60 ms at 4×, which is about 15 ms at 1×: inside a 16 ms frame on a
+desktop-class CPU. Whether it matters on a phone is for the real-phone check.
 
 ## Done when
 Final state of the slice.
@@ -184,12 +179,12 @@ Met:
 - **Bytes per query** 148 / 272 / 463 KB and 64 / 105 / 225 KB (≤ 150 / 280 / 480 and ≤ 65 / 110 /
   240), through the production module; the top 10 equals the reference for all 1,607 test queries.
 - **Typing does not wait on search.** Search runs in a worker: key to next paint, slowest per query,
-  24 / 47 / 80 ms against 120 / 168 / 304 ms with search on the page's thread; the main thread runs
+  32 / 48 / 120 ms against 120 / 168 / 304 ms with search on the page's thread; the main thread runs
   no search code. Stale queries are dropped (tested, and measured: with keys 50 ms apart most keys are
   replaced before they run).
-- **e2e:** 46 tests (find by name, keys, copy, open, escape, about, LEI good and bad, errors, format
-  reload, worker and fallback, fast typing, rows drawn in parts, dark mode, phone width). axe reports
-  no violations in light or dark on empty, results, error and about states. 349 unit tests, lint
+- **e2e:** 45 tests (find by name, keys, copy, open, escape, about, LEI good and bad, errors, format
+  reload, worker and fallback, fast typing, result numbering, dark mode, phone width). axe reports
+  no violations in light or dark on empty, results, error and about states. 348 unit tests, lint
   and typecheck pass.
 
 Not met:
@@ -203,8 +198,9 @@ Not met:
   worker's time to results is the same as on the page's thread (118 vs 125 ms median, every key), so
   the worker is not a latency gain; it frees the main thread.
 - **"No search long task on the main thread; render long tasks ≤ 50 ms at p90 at 4×."** The first half
-  holds by construction. The second does not: 94% of queries (every key) and 79% (last key) have a
-  frame over 50 ms (longest 117 and 172 ms), from layout and paint (above).
+  holds by construction. The second does not: 91% of queries (every key) and 60% (last key) have a
+  frame over 50 ms (longest 121 and 141 ms), from layout and paint (above). Three changes aimed at it
+  did not lower them.
 
 Not measurable here:
 - A real phone. 4× CPU slowdown on this host stands in for it, and the worker's slowdown is emulated.
@@ -212,5 +208,5 @@ Not measurable here:
   CORS header). Screenshots are in the session notes, not committed.
 
 ## Status
-Built, tested and measured as above. Next: a cheaper list layout and paint on a phone, then a
-real-phone check.
+Built, tested and measured as above. Open: the render long tasks, and the real-phone check that
+says whether they matter.

@@ -139,6 +139,17 @@ test.describe("search", () => {
     await expect(page.locator("#opt-0")).toHaveAttribute("aria-selected", "true");
   });
 
+  test("numbers the results for screen readers", async ({ page }) => {
+    await open(page);
+    await box(page).fill("bank");
+    const total = Number(await page.locator("#opt-0").getAttribute("aria-setsize"));
+    expect(total).toBeGreaterThan(30);
+    await expect(page.locator("#list [role=option]")).toHaveCount(total);
+    await expect(page.locator(`#opt-${total - 1}`)).toHaveAttribute("aria-posinset", String(total));
+    for (let i = 0; i < 3; i++) await page.keyboard.press("PageDown");
+    await expect(box(page)).toHaveAttribute("aria-activedescendant", "opt-30");
+  });
+
   test("copies the selected LEI on enter and says so", async ({ browser }) => {
     const context = await browser.newContext({
       permissions: ["clipboard-read", "clipboard-write"],
