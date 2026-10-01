@@ -1,6 +1,7 @@
 // After a deploy (or a rollback): does the live index serve what it should, the way it
 // should? Reads files as a browser would, with compression, and counts the bytes on the wire.
-import { request } from "node:https";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { brotliDecompressSync, gunzipSync } from "node:zlib";
 import { decodeEntries, filePath, type Manifest, parseManifest } from "@whichlei/core";
 import { IMMUTABLE, REVALIDATE } from "./headers.ts";
@@ -15,9 +16,10 @@ export interface RawResponse {
 
 export type Transport = (url: string) => Promise<RawResponse>;
 
-/** HTTPS GET asking for br or gzip, no decoding. */
+/** HTTPS GET (HTTP for a local test server) asking for br or gzip, no decoding. */
 export const httpsTransport: Transport = (url) =>
   new Promise((resolve, reject) => {
+    const request = url.startsWith("http:") ? httpRequest : httpsRequest;
     const req = request(url, { headers: { "accept-encoding": "br, gzip" } }, (res) => {
       const chunks: Buffer[] = [];
       res.on("data", (chunk: Buffer) => chunks.push(chunk));

@@ -30,17 +30,29 @@ can be restored with one run.
 ## Approach
 Build and check on one runner, deploy with `wrangler deploy --message <build>`. Keeping
 the live build means downloading its files from the live Worker (about 220 MB, one
-request each) and deploying both builds, 12,877 files, under the 20,000 limit. The check
+request each) and deploying both builds, 12,881 files (wrangler counts 12,884), under the 20,000 limit. The check
 thresholds live in one file in the repo, so a legitimate big change in GLEIF's data is
 a reviewed commit, not a silent pass.
 
 ## Unknowns
 - Wall time on a runner for build, checks, download and upload together. Target: under
-  60 minutes.
+  60 minutes. Local, this sandbox (4 vCPU, shared), 2026-09-16 golden copy, inputs on
+  disk: indexer build 163 s; `indexer check --eval` 116 s; `index checks` 18 s; `assemble`
+  1 s for a first publish (6,441 files, 524 MB) and 29 s for a second one (6,440 files
+  copied, 6,440 downloaded from a local server in 21 s; 12,881 files, 1,048 MB);
+  `wrangler deploy --dry-run` 6 s. Not measured here: the download of GLEIF's files, the
+  download from workers.dev, and the upload by `wrangler deploy`. First real run.
 - Whether Cloudflare compresses `text/plain` assets as slice 4 assumed. Checked on the live
   index: `content-encoding` and transferred bytes for a few files.
 - Whether re-enabling the workflow resets GitHub's 60-day clock. Documented by GitHub for
   activity, not for this call. Watched at the first 60-day mark.
+
+## Measured locally
+- All six fixed queries (`apps/index/checks.json`) find their entity first on the
+  2026-09-16 index; each LEI was checked against the GLEIF API. Objective 0.6515 (test
+  half), reachability 96.66%, gzip 220.7 MB: inside the first-publish bounds.
+- A second publish, with a local server standing in for the live Worker: `verify-live`
+  passes with gzip, 402 KB sent for 1,124 KB raw (36%), and fails without it.
 
 ## Done when
 - A scheduled run publishes on its own, and the live `index.json` names the new build.
