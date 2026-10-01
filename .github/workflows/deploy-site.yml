@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     environment:
       name: production
       url: https://whichlei.com
@@ -39,6 +39,9 @@ jobs:
           INDEX_ORIGIN: https://index.whichlei.com
       - id: deploy
         working-directory: apps/web
+        # bash with pipefail: wrangler prints the workers.dev URL before it can fail on the
+        # custom domain, and `| tee` would hide its exit code.
+        shell: bash
         run: |
           pnpm exec wrangler deploy | tee deploy.log
           url=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
@@ -51,6 +54,22 @@ jobs:
       - name: Deploy the www redirect
         working-directory: apps/redirect
         run: pnpm exec wrangler deploy
+      # The apex answers a minute or so after the deploy, and an edge may still serve the old
+      # robots.txt (Disallow) for a while. The check starts when it says Allow.
+      - name: Wait for whichlei.com to allow indexing
+        timeout-minutes: 6
+        shell: bash
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 10 https://whichlei.com/robots.txt | grep -qx 'Allow: /'; then
+              echo "whichlei.com/robots.txt allows indexing"
+              exit 0
+            fi
+            echo "attempt $i of 30: whichlei.com/robots.txt does not say 'Allow: /' yet"
+            sleep 10
+          done
+          echo "::error::https://whichlei.com/robots.txt did not say 'Allow: /' within 5 minutes"
+          exit 1
       # The live check (docs/specs/11-launch.md): a browser on the apex, Fathom let in but
       # answered by the check itself, so nothing is counted. It fails, and cannot hang: the
       # step and the test both have a limit.
