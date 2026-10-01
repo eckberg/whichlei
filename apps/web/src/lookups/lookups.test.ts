@@ -454,3 +454,23 @@ describe("Retry-After", () => {
     expect(none.gleif.calls).toHaveLength(2);
   });
 });
+
+describe("cookies", () => {
+  it("asks GLEIF without credentials by default, so its Set-Cookie is ignored", async () => {
+    const gleif = fakeGleif();
+    const inits: (RequestInit | undefined)[] = [];
+    vi.stubGlobal("fetch", (input: RequestInfo | URL, init?: RequestInit) => {
+      inits.push(init);
+      return gleif.fetch(String(input), init);
+    });
+    try {
+      const lookups = new Lookups();
+      lookups.input(ISIN);
+      await settle();
+      expect(inits).toHaveLength(1);
+      expect(inits[0]?.credentials).toBe("omit");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});

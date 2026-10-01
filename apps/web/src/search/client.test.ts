@@ -1,5 +1,5 @@
 import type { Manifest } from "@whichlei/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { IndexChangedError, IndexClient, IndexError } from "./client.ts";
 import { fakeServer, fixture } from "./test-helpers.ts";
 
@@ -27,7 +27,7 @@ describe("IndexClient", () => {
     const spy = new IndexClient(ORIGIN, {
       fetch: (input, init) => {
         inits.push(init);
-        return server.fetch(input, init);
+        return server.fetch(String(input), init);
       },
     });
     expect(await spy.manifest()).toEqual(manifest);
@@ -158,5 +158,24 @@ describe("IndexClient", () => {
     await client.file(manifest.build, 2);
     await client.file(manifest.build, 0);
     expect(server.log.filter((p) => p === `${manifest.build}/0.txt`)).toHaveLength(2);
+  });
+});
+
+describe("cookies", () => {
+  it("reads the index without credentials by default", async () => {
+    const { server, manifest } = setup();
+    const inits: (RequestInit | undefined)[] = [];
+    vi.stubGlobal("fetch", (input: RequestInfo | URL, init?: RequestInit) => {
+      inits.push(init);
+      return server.fetch(String(input), init);
+    });
+    try {
+      const client = new IndexClient(ORIGIN);
+      await client.manifest();
+      await client.file(manifest.build, 3);
+      expect(inits.map((init) => init?.credentials)).toEqual(["omit", "omit"]);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

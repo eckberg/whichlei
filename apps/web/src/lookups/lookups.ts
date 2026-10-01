@@ -101,7 +101,7 @@ const fromRecord = (record: LeiRecord): LookupHit => ({
 const EMPTY: LookupState = { text: "", readings: [] };
 
 export class Lookups {
-  readonly #fetch: Fetch | undefined;
+  readonly #fetch: Fetch;
   readonly #debounceMs: number;
   readonly #registerDebounceMs: number;
   readonly #timeoutMs: number;
@@ -116,7 +116,10 @@ export class Lookups {
   #heldUntil = 0;
 
   constructor(options: LookupOptions = {}) {
-    this.#fetch = options.fetch;
+    // GLEIF's load balancer answers with Set-Cookie. Omitting credentials makes the browser
+    // ignore it, so the site stays cookie-free whatever GLEIF sends (spec 11).
+    this.#fetch =
+      options.fetch ?? ((input, init) => fetch(input, { ...init, credentials: "omit" }));
     this.#debounceMs = options.debounceMs ?? LOOKUP_DEBOUNCE_MS;
     this.#registerDebounceMs = options.registerDebounceMs ?? REGISTER_DEBOUNCE_MS;
     this.#timeoutMs = options.timeoutMs ?? LOOKUP_TIMEOUT_MS;
@@ -203,7 +206,7 @@ export class Lookups {
       const answer = await query(reading, {
         // Stale (the box moved on) or too slow: either ends the request.
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(this.#timeoutMs)]),
-        ...(this.#fetch ? { fetch: this.#fetch } : {}),
+        fetch: this.#fetch,
       });
       this.#cache.set(key, answer);
       this.#set(reading, { phase: "done", ...answer });
