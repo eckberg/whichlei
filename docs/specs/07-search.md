@@ -39,6 +39,11 @@ prototype's 2,924 records encoded with `format.ts`.
   Measured with the slice 4 harness on this code.
 
 ## What was built
+- Search runs in a module Web Worker (`dist/search-worker.js`, DESIGN.md decision 20): the page
+  sends `{ seq, text }` for every input; `SearchHost` (`src/search/host.ts`) works on the newest
+  only and answers only while it is the newest; `RemoteSearch` (`src/page/remote.ts`) drops answers
+  to older inputs and keeps the hits array when nothing changed. Without `Worker` the same
+  `Search` runs on the page. CSP: `worker-src 'self'`.
 - `apps/web/src/search/`: `IndexClient` (manifest, files cached by `<build>/<n>.txt`, aborts a
   request nobody waits for, one manifest reload on a 404, `parseManifest`) and `Search` (the
   state machine; no DOM). `apps/web/src/page/`: `view.ts` (HTML strings, tested), `keys.ts` (what a
@@ -76,7 +81,7 @@ Bytes match slice 4 to the kilobyte, and the top 10 equals the reference for all
 keystroke is the typing pass plus the pause pass, each tokenise, route, decode new files, merge, score;
 the slowest single pass is 78 / 122 / 286 ms (every key).
 
-**The time targets are missed**, by 35 / 61 / 48 ms at the median, p90 and max (every key), and by
+(This section is the main-thread run, before the worker.) **The time targets are missed**, by 35 / 61 / 48 ms at the median, p90 and max (every key), and by
 33 pp on the share over 100 ms. Evidence that the machine, not the code, is most of it: this
 host was re-measured the same day with slice 4's own harness (`pnpm bench browser`, a single
 pass per key, no `Search`): 69 / 109 / 233 ms, against 45 / 73 / 225 ms in slice 4. Slice 4's 6×
@@ -84,7 +89,7 @@ run gave 69 / 113 / 371 ms: today's 4× is slice 4's 6×. Against the same-day h
 +22% / +29% / +28% (the pause pass after a typing pass that read other files, and state
 handling). In Node, `Search` and the harness cost the same (20 ms median). The numbers need a real
 phone (slice 4's unknown, still open) before they decide anything. If they hold, the next step is
-the one slice 4 named: scoring in a Web Worker. Not done: it needs the owner's word.
+the one slice 4 named: scoring in a Web Worker. Done afterwards, see "Measured with the worker".
 
 **Same session, same machine state** (one lock: slice 4's harness, `Search`, the harness again;
 4×, the same 808 queries; median / p90 / max, and the share of queries over 100 ms):
@@ -110,23 +115,65 @@ key of a query 58 / 71 / 139 ms. Event Timing, from the key press to the next pa
 slowest key per query 128 / 168 / 288 ms (over the 16 ms floor on 99% of keys). Paint is included
 there, not in the first number.
 
-Re-run, under the lock when other work shares the machine (about 70 minutes):
+Re-run, under the lock when other work shares the machine (about 80 minutes):
 ```
-pnpm --filter @whichlei/bench search --every 4 --render-every 16   # 4x; --rate N for another
+pnpm --filter @whichlei/bench search --every 4 --page-every 16 --last-every 4   # 4x; --rate N for another
 ```
-Writes `$DATA_DIR/format/search-4x.json`. `--skip bytes,timing,render` leaves parts out.
+Writes `$DATA_DIR/format/search-4x.json`. `--skip bytes,timing,page` leaves parts out.
+
+## Measured with the worker
+One locked session on this host (slice 4's harness, the page in three modes, the harness again,
+bytes), 4×. Chromium does not throttle workers, so the bench bundles the production worker with a
+self-slowdown (after a pass of P ms it spins 3·P ms before it answers; `throttled-worker.ts`). The
+page runs under the 4× throttle. Real key presses into the built page, a fresh page per query,
+390 px wide with touch. Median / p90 / max. `inthread` is the same page with `Worker` removed.
+
+| | worker, debounce on every key | worker, last key | on the page's thread, every key |
+|---|---|---|---|
+| Queries | 202 (every 16th) | 808 (every 4th) | 202 |
+| Key to first results painted | 118 / 307 / 514 ms | 114 / 184 / 488 ms | 125 / 302 / 428 ms |
+| Slowest per query | 354 / 411 / 514 ms | 186 / 316 / 488 ms | 332 / 370 / 428 ms |
+| Last key to final results (after the pause pass) | 168 / 278 / 403 ms | 287 / 361 / 511 ms | 168 / 305 / 397 ms |
+| Key to next paint, slowest per query | 32 / 48 / 120 ms | under 16 ms | 120 / 168 / 304 ms |
+| Queries with a long task over 50 ms | 91% | 60% | 100% |
+| Long tasks over 50 ms, total / longest | 704 / 121 ms | 875 / 141 ms | 2,478 / 253 ms |
+| DOM update per key (build, set; no layout) | 24 / 47 / 93 ms | n/a | 22 / 42 / 75 ms |
+
+Slice 4's harness, in the same session, before and after: slowest keystroke 71 / 112 / 296 ms and
+75 / 114 / 315 ms; 16.1% and 18.8% of queries over 100 ms. Bytes are as before (148 / 272 / 463 KB,
+64 / 105 / 225 KB; top 10 equals the reference for all 1,607 queries).
+
+- **Typing no longer waits on search.** Key to next paint falls from 120 / 168 / 304 ms (slowest per
+  query) to 32 / 48 / 120 ms, and long tasks from 2,478 to 704 (longest 253 to 121 ms).
+- **Long tasks remain, from rendering.** The main thread now runs no search code, only the key
+  handler, the message and the DOM update, which is 24 / 47 / 93 ms per key here (50 rows with
+  marks, at 4×). Splitting a render over several tasks would remove them; not done.
+- **Time to results is not better.** It is the same as on the page's thread (118 vs 125 ms median):
+  the work is the same and one thread now does it, plus a hop. The slowest key of a query,
+  354 ms median, is mostly the first key of a fresh page (files fetched, code cold) and the
+  4× render. It cannot meet slice 4's harness numbers, which leave all of that out. What the worker
+  buys is a main thread that is free while it waits.
+- Keys 50 ms apart: 5,065 of 12,327 keys get results of their own, the rest are replaced by a
+  newer key before they run, which is the point of the newest-only queue.
 
 ## Done when
-- The slice 4 targets, measured with `tools/bench` on the production search module at 4×:
-  bytes per query ≤ 150 / 280 / 480 KB, slowest keystroke ≤ 50 / 80 / 250 ms (plus
-  rendering, reported), at most 3% of queries over 100 ms.
+- Bytes per query ≤ 150 / 280 / 480 KB (slice 4's targets, unchanged), measured with
+  `tools/bench` on the production search module.
+- Typing never waits on search. Slice 4's targets for the slowest keystroke (≤ 50 / 80 / 250 ms,
+  at most 3% over 100 ms) were for scoring on the main thread, and the main-thread run missed
+  them (below). They are replaced, with the worker, by: (1) no long task over 50 ms on the main
+  thread comes from search (only from rendering), and the key-to-paint time of a key press stays
+  under 50 ms at the median; (2) time from a key to its results painted is no worse than the same
+  page's with the search on the main thread, measured in the same session. Slice 4's harness
+  numbers cannot be the target for (2): its keystroke leaves out the fetch, the thread hop, the
+  render and the frame, so a page cannot match it.
 - e2e tests: find by name, keyboard flow, copy, esc, about, LEI with good and bad check
   digits, open record, dark mode. axe reports no violations in either theme.
 - Live on workers.dev against the published index (after slice 6). Screenshots.
 
 ## Status
-- Built and tested: 42 e2e tests pass (find, keys, copy, open, escape, about, LEI good and bad,
+- Built and tested: 44 e2e tests pass (find, keys, copy, open, escape, about, LEI good and bad,
   errors, format reload, dark mode, phone width, axe in light and dark on four states, none
-  reported). 336 unit tests pass.
-- Open: the speed targets (above), a check on a real phone, and live on workers.dev against the
+  reported). 348 unit tests pass.
+- Open: rendering long tasks (above), a check on a real phone, and live on workers.dev against the
   published index (slice 6 sets `INDEX_ORIGIN` and the index host's CORS header).
