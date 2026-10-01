@@ -11,8 +11,10 @@
     "typecheck": "tsc"
   },
   "devDependencies": {
+    "@axe-core/playwright": "catalog:",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
+    "esbuild": "catalog:",
     "@whichlei/core": "workspace:*",
     "@whichlei/gleif": "workspace:*",
     "typescript": "catalog:",

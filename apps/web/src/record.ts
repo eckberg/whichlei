@@ -1,6 +1,6 @@
 // The record page: one LEI record as a server-rendered HTML document. A pure function of the
 // record, so the search page can reuse it later. Every value goes through `html`, which
-// escapes. Styles and the copy script are static assets (see scripts/build.ts).
+// escapes. The styles (fonts included) and the copy script are static assets (see scripts/build.ts).
 
 import type { Address, LeiRecord, ParentLink } from "@whichlei/gleif";
 import { type Html, html, raw } from "./html.ts";
@@ -9,9 +9,6 @@ export interface RecordPageContext {
   /** Origin of the canonical URL, such as `https://whichlei.com`, without a trailing slash. */
   canonicalOrigin: string;
 }
-
-const FONT_CSS =
-  "https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500;700&display=swap";
 
 const leiPath = (lei: string) => `/lei/${encodeURIComponent(lei)}`;
 
@@ -228,9 +225,6 @@ function shell(parts: { title: string; head?: Html; body: Html; copyScript?: boo
 <meta name="color-scheme" content="light dark">
 <title>${parts.title}</title>
 ${parts.head ?? ""}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${FONT_CSS}">
 <link rel="stylesheet" href="/styles/record.css">
 </head>
 <body>

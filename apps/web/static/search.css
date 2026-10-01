@@ -1,0 +1,326 @@
+/* The search page: one screen, like a terminal window. Prompt, a counter line, then the
+   result list with a live preview beside it (as in a fuzzy finder), and a key bar at the
+   foot. From design/prototype/page.css, without the prototype's in-page record view. */
+html,
+body {
+  height: 100%;
+}
+
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  padding-inline: 16px;
+  max-width: 1320px;
+  margin-inline: auto;
+}
+
+/* prompt */
+.top h1 {
+  font: inherit;
+  margin: 0;
+}
+.prompt {
+  display: flex;
+  align-items: baseline;
+  gap: 1ch;
+  padding-block: 18px 2px;
+  font-size: var(--fs-prompt);
+}
+.prompt .caret {
+  color: var(--accent);
+  font-weight: 700;
+  user-select: none;
+}
+#q {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 500;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  caret-color: var(--accent);
+  caret-shape: block;
+}
+#q::placeholder {
+  color: var(--faint);
+  font-weight: 400;
+}
+#q::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+.info {
+  min-height: calc(var(--fs) * var(--lh));
+  padding-block: 0 10px;
+  padding-left: calc(var(--fs-prompt) * 0.62 + 1ch);
+  color: var(--dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.info .ok {
+  color: var(--ok);
+}
+.info .bad {
+  color: var(--bad);
+}
+.info .warn {
+  color: var(--warn);
+}
+.info .btn {
+  margin-left: 1ch;
+}
+
+/* main area */
+main {
+  min-height: 0;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.72fr);
+}
+main.single {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* The usage text and the about page scroll inside the main area, not the page. */
+#doc {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.list {
+  min-height: 0;
+  overflow-y: auto;
+  padding-block: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.row {
+  display: grid;
+  grid-template-columns: 2ch 21ch minmax(0, 1fr) 3ch 8ch;
+  column-gap: 1ch;
+  padding-inline: 0.5ch;
+  cursor: default;
+  white-space: nowrap;
+  /* Rows below the fold are not laid out until they scroll into view: 50 rows cost 25-35 ms of
+     layout per keystroke at 4x on a phone otherwise. The height is the placeholder until then. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto calc(var(--fs) * var(--lh));
+}
+.row > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.row .ptr {
+  color: var(--accent);
+  font-weight: 700;
+}
+.row .lei {
+  color: var(--dim);
+}
+.row .cc {
+  color: var(--dim);
+}
+.row .aka {
+  color: var(--dim);
+}
+.row mark {
+  background: none;
+  color: var(--accent);
+  font-weight: 700;
+}
+.row[aria-selected="true"] {
+  background: var(--sel-bg);
+  color: var(--sel-fg);
+}
+.row[aria-selected="true"] > span,
+.row[aria-selected="true"] .aka {
+  color: var(--sel-fg);
+}
+.row[aria-selected="true"] mark {
+  color: var(--sel-fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.row[aria-selected="true"] .ptr {
+  color: var(--sel-fg);
+}
+.row:not([aria-selected="true"]):hover {
+  background: color-mix(in srgb, var(--fg) 6%, transparent);
+}
+
+/* preview, a bordered pane with its title set into the top border */
+.preview {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 0 12px 2ch;
+  border-left: 1px solid var(--rule);
+}
+.pane {
+  position: relative;
+  border: 1px solid var(--rule);
+  padding: 14px 1.5ch 12px;
+}
+.pane > .label {
+  position: absolute;
+  top: -0.8em;
+  left: 1ch;
+  padding-inline: 1ch;
+  background: var(--bg);
+  color: var(--dim);
+}
+.pane .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2ch;
+  margin-top: 12px;
+}
+.pane .note {
+  margin: 0 0 4px;
+  color: var(--dim);
+}
+
+/* usage text and man page share one column width */
+.doc {
+  padding-block: 16px 24px;
+  max-width: 76ch;
+}
+.doc h2 {
+  font: inherit;
+  font-weight: 700;
+  margin: 18px 0 2px;
+}
+.doc p,
+.doc dl {
+  margin: 0 0 8px 7ch;
+}
+.doc p.lead {
+  margin-left: 0;
+}
+.doc .examples {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 3ch;
+  row-gap: 2px;
+  margin-left: 7ch;
+}
+.doc .examples button {
+  text-align: left;
+  color: var(--accent);
+}
+.doc .examples span {
+  color: var(--dim);
+}
+.man-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 2ch;
+  color: var(--dim);
+}
+.man-head span:nth-child(2) {
+  text-align: center;
+}
+.man-head.foot {
+  margin-top: 18px;
+}
+.doc .keys {
+  display: grid;
+  grid-template-columns: 14ch minmax(0, 1fr);
+  margin-left: 7ch;
+  row-gap: 2px;
+}
+.doc .keys dd {
+  margin: 0;
+}
+
+/* key bar, reverse-video keys as in nano */
+.keys-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3ch;
+  flex-wrap: wrap;
+  padding-block: 8px calc(10px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--rule);
+  font-size: var(--fs-small);
+  color: var(--dim);
+}
+.keys-bar ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5ch 2.5ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.keys-bar kbd {
+  background: var(--fg);
+  color: var(--bg);
+  padding-inline: 0.6ch;
+  margin-right: 0.8ch;
+  font-weight: 500;
+}
+.keys-bar .meta {
+  white-space: nowrap;
+}
+
+.copied {
+  color: var(--ok);
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .preview {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 2ch minmax(0, 1fr) auto;
+    grid-template-areas: "p n c" "p l s";
+    padding-block: 6px;
+    white-space: normal;
+    border-bottom: 1px solid var(--rule);
+    contain-intrinsic-size: auto 62px;
+  }
+  .row .ptr {
+    grid-area: p;
+  }
+  .row .nm {
+    grid-area: n;
+    white-space: normal;
+  }
+  .row .cc {
+    grid-area: c;
+    text-align: right;
+  }
+  .row .lei {
+    grid-area: l;
+    font-size: var(--fs-small);
+  }
+  .row .st {
+    grid-area: s;
+    font-size: var(--fs-small);
+    text-align: right;
+  }
+  .doc p,
+  .doc dl,
+  .doc .examples,
+  .doc .keys {
+    margin-left: 2ch;
+  }
+  .man-head span:nth-child(2) {
+    display: none;
+  }
+}
+@media (hover: none) and (pointer: coarse) {
+  .keys-bar ul {
+    display: none;
+  }
+}

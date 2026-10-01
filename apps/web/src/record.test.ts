@@ -48,6 +48,8 @@ describe("every recorded fixture", () => {
         /<meta name="description" content="[^"]+GLEIF, golden copy 2026-09-30\.">/,
       );
       expect(page).toContain('<link rel="stylesheet" href="/styles/record.css">');
+      // Fonts come from the site (styles/record.css), not from a font host.
+      expect(page).not.toMatch(/fonts\.(googleapis|gstatic)\.com/);
       expect(page.startsWith("<!doctype html>")).toBe(true);
     },
   );

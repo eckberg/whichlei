@@ -26,6 +26,10 @@ e.g. `20260916-3f9a1c0e`. A file under it never changes.
 Every file is UTF-8 text served as `text/plain` or `application/json`, so Cloudflare
 compresses it on the fly. Nothing is precompressed.
 
+The search page is on another origin (its build setting `INDEX_ORIGIN`), so every response,
+404s included, carries `Access-Control-Allow-Origin: *`. The page needs nothing else from the
+index host: only GET, no custom request headers, no cookies.
+
 A publish uploads the new build directory and the new `index.json` in one Worker
 version. It keeps the previous build's directory too: 2 × (6,438 index files + `codes.json`
 + `report.json`) + 1 manifest = 12,881 files, under the 20,000-file limit. So a page that

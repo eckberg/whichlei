@@ -5,9 +5,11 @@ packages:
 
 # Tool versions, pinned once for every package.
 catalog:
+  "@axe-core/playwright": 4.13.0
   "@biomejs/biome": 2.5.14
   "@playwright/test": 1.63.0
   "@types/node": 26.6.3
+  esbuild: 0.28.2
   playwright-core: 1.63.0
   typescript: 7.0.2
   vitest: 5.0.2
