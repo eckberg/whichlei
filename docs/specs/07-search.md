@@ -156,24 +156,61 @@ Slice 4's harness, in the same session, before and after: slowest keystroke 71 /
 - Keys 50 ms apart: 5,065 of 12,327 keys get results of their own, the rest are replaced by a
   newer key before they run, which is the point of the newest-only queue.
 
+## Measured with rows drawn in parts
+The first 20 rows and the preview are drawn at once, the rest 15 at a time in the next frames.
+Same bench, page phase only (worker, 4×, the self-slowed worker; median / p90 / max):
+
+| | every key (202 queries) | last key (808 queries) |
+|---|---|---|
+| Key to first results painted (typing pass) | 107 / 296 / 622 ms | 121 / 202 / 487 ms |
+| Slowest per query | 339 / 384 / 622 ms | 210 / 331 / 487 ms |
+| Last key to final results (after the pause pass) | 165 / 268 / 415 ms | 300 / 374 / 537 ms |
+| Key to next paint, slowest per query | 24 / 47 / 80 ms | under 16 ms |
+| Queries with a long task over 50 ms | 93.6% | 78.5% |
+| Long tasks over 50 ms, total / longest | 758 / 117 ms | 1,628 / 172 ms |
+| DOM update per key | 16 / 30 / 57 ms | n/a |
+
+The DOM update fell (24 / 47 / 93 to 16 / 30 / 57 ms) but long tasks did not: 91% and 60% of queries
+before, 94% and 79% now. A trace of one query shows why. The long tasks are the browser's own work
+for a frame at 4×: layout 20-65 ms and paint 15-30 ms, around 8-18 ms of our script. Drawing 8, 20
+or 50 rows first gave 17, 27 and 19 long tasks in 34 keys, so row count is not what sets them, and
+the extra frames of the later parts add some in last-key mode. Not solved: it needs a cheaper layout
+and paint of the list on a phone, not less script.
+
 ## Done when
-- Bytes per query ≤ 150 / 280 / 480 KB (slice 4's targets, unchanged), measured with
-  `tools/bench` on the production search module.
-- Typing never waits on search. Slice 4's targets for the slowest keystroke (≤ 50 / 80 / 250 ms,
-  at most 3% over 100 ms) were for scoring on the main thread, and the main-thread run missed
-  them (below). They are replaced, with the worker, by: (1) no long task over 50 ms on the main
-  thread comes from search (only from rendering), and the key-to-paint time of a key press stays
-  under 50 ms at the median; (2) time from a key to its results painted is no worse than the same
-  page's with the search on the main thread, measured in the same session. Slice 4's harness
-  numbers cannot be the target for (2): its keystroke leaves out the fetch, the thread hop, the
-  render and the frame, so a page cannot match it.
-- e2e tests: find by name, keyboard flow, copy, esc, about, LEI with good and bad check
-  digits, open record, dark mode. axe reports no violations in either theme.
-- Live on workers.dev against the published index (after slice 6). Screenshots.
+Final state of the slice.
+
+Met:
+- **Bytes per query** 148 / 272 / 463 KB and 64 / 105 / 225 KB (≤ 150 / 280 / 480 and ≤ 65 / 110 /
+  240), through the production module; the top 10 equals the reference for all 1,607 test queries.
+- **Typing does not wait on search.** Search runs in a worker: key to next paint, slowest per query,
+  24 / 47 / 80 ms against 120 / 168 / 304 ms with search on the page's thread; the main thread runs
+  no search code. Stale queries are dropped (tested, and measured: with keys 50 ms apart most keys are
+  replaced before they run).
+- **e2e:** 46 tests (find by name, keys, copy, open, escape, about, LEI good and bad, errors, format
+  reload, worker and fallback, fast typing, rows drawn in parts, dark mode, phone width). axe reports
+  no violations in light or dark on empty, results, error and about states. 349 unit tests, lint
+  and typecheck pass.
+
+Not met:
+- **Slice 4's keystroke targets** (≤ 50 / 80 / 250 ms, ≤ 3% over 100 ms). On the page's thread the
+  slowest keystroke was 85 / 141 / 298 ms with 36% over 100 ms. Slice 4's own harness, in the same
+  session, gave 71 / 112 / 296 ms with 16-19% over 100 ms: this host is slower than the one slice 4
+  was measured on, and the harness misses the target too. The cost of scoring did not change; it
+  moved to a thread that does not block typing.
+- **Time to results no worse than the harness's slowest keystroke.** Replaced. The harness leaves out
+  the fetch, the thread hop, the render and the frame, so a page cannot match it. In the page, the
+  worker's time to results is the same as on the page's thread (118 vs 125 ms median, every key), so
+  the worker is not a latency gain; it frees the main thread.
+- **"No search long task on the main thread; render long tasks ≤ 50 ms at p90 at 4×."** The first half
+  holds by construction. The second does not: 94% of queries (every key) and 79% (last key) have a
+  frame over 50 ms (longest 117 and 172 ms), from layout and paint (above).
+
+Not measurable here:
+- A real phone. 4× CPU slowdown on this host stands in for it, and the worker's slowdown is emulated.
+- Live on workers.dev against the published index (slice 6 sets `INDEX_ORIGIN` and the index host's
+  CORS header). Screenshots are in the session notes, not committed.
 
 ## Status
-- Built and tested: 44 e2e tests pass (find, keys, copy, open, escape, about, LEI good and bad,
-  errors, format reload, dark mode, phone width, axe in light and dark on four states, none
-  reported). 348 unit tests pass.
-- Open: rendering long tasks (above), a check on a real phone, and live on workers.dev against the
-  published index (slice 6 sets `INDEX_ORIGIN` and the index host's CORS header).
+Built, tested and measured as above. Next: a cheaper list layout and paint on a phone, then a
+real-phone check.
