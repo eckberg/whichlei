@@ -108,6 +108,47 @@ For the DESIGN.md table.
   deploy.
 - **Crawler draw** on the 100,000 a day (slice 9). Watched in Workers analytics after launch.
 
+## Measured (step 1)
+**Key to next paint with the counter** (`pnpm --filter @whichlei/bench run search --skip bytes,timing
+--modes every --page-every 32 --stats on|off --settle-ms 2100`; the built page, 4x, real key
+presses, 101 queries, 1,485 keys; slowest per query, median / p90 / max, ms). `off` builds
+the page without the counter, `on` has it and a stub `window.fathom` that counted 101 events
+for 101 queries. One locked session of six runs, order off, on, off, on, then on, off
+(`--page-every 32`, not 16, to keep the lock to 13 minutes a run):
+
+| Run | 1 | 2 | 3 (reversed) |
+|---|---|---|---|
+| Counter off | 24 / 56 / 72 | 24 / 48 / 120 | 32 / 56 / 152 |
+| Counter on | 32 / 48 / 80 | 32 / 56 / 96 | 32 / 56 / 144 |
+
+The counter is within the spread of the baselines (24-32 / 48-56 / 72-152). The host got
+slower during the session: every number rose from run 1 to run 3, counter on or off. The
+first two pairs, off before on, alone put the median 8 ms (one 16 ms frame step) over the
+baselines; run 3, on before off, shows that was the drift. Key to first results, median:
+off 120 / 126 / 137, on 130 / 141 / 142 ms.
+The counter does one `setTimeout` and one `clearTimeout` a render and a short string
+normalisation; it sends once, 2 s after the results, from an idle callback.
+
+**Fathom's beacons in Playwright** (a dry run of `e2e/live.spec.ts` against a local site made
+canonical, with Fathom's script served from a copy): page-view images and the `search` event
+were answered by the check's route and never left the machine; the leave ping that Fathom sends
+on `pagehide` (`dp=1`) was not intercepted. So a live check counts no views and no search,
+but a visit's leave pings (duration, no path beyond `/` or `/lei/`) can reach Fathom. Going back
+reloads the search page in Playwright (no back/forward cache), so the check expects one `/` view
+for each load of the search page, not one in all.
+
+## Deviations from the first draft
+- The `www` custom domain is in `apps/redirect/wrangler.jsonc` in the code PR (step 1):
+  nothing points at it, and step 3 lists only the apex. The deploy workflow deploys the
+  redirect Worker after the e2e run; its environment name, `INDEX_ORIGIN` and the live-check
+  step wait for step 3, when the apex answers.
+- The loader's source is `src/page/stats-loader.ts` and `stats-entry.ts`, built to
+  `/scripts/stats.js`; the pageview URL is passed as a path (`/`, `/lei/`) and Fathom resolves it.
+- A search counts when its results are `done` or `no-match`: an error, a too short input and a
+  bad LEI do not. Case and spacing do not make a new query text.
+- Playwright blocks Fathom with `--host-resolver-rules` in the browser launch arguments (the
+  config cannot route requests); `LIVE_URL` removes the block and points the config at that site.
+
 ## Done when
 Each with its evidence in the PR or this spec.
 - `curl -sI`: `https://whichlei.com/` 200; `http://whichlei.com/` 301 to https;

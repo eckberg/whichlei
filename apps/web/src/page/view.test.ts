@@ -346,6 +346,17 @@ describe("the static screens", () => {
     expect(out).toContain("Nothing else you type goes anywhere");
   });
 
+  it("says in the about page what Fathom gets, where the code is, and that GLEIF is not behind it", () => {
+    const out = aboutHtml(null);
+    expect(out).toContain("Analytics are");
+    expect(out).toContain("without cookies");
+    expect(out).toContain("never the LEI");
+    expect(out).toContain("a count of searches without their text");
+    expect(out).toContain("It never sees what you type");
+    expect(out).toContain('href="https://github.com/eckberg/whichlei"');
+    expect(out).toContain("not affiliated with GLEIF");
+  });
+
   it("has no inline style or script", () => {
     for (const out of [usageHtml(), aboutHtml(null), previewHtml({ entry: entry() })]) {
       expect(out).not.toMatch(/\sstyle=|<script|\son[a-z]+=/i);
