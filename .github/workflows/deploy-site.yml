@@ -31,7 +31,10 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The search page reads the index origin at build time (slice 7).
       - run: pnpm --filter @whichlei/web build
+        env:
+          INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
       - id: deploy
         working-directory: apps/web
         run: |

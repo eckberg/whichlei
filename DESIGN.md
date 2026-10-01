@@ -57,6 +57,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 19 | The indexer measures **registration age to the golden copy's publish date** | The research used a fixed 2026.74 for the 2026-09-16 copy, a day count nobody maintains. The date gives 2026.708: the same 6,438 files and objective .6515 against .6516. `--now-year 2026.74` reproduces the research. |
 | 20 | **Names are kept whole**, also when one holds " \| " | The research joined an entity's names with " \| " in an intermediate file and split them again, cutting 64 names in two and shifting their types. Reading the golden copy directly has no such step, so a name stays what GLEIF has. 60 entries differ from the research index for this reason. |
 | 21 | Entities of **equal prominence go in LEI order**, in a file and at the 1,500 cap | A rule a reader can check with nothing but the file. The golden copy is in LEI order, so it is also the research's order by entity number. |
+| 22 | Each publish **keeps the build it replaces** and **a build that fails a check publishes nothing**. The checks compare the new build with the live one, with bounds in one reviewed file, `apps/index/checks.json` | A page that loaded the old `index.json` keeps working, and a rollback has something to return to. A bad night of GLEIF data, or a bug in the indexer, must not reach the live index unseen; a legitimate big change is a reviewed commit to the bounds. See [slice 6](docs/specs/06-data-publishing.md). |
 
 ## 3. Architecture
 

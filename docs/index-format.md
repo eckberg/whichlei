@@ -27,9 +27,13 @@ Every file is UTF-8 text served as `text/plain` or `application/json`, so Cloudf
 compresses it on the fly. Nothing is precompressed.
 
 A publish uploads the new build directory and the new `index.json` in one Worker
-version. It keeps the previous build's directory too: 2 × 6,438 index files + 1 manifest
-= 12,877 files, under the 20,000-file limit. So a page that loaded the old manifest keeps
-working.
+version. It keeps the previous build's directory too: 2 × (6,438 index files + `codes.json`
++ `report.json`) + 1 manifest = 12,881 files, under the 20,000-file limit. So a page that
+loaded the old manifest keeps working. The publish asserts the count stays under the limit.
+
+Every response carries `Access-Control-Allow-Origin: *` and `X-Content-Type-Options:
+nosniff`. They come from the `_headers` file `index assemble` writes, which also sets the
+`Cache-Control` above: one rule for `index.json` and one for each of the two builds.
 
 ## Reader rules
 
@@ -137,6 +141,40 @@ Names for the codes a record carries, so a page shows "Aktiebolag" and "Bolagsve
 
 A code that is missing from the file is shown as the code.
 
+## Report: `<build>/report.json`
+
+Added by publishing (slice 6), not by the indexer. It is the indexer's `build.json` plus what
+`index checks` measured over the built files, and it is part of the build's directory so the
+next publish can compare against it (`apps/index/checks.json`): entities, files and gzip
+size must stay within 3%, 5% and 10% of the live build's, and the evaluation objective may
+fall at most 0.01 below its. Fixed absolute bounds and a floor for the objective always
+apply too, and are all there is on a first publish. A manual run can skip the relative
+bounds for that run (`accept-change`). Pages do not read it.
+
+```json
+{
+  "build": "20260916-3f9a1c0e",
+  "asOf": "2026-09-16",
+  "records": 3431742,
+  "entities": 3317220,
+  "files": 6438,
+  "gzipBytes": 220600000,
+  "reachability": 0.9666,
+  "objective": { "test": 0.6515, "all": 0.657 },
+  "...": "the rest of build.json: capped, terms, postings, bytes, nowYear, stats, seconds, peakRssMb"
+}
+```
+
+- `records`: rows in the level 1 golden copy. `entities`: reachable through the index.
+  `reachability` is their ratio.
+- `files`: index files, `<build>/0.txt` and up. `bytes`: their size; `gzipBytes`: the same
+  with each file gzipped at level 6, near what the CDN sends.
+- `objective`: the evaluation objective over the built files on the held-out half (`test`)
+  and on all queries (`all`), from `indexer check --eval`.
+
+A build published before this file existed has none; the next publish then uses the
+absolute bounds instead of bounds relative to the live build.
+
 ## The index directory the indexer writes
 
 ```
@@ -146,7 +184,9 @@ prominence.tsv             only with `build --dump-prominence`: LEI, full-precis
                            registration age. Used by `check --reference`
 ```
 
-`build.json` and `prominence.tsv` are not part of the index and are never published.
+`build.json` and `prominence.tsv` are not part of the index and are never published as they
+are. `index checks` writes `measured.json` next to them: whether the build passed, and the
+report to publish as `<build>/report.json`. `index assemble` refuses a build without a pass.
 
 ## What the page gets from the GLEIF API instead
 
