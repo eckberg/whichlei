@@ -16,6 +16,9 @@
 //   --research-split  split other names at " | " as the research did (see entities.ts), for
 //                   `check --reference`
 //   --dump-prominence  also write <out>/prominence.tsv for `check --reference`
+//   --initials-min-prominence  entities at least this prominent index their names' initials
+//                   (default: INITIALS_MIN_PROMINENCE in src/entities.ts). "Infinity" indexes
+//                   none, as the research did: use it with `check --reference`
 import { parseArgs } from "node:util";
 import { buildIndex, peakRssMb } from "../src/build.ts";
 import { downloadInputs, localInputs } from "../src/sources.ts";
@@ -29,6 +32,7 @@ const { values } = parseArgs({
     "now-year": { type: "string" },
     "dump-prominence": { type: "boolean", default: false },
     "research-split": { type: "boolean", default: false },
+    "initials-min-prominence": { type: "string" },
   },
 });
 
@@ -45,6 +49,11 @@ log(`golden copy of ${inputs.asOf}`);
 
 const nowYear = values["now-year"] === undefined ? undefined : Number(values["now-year"]);
 if (nowYear !== undefined && !Number.isFinite(nowYear)) throw new Error("--now-year is no number");
+const initials = values["initials-min-prominence"];
+const initialsMinProminence = initials === undefined ? undefined : Number(initials);
+if (initialsMinProminence !== undefined && Number.isNaN(initialsMinProminence)) {
+  throw new Error("--initials-min-prominence is no number");
+}
 
 const report = await buildIndex({
   inputs,
@@ -53,6 +62,7 @@ const report = await buildIndex({
   researchSplit: values["research-split"] as boolean,
   log,
   ...(nowYear === undefined ? {} : { nowYear }),
+  ...(initialsMinProminence === undefined ? {} : { initialsMinProminence }),
 });
 log(
   `built ${report.build}: ${report.files} files, ${report.entities.toLocaleString()} of` +

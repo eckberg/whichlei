@@ -30,16 +30,21 @@ export {
   matchFeatures,
   matchLevel,
   matchScore,
+  memoLevel,
   prefixEditLe1,
   QUERY_STOP,
+  REFERENCE_MATCH_WEIGHTS,
   scoreCandidate,
   topK,
 } from "./score.ts";
 export {
   fold,
+  formStart,
   indexTerms,
+  LEGAL_FORMS,
   lastIsPrefix,
   type NameTokens,
+  nameInitials,
   nameTokens,
   queryTokens,
 } from "./tokens.ts";

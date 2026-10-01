@@ -5,6 +5,8 @@
 //
 // Needs build.ts's output and $DATA_DIR/parity/cases_all.json (port/dump_parity.py).
 // Writes $DATA_DIR/format/replay.json and top10.json (the browser harness checks against it).
+// The comparison with the reference scores with its weights (REFERENCE_MATCH_WEIGHTS);
+// top10.json is what search shows: prominence in tenths, MATCH_WEIGHTS.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -13,6 +15,7 @@ import {
   nameTokens,
   parseManifest,
   queryTokens,
+  REFERENCE_MATCH_WEIGHTS,
   roundProminence,
   route,
   routingTable,
@@ -107,6 +110,7 @@ const precisions: Record<string, (p: number) => number> = {
 };
 const tops: Record<string, Map<string, string[]>> = {};
 for (const precision of Object.keys(precisions)) tops[precision] = new Map();
+const shown = new Map<string, string[]>();
 for (const q of reference.keys()) {
   const tokens = queryTokens(q);
   const ids = new Set(route(tokens, table).flatMap((f) => files[f]?.ids ?? []));
@@ -117,7 +121,15 @@ for (const q of reference.keys()) {
       prominence: round(e.p),
       names: namesOf(e),
     }));
-    tops[precision]?.set(q, tokens.length === 0 ? [] : topK(tokens, candidates).map((c) => c.id));
+    tops[precision]?.set(
+      q,
+      tokens.length === 0
+        ? []
+        : topK(tokens, candidates, 10, REFERENCE_MATCH_WEIGHTS).map((c) => c.id),
+    );
+    if (precision === "1/10") {
+      shown.set(q, tokens.length === 0 ? [] : topK(tokens, candidates).map((c) => c.id));
+    }
   }
 }
 
@@ -140,5 +152,5 @@ for (const [precision, top] of Object.entries(tops)) {
 out.quality = quality;
 
 writeFileSync(join(OUT_DIR, "replay.json"), JSON.stringify(out, null, 1));
-writeFileSync(join(OUT_DIR, "top10.json"), JSON.stringify(Object.fromEntries(tops["1/10"] ?? [])));
+writeFileSync(join(OUT_DIR, "top10.json"), JSON.stringify(Object.fromEntries(shown)));
 log("wrote replay.json and top10.json");
