@@ -24,6 +24,7 @@ export {
 export { type RouteOptions, type RoutingTable, route } from "./route.ts";
 export {
   type Candidate,
+  INITIALS_MIN_PROMINENCE,
   MATCH_WEIGHTS,
   type MatchFeatures,
   type MatchWeights,

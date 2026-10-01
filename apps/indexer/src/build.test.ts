@@ -7,6 +7,7 @@ import {
   filePath,
   type Manifest,
   queryTokens,
+  roundProminence,
   route,
   routingTable,
   toCandidate,
@@ -183,7 +184,7 @@ describe("build, end to end on a tiny golden copy", () => {
     // "Acme Holdings 7 Limited" has a word that starts with a digit: no initials.
     expect(holders("ah")).toEqual([]);
     const prominent = [...entities.prominence.subarray(0, entities.count)].filter(
-      (p) => p >= INITIALS_MIN_PROMINENCE,
+      (p) => roundProminence(p) >= INITIALS_MIN_PROMINENCE,
     );
     expect(stats.initials).toBeGreaterThan(0);
     expect(stats.initials).toBeLessThanOrEqual(prominent.length);

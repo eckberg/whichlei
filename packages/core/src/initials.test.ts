@@ -1,6 +1,7 @@
 // Slice 10: acronyms and names that differ from the query only by their legal form.
 import { describe, expect, test } from "vitest";
 import {
+  INITIALS_MIN_PROMINENCE,
   MATCH_WEIGHTS,
   matchFeatures,
   matchScore,
@@ -120,5 +121,17 @@ describe("topK", () => {
     expect(
       scoreCandidate(queryTokens("SEB"), pool[0] as (typeof pool)[0], REFERENCE_MATCH_WEIGHTS),
     ).toBeNull();
+  });
+
+  test("only entities the indexer gives initials match by them: prominence of at least 1", () => {
+    const seb = (prominence: number) =>
+      candidate("bank", prominence, "Skandinaviska Enskilda Banken AB");
+    const q = queryTokens("seb");
+    expect(INITIALS_MIN_PROMINENCE).toBe(1);
+    expect(scoreCandidate(q, seb(1))).toBe(MATCH_WEIGHTS.m_initials + 1);
+    expect(scoreCandidate(q, seb(0.9))).toBeNull();
+    expect(scoreCandidate(q, seb(-2))).toBeNull();
+    // Words still match below the threshold.
+    expect(scoreCandidate(queryTokens("enskilda"), seb(0.9))).not.toBeNull();
   });
 });

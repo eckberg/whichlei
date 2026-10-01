@@ -43,6 +43,14 @@ export const MATCH_WEIGHTS: MatchWeights = {
   m_base_exact: 1,
 };
 
+/**
+ * Entities at least this prominent, as an index file stores it (in tenths), index the
+ * initials of their names, and only they match by initials: about the top 30,000. The
+ * indexer and the scorer apply the same test, so a result does not depend on which file
+ * an entity was fetched from (docs/specs/10-ranking-gaps.md).
+ */
+export const INITIALS_MIN_PROMINENCE = 1;
+
 /** Query tokens shorter than this never match fuzzily. */
 const FUZZY_MIN_LENGTH = 4;
 
@@ -163,11 +171,16 @@ export function memoLevel(): Level {
   };
 }
 
-/** Features of one name against the query tokens. The last query token may be partial. */
+/**
+ * Features of one name against the query tokens. The last query token may be partial.
+ * `initials`: whether the name may match as initials at all (scoreCandidate passes false
+ * below INITIALS_MIN_PROMINENCE and when m_initials is 0).
+ */
 export function matchFeatures(
   query: string[],
   { seq, extras }: NameTokens,
   level: Level = matchLevel,
+  initials = true,
 ): MatchFeatures {
   // Plain loops, no closures or temporary arrays: this runs for every candidate name on
   // every keystroke.
@@ -217,7 +230,7 @@ export function matchFeatures(
     exact: n === seq.length && same === n,
     prefix: n <= seq.length && same >= n - 1 && (seq[n - 1] ?? "").startsWith(query[n - 1] ?? ""),
     coverage: matched.length / Math.max(1, seq.length),
-    initials: isInitials(query, seq),
+    initials: initials && isInitials(query, seq),
     // The query is the name's leading words, and the rest is its legal form.
     baseExact: same === n && n < seq.length && formStart(seq) === n,
   };
@@ -259,8 +272,9 @@ export function scoreCandidate<Id>(
   level: Level = matchLevel,
 ): number | null {
   let best: number | null = null;
+  const initials = w.m_initials !== 0 && candidate.prominence >= INITIALS_MIN_PROMINENCE;
   for (const name of candidate.names) {
-    const m = matchScore(matchFeatures(query, name, level), w);
+    const m = matchScore(matchFeatures(query, name, level, initials), w);
     if (m !== null && (best === null || m > best)) best = m;
   }
   return best === null ? null : best + candidate.prominence;

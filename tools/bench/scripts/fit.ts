@@ -7,14 +7,15 @@
 // Every query is routed and scored once; the features of every candidate name are kept,
 // so each grid point only re-adds weights. The criterion is the mean MRR@10 over the six
 // strata of the objective plus the acronym set (research/ranking/eval/acronyms.tsv), on
-// train. Test is reported for the chosen point and the reference weights only, with a
-// clustered bootstrap (target entities resampled jointly across strata, as results.md).
+// train. It reads no test-half result: compare.ts reports the test half once the weights
+// are chosen.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import {
   decodeEntries,
   filePath,
+  INITIALS_MIN_PROMINENCE,
   type MatchWeights,
   matchFeatures,
   matchScore,
@@ -86,7 +87,7 @@ for (const { query } of rows) {
   for (const c of pool.values()) {
     let any = false;
     for (const name of c.names) {
-      const f = matchFeatures(tokens, name, level);
+      const f = matchFeatures(tokens, name, level, c.prominence >= INITIALS_MIN_PROMINENCE);
       const s0 = matchScore(f, REFERENCE_MATCH_WEIGHTS);
       if (s0 === null && !f.initials) continue;
       any = true;
@@ -202,58 +203,15 @@ for (const key of ["m_initials", "m_base_exact"] as const) {
   if (alone) log(`  ${key} alone: ${JSON.stringify(alone.w)}  ${fmt(alone.train)}`);
 }
 
-// ---- Test: the chosen point against the reference, with a clustered bootstrap --------
+// ---- The chosen point on train. The test half is compare.ts's job, after the choice. ---
 const chosen = { ...REFERENCE_MATCH_WEIGHTS, ...(results[0]?.w ?? {}) };
-const before = reciprocalRanks(REFERENCE_MATCH_WEIGHTS);
-const after = reciprocalRanks(chosen);
-const test = inSplit("test");
-const report: Record<string, unknown> = { chosen: results[0]?.w, grid: results.slice(0, 50) };
-for (const split of ["train", "test"]) {
-  report[split] = {
-    before: perStratum(before, inSplit(split)),
-    after: perStratum(after, inSplit(split)),
-  };
-  log(`${split} before: ${fmt(perStratum(before, inSplit(split)))}`);
-  log(`${split} after:  ${fmt(perStratum(after, inSplit(split)))}`);
-}
-
-// Resample target entities (the first target of each row) with replacement; a row counts
-// as many times as its entity was drawn. Seed 7, as results.md.
-const entityOf = rows.map((r) => [...r.targets][0] as string);
-const entities = [...new Set(entityOf.filter((_, i) => test(rows[i] as EvalQuery)))];
-let seed = 7;
-const random = () => {
-  seed = (seed * 1103515245 + 12345) % 2147483648;
-  return seed / 2147483648;
+const report: Record<string, unknown> = {
+  chosen: results[0]?.w,
+  grid: results.slice(0, 50),
+  train: {
+    before: perStratum(reciprocalRanks(REFERENCE_MATCH_WEIGHTS), inSplit("train")),
+    after: perStratum(reciprocalRanks(chosen), inSplit("train")),
+  },
 };
-const diffs: Record<string, number[]> = {};
-for (let b = 0; b < 2000; b++) {
-  const draws = new Map<string, number>();
-  for (let i = 0; i < entities.length; i++) {
-    const e = entities[Math.floor(random() * entities.length)] as string;
-    draws.set(e, (draws.get(e) ?? 0) + 1);
-  }
-  const take = (r: EvalQuery, i: number) => (test(r) ? (draws.get(entityOf[i] as string) ?? 0) : 0);
-  const x = perStratum(before, take);
-  const y = perStratum(after, take);
-  for (const k of ["objective", ...STRATA7]) {
-    const d = (y[k] as number) - (x[k] as number);
-    if (!Number.isFinite(d)) continue;
-    diffs[k] = [...(diffs[k] ?? []), d];
-  }
-}
-const ci: Record<string, [number, number]> = {};
-for (const [k, ds] of Object.entries(diffs)) {
-  ds.sort((a, b) => a - b);
-  ci[k] = [
-    ds[Math.floor(0.025 * ds.length)] as number,
-    ds[Math.floor(0.975 * ds.length)] as number,
-  ];
-}
-report.testCi = ci;
-log(
-  `test after - before, 95% CI: ${Object.entries(ci)
-    .map(([k, [a, b]]) => `${k} [${a.toFixed(4)}, ${b.toFixed(4)}]`)
-    .join("  ")}`,
-);
+log(`chosen: ${JSON.stringify(results[0]?.w)}`);
 if (values.out) writeFileSync(values.out, JSON.stringify(report, null, 1));

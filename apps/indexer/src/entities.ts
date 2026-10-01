@@ -2,11 +2,13 @@
 // terms. Port of research/ranking/signals/build_entities.py and the entity part of
 // prep.py, which wrote and re-read a 600 MB TSV; here each row is used as it arrives.
 import {
+  INITIALS_MIN_PROMINENCE,
   indexTerms,
   type NameTokens,
   nameInitials,
   nameTokens,
   QUERY_STOP,
+  roundProminence,
   type Status,
 } from "@whichlei/core";
 import { columnsOf, parseCsvStream } from "./csv.ts";
@@ -81,11 +83,7 @@ export interface EntityInputs {
   initialsMinProminence?: number;
 }
 
-/**
- * Entities at least this prominent index their names' initials: about the top 30,000
- * (docs/specs/10-ranking-gaps.md).
- */
-export const INITIALS_MIN_PROMINENCE = 1;
+export { INITIALS_MIN_PROMINENCE };
 
 // Python's str.strip() removes Unicode whitespace; JavaScript's trim() removes a slightly
 // different set. The names have to come out the same.
@@ -334,7 +332,8 @@ export async function readEntities(
     entities.prominence[id] = prominence(input, nowYear);
 
     // Initials, for acronyms. Search matches them as a whole word (score.ts).
-    if ((entities.prominence[id] as number) >= initialsMin) {
+    // Prominence as the file stores it, the test the scorer applies (score.ts).
+    if (roundProminence(entities.prominence[id] as number) >= initialsMin) {
       const before = terms.size;
       for (const t of indexed) for (const term of nameInitials(t.seq, QUERY_STOP)) terms.add(term);
       if (terms.size > before) stats.initials++;
