@@ -1,7 +1,16 @@
 // The level 1 golden copy, one pass: for every LEI its names, status, prominence and index
 // terms. Port of research/ranking/signals/build_entities.py and the entity part of
 // prep.py, which wrote and re-read a 600 MB TSV; here each row is used as it arrives.
-import { indexTerms, nameTokens, type Status } from "@whichlei/core";
+import {
+  INITIALS_MIN_PROMINENCE,
+  indexTerms,
+  type NameTokens,
+  nameInitials,
+  nameTokens,
+  QUERY_STOP,
+  roundProminence,
+  type Status,
+} from "@whichlei/core";
 import { columnsOf, parseCsvStream } from "./csv.ts";
 import { PostingsBuilder } from "./postings.ts";
 import {
@@ -47,6 +56,8 @@ export interface EntityStats {
   pipeNames: number;
   /** Entities that index no term, so no search can find them. */
   noTerms: number;
+  /** Entities whose initials added an index term: one their words did not already give. */
+  initials: number;
 }
 
 /** Examples of skipped rows kept for the report. */
@@ -64,7 +75,15 @@ export interface EntityInputs {
    * shift. For comparing with the research index; off, a name stays whole.
    */
   researchSplit?: boolean;
+  /**
+   * Index the initials of an entity's names ('seb' for Skandinaviska Enskilda Banken AB)
+   * when its prominence is at least this. Default INITIALS_MIN_PROMINENCE; Infinity: never,
+   * as the research.
+   */
+  initialsMinProminence?: number;
 }
+
+export { INITIALS_MIN_PROMINENCE };
 
 // Python's str.strip() removes Unicode whitespace; JavaScript's trim() removes a slightly
 // different set. The names have to come out the same.
@@ -171,6 +190,7 @@ export async function readEntities(
     examples: [],
     pipeNames: 0,
     noTerms: 0,
+    initials: 0,
   };
   const skip = (reason: SkipReason, lei: string) => {
     stats.skipped[reason] = (stats.skipped[reason] ?? 0) + 1;
@@ -194,6 +214,8 @@ export async function readEntities(
     nameLength: 0,
   };
   const terms = new Set<string>();
+  const indexed: NameTokens[] = [];
+  const initialsMin = inputs.initialsMinProminence ?? INITIALS_MIN_PROMINENCE;
 
   function add(row: string[]): void {
     stats.rows++;
@@ -254,9 +276,11 @@ export async function readEntities(
     // Index terms: the legal name and the names of types 1 to 3, skipping a name whose
     // tokens an earlier one already had. Previous names are matched by nobody.
     terms.clear();
+    indexed.length = 0;
     const seen = new Set<string>();
     const legal = nameTokens(name);
     seen.add(legal.seq.join(" "));
+    indexed.push(legal);
     for (const t of indexTerms(legal)) terms.add(t);
     for (const [type, n] of variants) {
       if (type === 4) break;
@@ -264,6 +288,7 @@ export async function readEntities(
       const key = t.seq.join(" ");
       if (t.seq.length === 0 || seen.has(key)) continue;
       seen.add(key);
+      indexed.push(t);
       for (const term of indexTerms(t)) terms.add(term);
     }
 
@@ -306,6 +331,13 @@ export async function readEntities(
     entities.registeredYear[id] = input.registeredYear;
     entities.prominence[id] = prominence(input, nowYear);
 
+    // Initials, for acronyms. Search matches them as a whole word (score.ts).
+    // Prominence as the file stores it, the test the scorer applies (score.ts).
+    if (roundProminence(entities.prominence[id] as number) >= initialsMin) {
+      const before = terms.size;
+      for (const t of indexed) for (const term of nameInitials(t.seq, QUERY_STOP)) terms.add(term);
+      if (terms.size > before) stats.initials++;
+    }
     if (terms.size === 0) stats.noTerms++;
     postings.add(id, terms);
   }

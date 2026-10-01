@@ -30,6 +30,11 @@ export interface BuildOptions {
   skipLimit?: { count: number; share: number };
   /** Split other names at " | " as the research did, for comparing with its index. */
   researchSplit?: boolean;
+  /**
+   * Entities at least this prominent index the initials of their names. Default
+   * INITIALS_MIN_PROMINENCE; Infinity indexes none, as the research did.
+   */
+  initialsMinProminence?: number;
   /** Also write prominence.tsv. */
   dumpProminence?: boolean;
   log?: (message: string) => void;
@@ -121,13 +126,24 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   log(`  ${isins.size.toLocaleString()} LEIs with ISINs, ${bics.size.toLocaleString()} with a BIC`);
 
   const { entities, postings, stats } = await step("entities", () =>
-    readEntities(inputs.lei2, { relationships, isins, bics, nowYear, researchSplit }, (rows) =>
-      log(`  ${rows.toLocaleString()} rows, rss ${peakRssMb().toFixed(0)} MB`),
+    readEntities(
+      inputs.lei2,
+      {
+        relationships,
+        isins,
+        bics,
+        nowYear,
+        researchSplit,
+        ...(options.initialsMinProminence === undefined
+          ? {}
+          : { initialsMinProminence: options.initialsMinProminence }),
+      },
+      (rows) => log(`  ${rows.toLocaleString()} rows, rss ${peakRssMb().toFixed(0)} MB`),
     ),
   );
   log(
     `  ${entities.count.toLocaleString()} entities, ${postings.size.toLocaleString()} postings` +
-      `, ${stats.noTerms} with no index term`,
+      `, ${stats.noTerms} with no index term, ${stats.initials.toLocaleString()} index initials`,
   );
   const skipped = Object.values(stats.skipped).reduce((a, b) => a + b, 0);
   if (skipped > 0) {

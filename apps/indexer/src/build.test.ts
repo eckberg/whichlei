@@ -7,6 +7,7 @@ import {
   filePath,
   type Manifest,
   queryTokens,
+  roundProminence,
   route,
   routingTable,
   toCandidate,
@@ -15,7 +16,7 @@ import {
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { buildIndex } from "./build.ts";
 import { checkIndex, compareReference, IndexDir, replayEvaluation } from "./check.ts";
-import { readEntities } from "./entities.ts";
+import { INITIALS_MIN_PROMINENCE, readEntities } from "./entities.ts";
 import { FILLERS, fillerLei, fixtureGolden, LEI, writeInputs } from "./fixture.ts";
 import { CAP } from "./pack.ts";
 import { readRelationships } from "./signals.ts";
@@ -157,6 +158,40 @@ describe("build, end to end on a tiny golden copy", () => {
     expect(holders("ericsson")).toHaveLength(4);
     // Single characters are not terms.
     expect(words.filter((w) => w.length < 2)).toEqual([]);
+  });
+
+  test("prominent entities index the initials of their names", async () => {
+    const inputs = writeInputs(join(root, "in"), fixtureGolden());
+    const read = async (initialsMinProminence?: number) => {
+      const { postings, entities, stats } = await readEntities(inputs.lei2, {
+        relationships: await readRelationships(inputs.rr),
+        isins: new Map(),
+        bics: new Set(),
+        nowYear: 2026.74,
+        ...(initialsMinProminence === undefined ? {} : { initialsMinProminence }),
+      });
+      const { words, start, entities: ids } = postings.finish();
+      const holders = (term: string) => {
+        const i = words.indexOf(term);
+        return i < 0 ? [] : [...ids.slice(start[i], start[i + 1])].map((id) => entities.lei[id]);
+      };
+      return { holders, stats, entities };
+    };
+    const { holders, stats, entities } = await read();
+    // "Telefonaktiebolaget LM Ericsson" -> "tle"; "A.P. Møller - Mærsk A/S" -> "amm".
+    expect(holders("tle")).toEqual([LEI.ericsson]);
+    expect(holders("amm")).toEqual([LEI.maersk]);
+    // "Acme Holdings 7 Limited" has a word that starts with a digit: no initials.
+    expect(holders("ah")).toEqual([]);
+    const prominent = [...entities.prominence.subarray(0, entities.count)].filter(
+      (p) => roundProminence(p) >= INITIALS_MIN_PROMINENCE,
+    );
+    expect(stats.initials).toBeGreaterThan(0);
+    expect(stats.initials).toBeLessThanOrEqual(prominent.length);
+    // Below the threshold, none; the research's index had none.
+    const none = await read(Number.POSITIVE_INFINITY);
+    expect(none.holders("tle")).toEqual([]);
+    expect(none.stats.initials).toBe(0);
   });
 
   test("files order entries by prominence, then LEI", () => {

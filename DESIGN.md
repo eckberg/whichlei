@@ -36,7 +36,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 
 | # | Decision | Why |
 |---|----------|-----|
-| 1 | The search index is **static files on a CDN**. No search server | 6,438 files, 221 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
+| 1 | The search index is **static files on a CDN**. No search server | 6,445 files, 221 MB. Fits a free static host (20,000-file limit), where static requests are free and unlimited. |
 | 2 | An opened record is **fetched live** from the GLEIF API | The API is too slow for typeahead (~0.5 s median, per-IP rate limit) but right for one deliberate lookup, and always current. |
 | 3 | The index is **rebuilt nightly** from GLEIF's daily files | The only compute in the system. Runs on free CI. |
 | 4 | Ranking adds a **prominence** score to **name match**, with weights fitted on an evaluation set | Name match alone ranked Telefonaktiebolaget LM Ericsson 335th for "ericsson". Fitted, the mean reciprocal rank on held-out queries goes from .23 to .65. See §4. |
@@ -61,6 +61,7 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 23 | **The font is self-hosted** (Red Hat Mono, SIL OFL, `apps/web/static/fonts/`) and the **CSP allows only the site, the index host, the GLEIF API and Fathom** (`https://cdn.usefathom.com` for script, image and connect, added at launch), with no inline script or style | A Google Fonts request tells a third party about every visit, against the privacy promise of decision 12. Without inline code the policy stops injected script from running. Fathom's script, its page-view image and its beacons need their host; the stats loader keeps it off every host but whichlei.com (decision 30). |
 | 24 | **Search runs in a Web Worker**: the index client, routing, decoding and scoring. The page sends every input with a sequence number, the worker works on the newest only, and answers to older inputs are dropped | Typing never waits on scoring, which took up to 300 ms of the main thread at 4× CPU slowdown (slice 7 spec). A pass cannot be interrupted, so what the user typed meanwhile replaces the queue rather than lining up behind it. Where `Worker` is missing the same code runs on the page. |
 | 25 | A **code typed in the box is looked up at GLEIF from the browser**, after a pause (350 ms; 800 ms for a register number), once per reading and input, cached for the page session, aborted when stale or after 8 s, and held back after a 429 for its Retry-After (60 s if unreadable). **A name with spaces never goes to GLEIF.** A single word shaped like a BIC (ERICSSON, 8 or 11 letters and digits) does, because decision 8 lets the hits decide; so does an input with an LEI's or an ISIN's valid check digits (an ISIN without spaces, an LEI in groups of 4), or that looks like a register number | ISINs, BICs and register numbers are not in the index. The API is rate limited per IP (about 60 a minute). A reading with no hits shows nothing (decision 8), and a lookup failure never blocks the names. What counts as a code is narrow, to keep names at home: a BIC may have spaces only between all its groups (`TEER SE SS XXX`: "Sony Corp" and "Barclays PLC" are not BICs); a register number has at least 5 digits, digits at least half of its letters and digits, a digit run that is not a year ("Fund 2021", "AP7 2021" are names), and is not 19 or 20 characters in one piece (an LEI with a character missing); nothing over 35 characters is looked up. The about page says it. Slice 8 spec. |
+| 26 | **Acronyms are searchable**: entities with prominence ≥ 1 also index the initials of their names ("Skandinaviska Enskilda Banken AB" → "seb"), and a one-word query equal to a name's initials matches it | All 22 acronyms in a set of well-known ones found nothing: no index term held them. On that set of 60 acronyms and short names, held-out half, the right entity first .53 → .73, for +7 index files (+0.17% bytes). The scorer applies the same prominence test, so a result does not depend on the file an entity came from. Two-letter initials and a lower threshold cost more, for no better objective on the fitting half. [Slice 10](docs/specs/10-ranking-gaps.md). |
 | 27 | **whichlei.com is the only canonical host**, a Workers Custom Domain on `whichlei-site`. workers.dev stays up as the preview and is never indexed | A custom domain creates its own DNS record and certificate, so no DNS or ruleset permission is needed. The Cache API starts working (decision 18). |
 | 28 | **www.whichlei.com is a separate Worker, `whichlei-redirect`**, that answers 301 to the apex with path and query | A Redirect Rule needs a proxied DNS record for www and ruleset permission, which the token lacks. Adding www to `whichlei-site` would not redirect static paths (only `/lei/*` runs the Worker), and running the Worker on every path spends the free plan's 100,000 requests a day. www traffic is small. |
 | 29 | **The index is served from index.whichlei.com**; its workers.dev host stays | The site no longer depends on the account's personal workers.dev subdomain, which can be renamed. CORS is already `*`, so previews keep working. No cost. |
@@ -84,10 +85,10 @@ Two paths, split by latency.
 |---|---|
 | Records | 3,431,742 |
 | Reachable through the index | 96.7% |
-| Index files | 6,438 |
+| Index files | 6,445 |
 | Index size, gzipped | 221 MB |
 | File size, gzipped | median 36 KB, max 82 KB |
-| Fetched while typing, debounce fires on every key | median 148 KB, p90 272 KB, max 463 KB |
+| Fetched while typing, debounce fires on every key | median 148 KB, p90 272 KB, max 465 KB |
 | Fetched while typing, debounce fires on the last key | median 64 KB, p90 105 KB, max 225 KB |
 | Parsing and scoring, slowest keystroke per query (Chromium, 4× CPU slowdown) | median 45 ms, p90 74 ms, max 222 ms |
 | Manifest with the routing table, gzipped | 21 KB |
@@ -108,8 +109,10 @@ Each candidate's score is its prominence plus its best name match.
   status, consolidated subsidiaries, top-parent status, BIC, ISINs, registration age, name
   length. It orders each file and decides what survives a file's cap.
 - **Match** is computed in the browser: words matched, exact or fuzzy (one edit), share of
-  the name's words matched, exact name.
-- 19 weights, fitted on half of the evaluation set. The other half is only used to report.
+  the name's words matched, exact name, the name less its legal form, the name's initials.
+- 21 weights: 19 fitted on half of the evaluation set, then the two for the legal form and
+  initials (slice 10) chosen on the same half with the 19 fixed. The other half is only
+  used to report.
 
 The evaluation set covers well-known entities by common name and brand (from Wikidata),
 mid-tier entities by their first words, obscure entities by full legal name, and typos.
@@ -127,9 +130,17 @@ On 100 of the well-known queries, GLEIF's own autocomplete puts the right entity
 of the time; this ranking 56%. The held-out half was scored more than once while fixing
 bugs, so these numbers may be slightly optimistic.
 
-Known gaps: acronyms ("seb" finds SEB SA, not the bank), short queries of two to four
-letters ("bp", "sas"), ~92k names with no Latin-script form, typos in the first three or
-four characters, previous names.
+Slice 10 added acronyms and names less their legal form ("bp" finds BP P.L.C., not BPCE).
+Held-out half, the right entity first: well-known entities .557 → .570, the other strata
+unchanged or up; 60 well-known acronyms and short names .53 → .73; the evaluation set's
+one-word queries of two to four characters .26 → .29 (named entities .38 → .45).
+
+Known gaps: two-letter acronyms ("ge", "db"), acronyms of entities with prominence under 1
+("klm", "hbo"), acronyms that are not the legal name's initials ("anz", "iag"); "seb" still
+finds SEB SA first (more prominent, and named exactly that); "sas" and "sca" rank second
+behind companies with that legal form; "tsb" ranks "TSB, L.P." (a shell named exactly
+that, less its legal form) above TSB Bank PLC; ~92k names with no Latin-script form, typos in the
+first three or four characters, previous names.
 
 Method, code and full results: [`research/ranking/`](research/ranking/).
 

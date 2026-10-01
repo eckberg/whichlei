@@ -31,8 +31,8 @@ The search page is on another origin (its build setting `INDEX_ORIGIN`), so ever
 index host: only GET, no custom request headers, no cookies.
 
 A publish uploads the new build directory and the new `index.json` in one Worker
-version. It keeps the previous build's directory too: 2 × (6,438 index files + `codes.json`
-+ `report.json`) + 1 manifest = 12,881 files, under the 20,000-file limit. So a page that
+version. It keeps the previous build's directory too: 2 × (6,445 index files + `codes.json`
++ `report.json`) + 1 manifest = 12,895 files, under the 20,000-file limit. So a page that
 loaded the old manifest keeps working. The publish asserts the count stays under the limit.
 
 Every response carries `Access-Control-Allow-Origin: *` and `X-Content-Type-Options:
@@ -113,7 +113,9 @@ cap also uses full precision. The stored tenths are for scoring only, so two lin
 the same stored prominence need not be in LEI order.
 
 An entity appears in every file that holds one of its index terms, so the same line can be
-in two fetched files; the reader merges by LEI.
+in two fetched files; the reader merges by LEI. Its index terms are the words of its names
+(`indexTerms`) and, when its prominence is at least 1, their initials (`nameInitials`,
+slice 10). The reader works out both from the names in the line.
 
 Example:
 

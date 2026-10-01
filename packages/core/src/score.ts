@@ -1,9 +1,13 @@
 // Query-time scoring. Port of research/ranking/ranking.py, section 4, with legal-form
 // stripping off (the recommended configuration), so the core name is the whole name.
-import type { NameTokens } from "./tokens.ts";
+import { formStart, INITIALS_LENGTH, type NameTokens, nameInitials } from "./tokens.ts";
 
-/** Fitted match weights (ranking.py W_RECOMMENDED). The prominence weights come with the indexer. */
-export const MATCH_WEIGHTS = {
+/**
+ * The match weights of the reference (ranking.py W_RECOMMENDED), fitted there, with the
+ * slice 10 features off (0): this scores exactly as the reference does. The prominence
+ * weights come with the indexer.
+ */
+export const REFERENCE_MATCH_WEIGHTS = {
   /** Every content word matched. */
   m_all: 2.59,
   /** Per unmatched content word. */
@@ -18,9 +22,34 @@ export const MATCH_WEIGHTS = {
   m_prefix: 0.84,
   /** Times the share of name words matched. */
   m_coverage: 2.26,
+  /**
+   * Score of a name the query matches as its initials ('seb' for Skandinaviska Enskilda
+   * Banken AB), when that beats its word match. 0: initials never match.
+   */
+  m_initials: 0,
+  /** Query equals the name without its trailing legal form ('bp' for BP P.L.C.). */
+  m_base_exact: 0,
 } as const;
 
-export type MatchWeights = Record<keyof typeof MATCH_WEIGHTS, number>;
+export type MatchWeights = Record<keyof typeof REFERENCE_MATCH_WEIGHTS, number>;
+
+/**
+ * The weights search uses: the reference's, plus the slice 10 weights, chosen on the
+ * evaluation set's train half (docs/specs/10-ranking-gaps.md).
+ */
+export const MATCH_WEIGHTS: MatchWeights = {
+  ...REFERENCE_MATCH_WEIGHTS,
+  m_initials: 6.5,
+  m_base_exact: 1,
+};
+
+/**
+ * Entities at least this prominent, as an index file stores it (in tenths), index the
+ * initials of their names, and only they match by initials: about the top 30,000. The
+ * indexer and the scorer apply the same test, so a result does not depend on which file
+ * an entity was fetched from (docs/specs/10-ranking-gaps.md).
+ */
+export const INITIALS_MIN_PROMINENCE = 1;
 
 /** Query tokens shorter than this never match fuzzily. */
 const FUZZY_MIN_LENGTH = 4;
@@ -101,6 +130,24 @@ export interface MatchFeatures {
   exact: boolean;
   prefix: boolean;
   coverage: number;
+  /** The query is one word, equal to the name's initials. */
+  initials: boolean;
+  /** The query equals the name without its trailing legal form, and the name has one. */
+  baseExact: boolean;
+}
+
+/**
+ * Whether the query is one word that equals the initials of the name. Most names fail on
+ * the first letter, before any initials are made: this runs for every candidate name.
+ */
+function isInitials(query: readonly string[], seq: readonly string[]): boolean {
+  const q = query[0];
+  if (query.length !== 1 || q === undefined) return false;
+  if (q.length < INITIALS_LENGTH.min || q.length > INITIALS_LENGTH.max) return false;
+  let first = 0;
+  while (first < seq.length && QUERY_STOP.has(seq[first] as string)) first++;
+  if ((seq[first] ?? "").charCodeAt(0) !== q.charCodeAt(0)) return false;
+  return nameInitials(seq, QUERY_STOP).includes(q);
 }
 
 /** A match level function: matchLevel, or a memo of it. */
@@ -124,11 +171,16 @@ export function memoLevel(): Level {
   };
 }
 
-/** Features of one name against the query tokens. The last query token may be partial. */
+/**
+ * Features of one name against the query tokens. The last query token may be partial.
+ * `initials`: whether the name may match as initials at all (scoreCandidate passes false
+ * below INITIALS_MIN_PROMINENCE and when m_initials is 0).
+ */
 export function matchFeatures(
   query: string[],
   { seq, extras }: NameTokens,
   level: Level = matchLevel,
+  initials = true,
 ): MatchFeatures {
   // Plain loops, no closures or temporary arrays: this runs for every candidate name on
   // every keystroke.
@@ -178,12 +230,20 @@ export function matchFeatures(
     exact: n === seq.length && same === n,
     prefix: n <= seq.length && same >= n - 1 && (seq[n - 1] ?? "").startsWith(query[n - 1] ?? ""),
     coverage: matched.length / Math.max(1, seq.length),
+    initials: initials && isInitials(query, seq),
+    // The query is the name's leading words, and the rest is its legal form.
+    baseExact: same === n && n < seq.length && formStart(seq) === n,
   };
 }
 
-/** Match score of one name, or null when no content word matches and it is not shown. */
+/**
+ * Match score of one name, or null when it is not shown: no content word matches and the
+ * query is not its initials (or m_initials is 0). With the slice 10 weights at 0 this is
+ * the reference's score, bit for bit.
+ */
 export function matchScore(f: MatchFeatures, w: MatchWeights = MATCH_WEIGHTS): number | null {
-  if (!f.shown) return null;
+  const initials = f.initials && w.m_initials !== 0 ? w.m_initials : null;
+  if (!f.shown) return initials;
   let s = 0;
   if (f.nMiss === 0) s += w.m_all;
   s -= w.m_miss * f.nMiss;
@@ -192,7 +252,8 @@ export function matchScore(f: MatchFeatures, w: MatchWeights = MATCH_WEIGHTS): n
   if (f.exact) s += w.m_core_exact;
   if (f.prefix) s += w.m_prefix;
   s += w.m_coverage * f.coverage;
-  return s;
+  if (f.baseExact) s += w.m_base_exact;
+  return initials !== null && initials > s ? initials : s;
 }
 
 export interface Candidate<Id> {
@@ -211,8 +272,9 @@ export function scoreCandidate<Id>(
   level: Level = matchLevel,
 ): number | null {
   let best: number | null = null;
+  const initials = w.m_initials !== 0 && candidate.prominence >= INITIALS_MIN_PROMINENCE;
   for (const name of candidate.names) {
-    const m = matchScore(matchFeatures(query, name, level), w);
+    const m = matchScore(matchFeatures(query, name, level, initials), w);
     if (m !== null && (best === null || m > best)) best = m;
   }
   return best === null ? null : best + candidate.prominence;

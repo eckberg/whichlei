@@ -4,7 +4,7 @@ import { identifierReadings, isValidBic, isValidIsin, isValidLei } from "./ident
 
 const EVAL_DIR = new URL("../../../research/ranking/eval/", import.meta.url);
 
-/** Every distinct LEI in the evaluation set: the target and alternative columns. */
+/** Every distinct LEI in the evaluation set and the acronym set: the target and alternative columns. */
 function evaluationLeis(): string[] {
   const leis = new Set<string>();
   for (const file of readdirSync(EVAL_DIR).filter((name) => name.endsWith(".tsv"))) {
@@ -40,7 +40,7 @@ const leis = evaluationLeis();
 
 describe("isValidLei", () => {
   test("reads the evaluation set", () => {
-    expect(leis.length).toBe(1613);
+    expect(leis.length).toBe(1674);
   });
 
   test("accepts every LEI in the evaluation set", () => {

@@ -132,3 +132,58 @@ export function queryTokens(query: string): string[] {
 export function indexTerms({ seq, extras }: NameTokens): Set<string> {
   return new Set([...seq, ...extras].filter((term) => term.length >= 2));
 }
+
+/**
+ * Tokens that end a name as its legal form: 'AB', 'GmbH & Co. KG', 'S.p.A.', 'Sp. z o.o.',
+ * 'Aktiengesellschaft', 'Corporation', as nameTokens writes them. The frequent last words of
+ * legal names in the golden copy that are legal forms, and the words of spelled-out forms.
+ */
+export const LEGAL_FORMS: ReadonlySet<string> = new Set(
+  `ab aktiebolag aktiebolaget publ as asa aps oy oyj osakeyhtio ehf hf
+  gmbh mbh ggmbh ag kg kgaa ohg gbr ug haftungsbeschrankt eg ev co se
+  aktiengesellschaft kommanditgesellschaft gesellschaft mit beschrankter haftung
+  ltd limited plc llc llp lp inc incorporated corp corporation company public pte pty pvt private
+  sa sas sasu sarl eurl sca scs snc sci scop societe anonyme spa srl srls sapa
+  sl slu slp sau ltda limitada lda sociedad sociedade anonima por acoes unipessoal unipersonal eireli
+  bv nv vof cv cvba bvba naamloze besloten vennootschap sro ks vos akciova spolecnost
+  sp z oo spolka akcyjna ograniczona odpowiedzialnoscia komandytowa jawna
+  kft zrt nyrt rt tarsasag felelossegu korlatolt reszvenytarsasag mukodo nyilvanosan
+  doo dd ad ood eood ou uab sia bhd sdn kk`
+    .trim()
+    .split(/\s+/),
+);
+
+/**
+ * Where the trailing legal form of a name starts: the first word of the run of LEGAL_FORMS
+ * at its end, or `seq.length` when it has none. Never 0: a name that is all legal form
+ * keeps its first word ('SAS AB' -> 1, 'AB' -> 1).
+ */
+export function formStart(seq: readonly string[]): number {
+  let start = seq.length;
+  while (start > 1 && LEGAL_FORMS.has(seq[start - 1] as string)) start--;
+  return start;
+}
+
+/** Initials have this many letters at least, and at most. */
+export const INITIALS_LENGTH = { min: 3, max: 6 } as const;
+const LETTER = /^[a-z]/;
+
+/**
+ * Initials of a name, for acronyms: the first letter of each word, `stop` words left out.
+ * Once without the trailing legal form, and once with its first word when that is spelled
+ * out (four letters or more), as in BBC and HSBC. 'Skandinaviska Enskilda Banken AB' ->
+ * ['seb']; 'British Broadcasting Corporation' -> ['bb', 'bbc']; 'International Business
+ * Machines Corporation' -> ['ibm', 'ibmc']. INITIALS_LENGTH words, each starting with a
+ * letter; else none.
+ */
+export function nameInitials(seq: readonly string[], stop: ReadonlySet<string>): string[] {
+  const start = formStart(seq);
+  const words = seq.slice(0, start).filter((word) => !stop.has(word));
+  if (!words.every((word) => LETTER.test(word))) return [];
+  const form = seq[start];
+  const variants = [words];
+  if (form !== undefined && form.length >= 4) variants.push([...words, form]);
+  return variants
+    .filter((v) => v.length >= INITIALS_LENGTH.min && v.length <= INITIALS_LENGTH.max)
+    .map((v) => v.map((word) => word[0]).join(""));
+}
