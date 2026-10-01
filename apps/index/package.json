@@ -1,0 +1,22 @@
+{
+  "name": "@whichlei/index",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "checks": "node --max-old-space-size=4000 scripts/checks.ts",
+    "assemble": "node scripts/assemble.ts",
+    "verify-live": "node scripts/verify-live.ts",
+    "live-build": "node scripts/live-build.ts",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@whichlei/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "wrangler": "catalog:"
+  }
+}

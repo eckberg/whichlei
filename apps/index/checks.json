@@ -1,0 +1,23 @@
+{
+  "relative": { "entities": 0.03, "files": 0.05, "gzipBytes": 0.1 },
+  "absolute": {
+    "entities": { "min": 3000000, "max": 3700000 },
+    "files": { "min": 5500, "max": 7500 },
+    "gzipBytes": { "min": 190000000, "max": 250000000 },
+    "objective": 0.62
+  },
+  "reachability": 0.96,
+  "objectiveDrop": 0.01,
+  "queries": [
+    {
+      "query": "ericsson",
+      "lei": "549300W9JLPW15XIFM52",
+      "name": "Telefonaktiebolaget LM Ericsson, SE"
+    },
+    { "query": "siemens", "lei": "W38RGI023J3WT1HWRP32", "name": "Siemens Aktiengesellschaft, DE" },
+    { "query": "nestle", "lei": "KY37LUS27QQX7BB93L28", "name": "NESTLÉ S.A., CH" },
+    { "query": "hsbc", "lei": "MLU0ZO3ML4LN2LL2TL39", "name": "HSBC HOLDINGS PLC, GB" },
+    { "query": "microsoft", "lei": "INR2EJN1ERAN0W5ZP974", "name": "MICROSOFT CORPORATION, US" },
+    { "query": "bnp paribas", "lei": "R0MUWSFPU8MPRO8K5P83", "name": "BNP PARIBAS, FR" }
+  ]
+}

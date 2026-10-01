@@ -1,0 +1,13 @@
+// The search index: static assets only, no script. Static requests are free and unlimited.
+// `pnpm --filter @whichlei/index assemble` fills ./publish; .github/workflows/publish-index.yml
+// deploys it every night, and rollback-index.yml restores the previous version.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "whichlei-index",
+  "compatibility_date": "2026-09-29",
+  "workers_dev": true,
+  "send_metrics": false,
+  "assets": {
+    "directory": "./publish"
+  }
+}

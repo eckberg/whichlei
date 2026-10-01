@@ -30,3 +30,6 @@ apps/indexer/.inputs/
 
 # indexer output in CI
 index-out/
+
+# index Worker upload directory
+apps/index/publish/
