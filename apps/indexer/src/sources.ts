@@ -1,10 +1,11 @@
 // Where the inputs come from: GLEIF's golden copy, its ISIN and BIC mapping files, and two
 // code lists. Port of research/ranking/fetch_data.py. The download is a function of a
 // publish date (or "latest") and of `fetch`, which tests replace.
+import { execFileSync } from "node:child_process";
 import { createWriteStream } from "node:fs";
-import { mkdir, readdir, rename, stat } from "node:fs/promises";
+import { mkdir, readdir, rename, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { Readable } from "node:stream";
+import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { firstMember } from "./unzip.ts";
 
@@ -31,7 +32,8 @@ export interface Inputs {
   isin: string;
   bic: string;
   elf: string;
-  ra: string;
+  /** The registration authorities list. A directory the research filled has none. */
+  ra: string | undefined;
   /** Publish date of the golden copy, YYYY-MM-DD. */
   asOf: string;
   /** Records the publishes API announced for the level 1 file, when it was downloaded. */
@@ -43,15 +45,22 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** A directory that already holds the inputs, as the research's `research/data` does. */
 export async function localInputs(dir: string, publishDate?: string): Promise<Inputs> {
-  const found = async (name: string): Promise<string> => {
+  const look = async (name: string): Promise<string | undefined> => {
     for (const path of [join(dir, name), join(dir, "signals", name)]) {
       try {
         if ((await stat(path)).isFile()) return path;
       } catch {}
     }
-    throw new Error(
-      `${name} is not in ${dir} (or ${join(dir, "signals")}); it has ${await list(dir)}`,
-    );
+    return undefined;
+  };
+  const found = async (name: string): Promise<string> => {
+    const path = await look(name);
+    if (path === undefined) {
+      throw new Error(
+        `${name} is not in ${dir} (or ${join(dir, "signals")}); it has ${await list(dir)}`,
+      );
+    }
+    return path;
   };
   const lei2 = await found(FILE_NAMES.lei2);
   const asOf =
@@ -63,7 +72,7 @@ export async function localInputs(dir: string, publishDate?: string): Promise<In
     isin: await found(FILE_NAMES.isin),
     bic: await found(FILE_NAMES.bic),
     elf: await found(FILE_NAMES.elf),
-    ra: await found(FILE_NAMES.ra),
+    ra: await look(FILE_NAMES.ra),
     asOf,
     records: undefined,
   };
@@ -84,51 +93,146 @@ function dateOfMember(zipPath: string): string {
   return `${match[1]}-${match[2]}-${match[3]}`;
 }
 
-// ---- The publishes API ------------------------------------------------------------
+// ---- Talking to GLEIF ---------------------------------------------------------------
 
-interface Publish {
-  publish_date: string;
-  lei2: { full_file: { csv: { url: string; record_count?: number } } };
-  rr: { full_file: { csv: { url: string } } };
+/** How the downloader reaches the network. Tests replace all of it. */
+export interface Http {
+  fetch?: Fetch;
+  /** Wait between attempts. */
+  sleep?: (ms: number) => Promise<void>;
+  /** An attempt that gets no byte for this long is abandoned and retried. */
+  idleMs?: number;
+  /** Attempts per request or download. */
+  tries?: number;
+  /** Base of the wait between attempts: it grows with each one. */
+  backoffMs?: number;
 }
 
-export async function getJson(url: string, doFetch: Fetch = fetch): Promise<unknown> {
-  const response = await withRetries(() =>
-    doFetch(url, { headers: { Accept: "application/json" } }),
-  );
-  return response.json();
-}
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-async function withRetries(attempt: () => Promise<Response>, tries = 3): Promise<Response> {
-  let failure: unknown;
-  for (let i = 1; i <= tries; i++) {
-    try {
-      const response = await attempt();
-      if (response.ok) return response;
-      failure = new Error(`${response.status} ${response.statusText} from ${response.url}`);
-      if (response.status < 500 && response.status !== 429) break;
-    } catch (error) {
-      failure = error;
-    }
-    if (i < tries) await new Promise((resolve) => setTimeout(resolve, 2000 * i));
-  }
-  throw failure;
+/** A failure that another attempt will not fix, such as a 404. */
+class Permanent extends Error {}
+
+/** An abort signal that fires when nothing has happened for `ms`; `touch` resets it. */
+function idleSignal(ms: number) {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const touch = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => controller.abort(new Error(`no data for ${ms / 1000} s`)), ms);
+  };
+  touch();
+  return { signal: controller.signal, touch, stop: () => clearTimeout(timer) };
 }
 
 /**
- * The golden copy published on `date`, or the latest. GLEIF publishes several times a day;
+ * Run `attempt` until it succeeds, up to `tries` times with a growing wait between. An
+ * attempt is a whole request: connect, headers and body, so a connection that resets half
+ * way through a body is tried again from the start. `attempt` gets a signal that fires
+ * when the connection stalls, and a `touch` to call whenever data arrives.
+ */
+async function withRetries<T>(
+  what: string,
+  http: Http,
+  attempt: (idle: ReturnType<typeof idleSignal>) => Promise<T>,
+): Promise<T> {
+  const { tries = 3, idleMs = 60_000, backoffMs = 2000, sleep = wait } = http;
+  let failure: unknown;
+  for (let i = 1; i <= tries; i++) {
+    const idle = idleSignal(idleMs);
+    try {
+      return await attempt(idle);
+    } catch (error) {
+      failure = error;
+      if (error instanceof Permanent) break;
+    } finally {
+      idle.stop();
+    }
+    if (i < tries) await sleep(backoffMs * i);
+  }
+  const reason = failure instanceof Error ? (failure.cause ?? failure) : failure;
+  throw new Error(`${what}: ${String(reason instanceof Error ? reason.message : reason)}`, {
+    cause: failure,
+  });
+}
+
+/** A response that is not OK: permanent unless the server is at fault or busy. */
+function statusError(response: Response): Error {
+  const message = `${response.status} ${response.statusText} from ${response.url}`;
+  const retry = response.status >= 500 || response.status === 429;
+  return retry ? new Error(message) : new Permanent(message);
+}
+
+async function request(
+  url: string,
+  http: Http,
+  idle: ReturnType<typeof idleSignal>,
+  accept?: string,
+): Promise<Response> {
+  const doFetch = http.fetch ?? fetch;
+  const response = await doFetch(url, {
+    signal: idle.signal,
+    ...(accept === undefined ? {} : { headers: { Accept: accept } }),
+  });
+  if (!response.ok) throw statusError(response);
+  return response;
+}
+
+export async function getJson(url: string, http: Http = {}): Promise<unknown> {
+  return withRetries(`GET ${url}`, http, async (idle) => {
+    const response = await request(url, http, idle, "application/json");
+    return response.json();
+  });
+}
+
+async function getText(url: string, http: Http): Promise<string> {
+  return withRetries(`GET ${url}`, http, async (idle) => (await request(url, http, idle)).text());
+}
+
+/** A file to download, and its size if the API says. */
+export interface Remote {
+  url: string;
+  size?: number;
+}
+
+interface Csv {
+  url: string;
+  size?: number;
+  record_count?: number;
+}
+interface Publish {
+  publish_date: string;
+  lei2: { full_file: { csv: Csv } };
+  rr: { full_file: { csv: Csv } };
+}
+
+export interface Resolved {
+  /** `YYYY-MM-DD`. */
+  asOf: string;
+  /** When the golden copy was published, ISO 8601, UTC. */
+  publishedAt: string;
+  lei2: Remote;
+  rr: Remote;
+  records: number | undefined;
+}
+
+/** `2026-09-16 08:00:00` as `2026-09-16T08:00:00Z`. */
+const isoOf = (publishDate: string) => `${publishDate.replace(" ", "T")}Z`;
+
+const remote = ({ url, size }: Csv): Remote => (size === undefined ? { url } : { url, size });
+
+/**
+ * The golden copy published on `date`, or the latest. GLEIF publishes three times a day;
  * a date takes the 08:00 one, as the research did, else the newest of that day.
  */
-export async function resolvePublish(
-  date: string,
-  doFetch: Fetch = fetch,
-): Promise<{ asOf: string; lei2: string; rr: string; records: number | undefined }> {
+export async function resolvePublish(date: string, http: Http = {}): Promise<Resolved> {
   const page = async (n: number) =>
-    ((await getJson(`${PUBLISHES_API}?page=${n}`, doFetch)) as { data: Publish[] }).data;
-  const pick = (row: Publish) => ({
+    ((await getJson(`${PUBLISHES_API}?page=${n}`, http)) as { data: Publish[] }).data;
+  const pick = (row: Publish): Resolved => ({
     asOf: row.publish_date.slice(0, 10),
-    lei2: row.lei2.full_file.csv.url,
-    rr: row.rr.full_file.csv.url,
+    publishedAt: isoOf(row.publish_date),
+    lei2: remote(row.lei2.full_file.csv),
+    rr: remote(row.rr.full_file.csv),
     records: row.lei2.full_file.csv.record_count,
   });
   if (date === "latest") {
@@ -151,26 +255,66 @@ export async function resolvePublish(
   return pick(chosen);
 }
 
-/** The newest upload of a mapping file. GLEIF keeps no history by date. */
-export async function latestMapping(
-  kind: "isin-lei" | "bic-lei",
-  doFetch: Fetch = fetch,
-): Promise<string> {
-  const { data } = (await getJson(`${MAPPING_API}/${kind}`, doFetch)) as {
-    data: { attributes: { downloadLink: string } }[];
+/** One upload in GLEIF's mapping API, as it lists them. */
+export interface MappingUpload {
+  attributes: { fileName: string; uploadedAt: string; downloadLink: string } & {
+    valid?: boolean;
+    processed?: boolean;
   };
-  const link = data[0]?.attributes.downloadLink;
-  if (link === undefined) throw new Error(`the mapping API lists no ${kind} file`);
-  return link;
+}
+
+/**
+ * The newest upload that was already there when the golden copy came out: uploaded at or
+ * before `publishedAt`, and both `valid` and `processed` (GLEIF's own checks). Uploads of
+ * any order. `undefined` if there is none.
+ */
+export function pickMapping(
+  uploads: readonly MappingUpload[],
+  publishedAt: string,
+): MappingUpload | undefined {
+  const limit = Date.parse(publishedAt);
+  let best: MappingUpload | undefined;
+  for (const upload of uploads) {
+    const { uploadedAt, valid, processed } = upload.attributes;
+    const at = Date.parse(uploadedAt);
+    if (valid !== true || processed !== true || Number.isNaN(at) || at > limit) continue;
+    if (best === undefined || at > Date.parse(best.attributes.uploadedAt)) best = upload;
+  }
+  return best;
+}
+
+/**
+ * The mapping file that matches a golden copy: the newest upload from before it. The API
+ * lists uploads newest first, 100 to a page, so this reads pages until one reaches back
+ * past the golden copy's time.
+ */
+export async function findMapping(
+  kind: "isin-lei" | "bic-lei",
+  publishedAt: string,
+  http: Http = {},
+): Promise<string> {
+  let url: string | undefined = `${MAPPING_API}/${kind}?page%5Bsize%5D=100`;
+  for (let pages = 0; url !== undefined && pages < 100; pages++) {
+    const body = (await getJson(url, http)) as {
+      data: MappingUpload[];
+      links?: { next?: string | null };
+    };
+    const found = pickMapping(body.data, publishedAt);
+    // Newest first: pages before this one had no valid upload from before the golden copy,
+    // so the best one is on this page, if there is one.
+    if (found !== undefined) return found.attributes.downloadLink;
+    url = body.links?.next ?? undefined;
+  }
+  throw new Error(`the mapping API has no valid ${kind} upload from before ${publishedAt}`);
 }
 
 /** The CSV a code list page links to. */
 export async function codeListLink(
   page: string,
   pattern: RegExp,
-  doFetch: Fetch = fetch,
+  http: Http = {},
 ): Promise<string> {
-  const html = await (await withRetries(() => doFetch(page))).text();
+  const html = await getText(page, http);
   const links = [...html.matchAll(/href="(https:\/\/www\.gleif\.org\/[^"]*\.csv)"/g)].map(
     (m) => m[1] as string,
   );
@@ -181,16 +325,48 @@ export async function codeListLink(
 
 // ---- Downloading ------------------------------------------------------------------
 
-/** Download `url` to `destination`, through a `.part` file, with retries. */
+/**
+ * Download `remote` to `destination`, through a `.part` file. An attempt that resets, stalls,
+ * delivers a different number of bytes than the API (or Content-Length) announced, or is a
+ * zip that does not test clean, is deleted and tried again from the start.
+ */
 export async function download(
-  url: string,
+  remote: Remote,
   destination: string,
-  doFetch: Fetch = fetch,
+  http: Http = {},
 ): Promise<void> {
   const part = `${destination}.part`;
-  const response = await withRetries(() => doFetch(url));
-  if (response.body === null) throw new Error(`${url} returned no body`);
-  await pipeline(Readable.fromWeb(response.body as never), createWriteStream(part));
+  try {
+    await withRetries(`download ${remote.url}`, http, async (idle) => {
+      const response = await request(remote.url, http, idle);
+      if (response.body === null) throw new Error("no body");
+      let bytes = 0;
+      const count = new Transform({
+        transform(chunk: Buffer, _encoding, done) {
+          bytes += chunk.length;
+          idle.touch();
+          done(null, chunk);
+        },
+      });
+      await pipeline(Readable.fromWeb(response.body as never), count, createWriteStream(part), {
+        signal: idle.signal,
+      });
+      const announced = remote.size ?? Number(response.headers.get("content-length") ?? Number.NaN);
+      if (Number.isFinite(announced) && bytes !== announced) {
+        throw new Error(`got ${bytes} bytes, expected ${announced}`);
+      }
+      if (destination.endsWith(".zip")) {
+        try {
+          execFileSync("unzip", ["-tqq", part], { stdio: "pipe" });
+        } catch (error) {
+          throw new Error(`the zip does not test clean: ${(error as Error).message}`);
+        }
+      }
+    });
+  } catch (error) {
+    await rm(part, { force: true });
+    throw error;
+  }
   await rename(part, destination);
 }
 
@@ -198,26 +374,26 @@ export async function download(
 export async function downloadInputs(
   dir: string,
   publishDate: string,
-  doFetch: Fetch = fetch,
+  http: Http = {},
   log: (message: string) => void = () => {},
 ): Promise<Inputs> {
   await mkdir(dir, { recursive: true });
-  const publish = await resolvePublish(publishDate, doFetch);
-  const plan: [keyof typeof FILE_NAMES, string][] = [
+  const publish = await resolvePublish(publishDate, http);
+  const plan: [keyof typeof FILE_NAMES, Remote][] = [
     ["lei2", publish.lei2],
     ["rr", publish.rr],
-    ["isin", await latestMapping("isin-lei", doFetch)],
-    ["bic", await latestMapping("bic-lei", doFetch)],
-    ["elf", await codeListLink(ELF_PAGE, /elf-code-list/i, doFetch)],
-    ["ra", await codeListLink(RA_PAGE, /ra-list/i, doFetch)],
+    ["isin", { url: await findMapping("isin-lei", publish.publishedAt, http) }],
+    ["bic", { url: await findMapping("bic-lei", publish.publishedAt, http) }],
+    ["elf", { url: await codeListLink(ELF_PAGE, /elf-code-list/i, http) }],
+    ["ra", { url: await codeListLink(RA_PAGE, /ra-list/i, http) }],
   ];
   const paths = {} as Record<keyof typeof FILE_NAMES, string>;
-  for (const [key, url] of plan) {
+  for (const [key, file] of plan) {
     const path = join(dir, FILE_NAMES[key]);
     const started = Date.now();
-    await download(url, path, doFetch);
+    await download(file, path, http);
     paths[key] = path;
-    log(`${FILE_NAMES[key]}: ${url} (${((Date.now() - started) / 1000).toFixed(0)} s)`);
+    log(`${FILE_NAMES[key]}: ${file.url} (${((Date.now() - started) / 1000).toFixed(0)} s)`);
   }
   return { ...paths, asOf: publish.asOf, records: publish.records };
 }

@@ -147,10 +147,10 @@ export function checkIndex(index: IndexDir, records: number | undefined, report:
       readFileSync(join(index.dir, manifest.build, "codes.json"), "utf8"),
     ) as {
       elf: object;
-      ra: object;
+      ra?: object;
     };
     log(
-      `codes.json: ${Object.keys(codes.elf).length} legal forms, ${Object.keys(codes.ra).length} registration authorities`,
+      `codes.json: ${Object.keys(codes.elf).length} legal forms, ${Object.keys(codes.ra ?? {}).length} registration authorities`,
     );
   } else {
     problems.push("codes.json is missing");

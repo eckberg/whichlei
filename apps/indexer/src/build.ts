@@ -149,10 +149,14 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
 
   const codes: Codes = await step("codes", () => ({
     elf: readElf(readFileSync(inputs.elf)),
-    ra: readRegistrationAuthorities(readFileSync(inputs.ra)),
+    ...(inputs.ra === undefined
+      ? {}
+      : { ra: readRegistrationAuthorities(readFileSync(inputs.ra)) }),
   }));
+  if (inputs.ra === undefined)
+    log("  WARNING: no registration authorities list; codes.json has no ra");
   log(
-    `  ${Object.keys(codes.elf).length} legal forms, ${Object.keys(codes.ra).length} registration authorities`,
+    `  ${Object.keys(codes.elf).length} legal forms, ${Object.keys(codes.ra ?? {}).length} registration authorities`,
   );
 
   // Files go into a scratch directory first: the build's name depends on their content.

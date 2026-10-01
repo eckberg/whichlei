@@ -7,7 +7,8 @@
 //                   of the files there; by default that comes from the file.
 //   --input-dir     use the files in this directory and download nothing. It holds lei2.csv.zip,
 //                   rr.csv.zip, isin-lei.zip, bic-lei.zip, elf-raw.csv and ra-list.csv, or
-//                   has them in a signals/ folder, as research/data does.
+//                   has them in a signals/ folder, as research/data does. Without
+//                   ra-list.csv the build warns and codes.json has no "ra".
 //   --download-dir  where downloads go (default .inputs)
 //   --out           the index directory (default dist). Emptied first if it holds an earlier build.
 //   --now-year      registration age is measured to this year fraction. Default: the publish
@@ -39,7 +40,7 @@ const publishDate = values["publish-date"] as string;
 const inputs =
   values["input-dir"] !== undefined
     ? await localInputs(values["input-dir"], publishDate)
-    : await downloadInputs(values["download-dir"] as string, publishDate, fetch, log);
+    : await downloadInputs(values["download-dir"] as string, publishDate, {}, log);
 log(`golden copy of ${inputs.asOf}`);
 
 const nowYear = values["now-year"] === undefined ? undefined : Number(values["now-year"]);

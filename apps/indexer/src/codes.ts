@@ -6,8 +6,11 @@ import { columnsOf, parseCsv } from "./csv.ts";
 export interface Codes {
   /** ELF code to the legal form's name in its own language. */
   elf: Record<string, string>;
-  /** Registration authority code to the name of the organisation that keeps the register. */
-  ra: Record<string, string>;
+  /**
+   * Registration authority code to the name of the organisation that keeps the register.
+   * Absent when the list was not available to the build.
+   */
+  ra?: Record<string, string>;
 }
 
 /** First non-empty of the candidates, trimmed. */
@@ -80,5 +83,9 @@ function sorted(object: Record<string, string>): Record<string, string> {
 
 /** `codes.json`: compact, keys in order. */
 export function encodeCodes(codes: Codes): string {
-  return JSON.stringify({ elf: sorted(codes.elf), ra: sorted(codes.ra) });
+  return JSON.stringify(
+    codes.ra === undefined
+      ? { elf: sorted(codes.elf) }
+      : { elf: sorted(codes.elf), ra: sorted(codes.ra) },
+  );
 }

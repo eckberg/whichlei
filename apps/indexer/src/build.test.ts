@@ -239,6 +239,17 @@ describe("build, end to end on a tiny golden copy", () => {
     expect(text).not.toContain("\n");
   });
 
+  test("without a registration authorities list the build goes on, and codes.json has no ra", async () => {
+    const dir = join(root, "no-ra");
+    const inputs = { ...writeInputs(join(root, "in"), fixtureGolden()), ra: undefined };
+    const logs: string[] = [];
+    const built = await buildIndex({ inputs, out: dir, log: (m) => logs.push(m) });
+    expect(JSON.parse(readFileSync(join(dir, built.build, "codes.json"), "utf8"))).toEqual({
+      elf: { ABCD: "Obshchestvo", XJHM: "Aktiebolag" },
+    });
+    expect(logs.join("\n")).toMatch(/WARNING: no registration authorities list/);
+  });
+
   test("prominence.tsv holds every entity at full precision", () => {
     const rows = readFileSync(join(out, "prominence.tsv"), "utf8").trimEnd().split("\n");
     expect(rows).toHaveLength(records);
