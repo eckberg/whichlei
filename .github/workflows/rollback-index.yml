@@ -1,20 +1,32 @@
 name: Roll back index
 
 # By hand only: Actions → Roll back index → Run workflow, with "rollback" typed in.
-# Restores the previous version of the whichlei-index Worker. That version holds the build
-# before the live one and the one before that, so pages open on either keep working. The
-# next scheduled publish builds from GLEIF again and replaces whatever is live.
+# Restores an earlier version of the whichlei-index Worker. That version holds its own build
+# and the one before it, so pages open on either keep working.
+#
+# Which version: the one you give in version-id (from `wrangler versions list`), or else the
+# newest version whose message is a build id older than the live one. "The previous
+# version" is never used: after an earlier rollback or a re-run it is not the build before.
+# The live build is read inside the job, once the run has its turn in the publish-index
+# group, so a rollback queued behind a publish targets what is live after it.
+#
+# The next scheduled publish builds from GLEIF again and replaces whatever is live.
 on:
   workflow_dispatch:
     inputs:
       confirm:
-        description: Type "rollback" to restore the previous version of the index.
+        description: Type "rollback" to restore an earlier version of the index.
         required: true
+      version-id:
+        description: Worker version to restore. Empty for the newest build older than the live one.
+        required: false
+        default: ""
 
 permissions:
   contents: read
 
-# The same group as the publish, so the two never run at once.
+# The same group as the publish, so the two never run at once. GitHub keeps only one waiting
+# run per group, and a newer one replaces an older one that is still waiting.
 concurrency:
   group: publish-index
   cancel-in-progress: false
@@ -29,12 +41,11 @@ jobs:
     timeout-minutes: 20
     env:
       INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
-      CONFIRM: ${{ inputs.confirm }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       WRANGLER_SEND_METRICS: "false"
     steps:
       - name: Confirm
+        env:
+          CONFIRM: ${{ inputs.confirm }}
         run: |
           if [ "$CONFIRM" != "rollback" ]; then
             echo "::error::Type rollback in the confirm input to run this workflow."
@@ -48,7 +59,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      - name: Live build before
+      - name: Live build now
         id: live
         run: |
           build=$(node apps/index/scripts/live-build.ts --origin "$INDEX_ORIGIN")
@@ -59,27 +70,54 @@ jobs:
           echo "before=$build" >> "$GITHUB_OUTPUT"
           echo "live build before the rollback: $build"
 
-      - name: Roll back
+      - name: Pick the version
+        id: target
         working-directory: apps/index
         env:
           BEFORE: ${{ steps.live.outputs.before }}
-        run: pnpm exec wrangler rollback --yes --message "rollback from $BEFORE"
+          VERSION_ID: ${{ inputs.version-id }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm exec wrangler versions list --json > "$RUNNER_TEMP/versions.json" 2> "$RUNNER_TEMP/versions.err" \
+            || { cat "$RUNNER_TEMP/versions.err"; exit 1; }
+          target=$(node scripts/rollback-target.ts --versions "$RUNNER_TEMP/versions.json" --live "$BEFORE" \
+            --version-id "$VERSION_ID")
+          echo "target: $target"
+          echo "id=$(jq -r .id <<< "$target")" >> "$GITHUB_OUTPUT"
+          echo "build=$(jq -r .build <<< "$target")" >> "$GITHUB_OUTPUT"
+
+      - name: Roll back
+        working-directory: apps/index
+        env:
+          VERSION: ${{ steps.target.outputs.id }}
+          BUILD: ${{ steps.target.outputs.build }}
+          BEFORE: ${{ steps.live.outputs.before }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: pnpm exec wrangler rollback "$VERSION" --yes --message "rollback from $BEFORE to $BUILD"
 
       - name: Verify the live index
         env:
-          BEFORE: ${{ steps.live.outputs.before }}
+          BUILD: ${{ steps.target.outputs.build }}
         run: |
-          pnpm --filter @whichlei/index verify-live --origin "$INDEX_ORIGIN" --not-build "$BEFORE" \
+          pnpm --filter @whichlei/index verify-live --origin "$INDEX_ORIGIN" --build "$BUILD" \
             --markdown "$GITHUB_STEP_SUMMARY"
 
       - name: Summary
         if: ${{ !cancelled() }}
+        env:
+          BEFORE: ${{ steps.live.outputs.before }}
+          BUILD: ${{ steps.target.outputs.build }}
+          VERSION: ${{ steps.target.outputs.id }}
         run: |
           after=$(node apps/index/scripts/live-build.ts --origin "$INDEX_ORIGIN" || true)
           {
             echo "### Rollback"
             echo
-            echo "Live build before: \`${{ steps.live.outputs.before }}\`"
+            echo "Live build before: \`$BEFORE\`"
+            echo
+            echo "Restored: \`${BUILD:-none}\` (version \`${VERSION:-none}\`)"
             echo
             echo "Live build now: \`${after:-unknown}\`"
           } >> "$GITHUB_STEP_SUMMARY"

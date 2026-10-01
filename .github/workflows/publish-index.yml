@@ -4,7 +4,9 @@ name: Publish index
 # Builds the index from GLEIF's latest golden copy (GLEIF publishes at 00:00, 08:00 and 16:00
 # UTC), checks it, adds the live build's files so open pages keep working, deploys the
 # whichlei-index Worker and verifies what is live. A build that fails a check publishes
-# nothing. Roll back with "Roll back index". Spec: docs/specs/06-data-publishing.md.
+# nothing. If the live index fails verification after the deploy, the previous Worker version
+# is restored and the run still ends red. Roll back later with "Roll back index".
+# Spec: docs/specs/06-data-publishing.md.
 on:
   schedule:
     - cron: "47 2 * * *"
@@ -14,17 +16,22 @@ on:
         description: Golden copy publish date, YYYY-MM-DD. Empty for the latest.
         required: false
         default: ""
+      accept-change:
+        description: Skip the bounds relative to the live build, for this run only. The absolute bounds still apply.
+        type: boolean
+        required: false
+        default: false
       force-fail:
         description: Make one check fail, to prove that a failing check publishes nothing.
         type: boolean
         required: false
         default: false
 
-# actions: write is for the keep-alive step at the end.
 permissions:
   contents: read
-  actions: write
 
+# A run waits for the one before it. GitHub keeps only one waiting run per group, and a newer
+# one replaces an older one that is still waiting.
 concurrency:
   group: publish-index
   cancel-in-progress: false
@@ -41,10 +48,6 @@ jobs:
       INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
       INDEX_DIR: ${{ runner.temp }}/index
       EVAL_JSON: ${{ runner.temp }}/eval.json
-      INPUT_DATE: ${{ inputs.publish-date }}
-      FORCE_FAIL: ${{ inputs.force-fail }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       WRANGLER_SEND_METRICS: "false"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -78,6 +81,8 @@ jobs:
           echo "live build before this run: ${build:-none}"
 
       - name: Build
+        env:
+          INPUT_DATE: ${{ inputs.publish-date }}
         run: |
           source "$RUNNER_TEMP/timed.sh"
           timed build /usr/bin/time -v -o "$RUNNER_TEMP/build-time.txt" \
@@ -90,10 +95,14 @@ jobs:
             pnpm --filter @whichlei/indexer check "$INDEX_DIR" --eval --json "$EVAL_JSON"
 
       - name: Checks before publishing
+        env:
+          FORCE_FAIL: ${{ inputs.force-fail }}
+          ACCEPT_CHANGE: ${{ inputs.accept-change }}
         run: |
           source "$RUNNER_TEMP/timed.sh"
           args=()
           if [ "$FORCE_FAIL" = "true" ]; then args+=(--force-fail); fi
+          if [ "$ACCEPT_CHANGE" = "true" ]; then args+=(--accept-change); fi
           timed checks pnpm --filter @whichlei/index checks --build "$INDEX_DIR" --eval "$EVAL_JSON" \
             --live "$INDEX_ORIGIN" --markdown "$GITHUB_STEP_SUMMARY" "${args[@]}"
 
@@ -103,16 +112,46 @@ jobs:
           timed assemble pnpm --filter @whichlei/index assemble --build "$INDEX_DIR" --out publish \
             --live "$INDEX_ORIGIN"
 
+      # The version to restore if the deploy turns out bad. None on a first publish.
+      - name: Record the live version
+        id: record
+        working-directory: apps/index
+        env:
+          BEFORE: ${{ steps.live.outputs.before }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$BEFORE" ]; then
+            echo "no live index: a first publish, nothing to restore"
+            exit 0
+          fi
+          pnpm exec wrangler deployments status --json > "$RUNNER_TEMP/deployment.json" 2> "$RUNNER_TEMP/deployment.err" \
+            || { cat "$RUNNER_TEMP/deployment.err"; exit 1; }
+          version=$(jq -r '[.versions[] | select(.percentage == 100)][0].version_id // empty' "$RUNNER_TEMP/deployment.json")
+          if [ -z "$version" ]; then
+            echo "::error::cannot read the live version id"
+            cat "$RUNNER_TEMP/deployment.json"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "live version before this run: $version (build $BEFORE)"
+
       - name: Deploy
         id: deploy
         working-directory: apps/index
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           source "$RUNNER_TEMP/timed.sh"
           build=$(jq -r .build "$INDEX_DIR/index.json")
           echo "build=$build" >> "$GITHUB_OUTPUT"
           timed deploy pnpm exec wrangler deploy --message "$build"
 
+      # A failed verification does not end the job here: the next steps undo the deploy.
       - name: Verify the live index
+        id: verify
+        continue-on-error: true
         env:
           BUILD: ${{ steps.deploy.outputs.build }}
           BEFORE: ${{ steps.live.outputs.before }}
@@ -123,20 +162,65 @@ jobs:
           timed verify pnpm --filter @whichlei/index verify-live --origin "$INDEX_ORIGIN" \
             --markdown "$GITHUB_STEP_SUMMARY" "${args[@]}"
 
+      - name: Roll back the failed deploy
+        id: rollback
+        if: ${{ steps.verify.outcome == 'failure' && steps.record.outputs.version != '' }}
+        working-directory: apps/index
+        env:
+          VERSION: ${{ steps.record.outputs.version }}
+          BUILD: ${{ steps.deploy.outputs.build }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          pnpm exec wrangler rollback "$VERSION" --yes --message "auto-rollback: verify failed for $BUILD"
+
+      - name: Verify the restored index
+        id: verify-rollback
+        if: ${{ steps.rollback.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          BEFORE: ${{ steps.live.outputs.before }}
+        run: |
+          pnpm --filter @whichlei/index verify-live --origin "$INDEX_ORIGIN" --build "$BEFORE" \
+            --markdown "$GITHUB_STEP_SUMMARY"
+
+      # The state of the live index, in one line, and the job's verdict.
       - name: Summary
         if: ${{ !cancelled() }}
+        env:
+          BEFORE: ${{ steps.live.outputs.before }}
+          DEPLOY: ${{ steps.deploy.outcome }}
+          VERIFY: ${{ steps.verify.outcome }}
+          ROLLBACK: ${{ steps.rollback.outcome }}
+          VERIFY_ROLLBACK: ${{ steps.verify-rollback.outcome }}
+          ACCEPT_CHANGE: ${{ inputs.accept-change }}
         run: |
+          fail=0
+          if [ "$DEPLOY" != "success" ]; then
+            status="NOT PUBLISHED: nothing was deployed, the live index is unchanged"
+          elif [ "$VERIFY" = "success" ]; then
+            status="DEPLOYED + VERIFIED"
+          elif [ "$ROLLBACK" = "success" ] && [ "$VERIFY_ROLLBACK" = "success" ]; then
+            status="ROLLED BACK: the new build failed verification, the previous one (${BEFORE}) is live and verified"; fail=1
+          elif [ "$ROLLBACK" = "success" ]; then
+            status="ROLLED BACK, NOT VERIFIED: the new build failed verification, the previous one was restored but could not be verified"; fail=1
+          elif [ "$ROLLBACK" = "failure" ]; then
+            status="DEPLOYED, NOT VERIFIED: verification failed and the automatic rollback failed too"; fail=1
+          else
+            status="DEPLOYED, NOT VERIFIED: verification failed and there was no previous version to restore"; fail=1
+          fi
           {
-            echo "### Build"
+            echo "## $status"
             echo
+            if [ "$ACCEPT_CHANGE" = "true" ]; then echo "**accept-change:** the bounds relative to the live build were skipped in this run."; echo; fi
             if [ -f "$INDEX_DIR/measured.json" ] && jq -e .passed "$INDEX_DIR/measured.json" >/dev/null; then
               jq -r '.report | "Build `\(.build)`, golden copy \(.asOf): \(.entities) of \(.records) records reachable (\(.reachability * 10000 | round / 100)%), \(.files) files, \(.bytes / 1e6 | round) MB raw, \(.gzipBytes / 1e6 | round) MB gzip, objective \(.objective.test)."' "$INDEX_DIR/measured.json"
             else
-              echo "No build passed the checks, so nothing was published."
+              echo "No build passed the checks."
             fi
             echo
             echo '```'
-            echo "live before: ${{ steps.live.outputs.before || 'none' }}"
+            echo "live before: ${BEFORE:-none}"
             cat "$RUNNER_TEMP/timings.txt" 2>/dev/null || true
             for step in build check; do
               echo "== $step"
@@ -144,11 +228,30 @@ jobs:
             done
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          echo "$status"
+          exit $fail
 
-      # GitHub stops a scheduled workflow after 60 days without repository activity.
-      # Enabling it again each run is meant to keep it going; watched at the first 60-day mark.
-      - name: Keep the schedule alive
-        if: ${{ !cancelled() }}
+  # GitHub stops a scheduled workflow after 60 days without repository activity. Enabling it
+  # again each run is meant to keep it going; whether it resets the clock is watched at the
+  # first 60-day mark. Only an active workflow is touched: one disabled by hand stays off.
+  # This job has its own, wider permission, and never fails the run.
+  keep-alive:
+    needs: publish
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      actions: write
+    steps:
+      - name: Enable the workflow again
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/publish-index.yml/enable"
+        run: |
+          state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/publish-index.yml" --jq .state)
+          echo "workflow state: $state"
+          if [ "$state" = "active" ]; then
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/publish-index.yml/enable"
+          else
+            echo "not active: left as it is"
+          fi
