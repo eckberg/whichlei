@@ -33,7 +33,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: GNU time
-        run: test -x /usr/bin/time || sudo apt-get install -y time
+        run: test -x /usr/bin/time || { sudo apt-get update && sudo apt-get install -y time; }
       - name: Build
         run: |
           /usr/bin/time -v -o "$RUNNER_TEMP/build-time.txt" \
@@ -49,8 +49,8 @@ jobs:
             echo "== $step"
             grep -E "Elapsed \(wall clock\)|Maximum resident set size|Exit status" "$RUNNER_TEMP/$step-time.txt" || true
           done | tee -a "$GITHUB_STEP_SUMMARY"
-      # The index only: build.json is the build's own report, prominence.tsv is not written.
-      - uses: actions/upload-artifact@v4
+      # The whole output directory: the index and build.json, the build's own report.
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: index
           path: ${{ runner.temp }}/index

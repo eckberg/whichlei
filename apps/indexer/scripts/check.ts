@@ -6,9 +6,11 @@
 //   --reference  the research index (research/ranking/port/dump_index.py): diff the routing
 //                table, capped files, every file's entities and order, and prominence
 //   --eval       replay the evaluation queries and print the objective
+//   --json       with --eval: write the objective to this file, for `index checks`:
+//                {"objective": {"test": 0.6515, "all": 0.657}}
 //   --records    entities in the golden copy, for reachability (default: from build.json)
 // Exits 1 if anything is wrong.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { checkIndex, compareReference, IndexDir, replayEvaluation } from "../src/check.ts";
@@ -18,6 +20,7 @@ const { values, positionals } = parseArgs({
   options: {
     reference: { type: "string" },
     eval: { type: "boolean", default: false },
+    json: { type: "string" },
     records: { type: "string" },
   },
 });
@@ -40,7 +43,13 @@ const records =
 
 checkIndex(index, records, report);
 if (values.reference !== undefined) await compareReference(index, values.reference, report);
-if (values.eval) replayEvaluation(index, log);
+if (values.json !== undefined && !values.eval) throw new Error("--json needs --eval");
+if (values.eval) {
+  const objective = replayEvaluation(index, log);
+  if (values.json !== undefined) {
+    writeFileSync(values.json, `${JSON.stringify({ objective })}\n`);
+  }
+}
 
 if (report.problems.length > 0) {
   for (const problem of report.problems.slice(0, 50)) console.error(`PROBLEM: ${problem}`);
