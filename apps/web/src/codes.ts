@@ -136,7 +136,8 @@ export function createCodesReader(deps: CodesDeps) {
           });
           return codes;
         },
-        () => {
+        (error: unknown) => {
+          console.warn(`codes: ${error instanceof Error ? error.message : String(error)}`);
           // Keep what an earlier read found, if anything: slightly old names beat none.
           memory.set(origin, { codes: kept?.codes ?? null, until: deps.now() + CODES_RETRY_MS });
           return kept?.codes ?? null;
