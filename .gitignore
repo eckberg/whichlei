@@ -27,3 +27,6 @@ apps/indexer/.inputs/
 
 # agent worktrees
 .claude/worktrees/
+
+# indexer output in CI
+index-out/
