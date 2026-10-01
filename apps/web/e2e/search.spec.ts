@@ -139,6 +139,37 @@ test.describe("search", () => {
     await expect(page.locator("#opt-0")).toHaveAttribute("aria-selected", "true");
   });
 
+  test("draws a long list in parts, and the keys reach rows that are not drawn yet", async ({
+    page,
+  }) => {
+    await open(page);
+    // No later frame: only the first rows are drawn until something needs the rest.
+    await page.evaluate(() => {
+      window.requestAnimationFrame = () => 0;
+    });
+    await box(page).fill("bank");
+    await expect(page.locator("#opt-0")).toBeVisible();
+    await expect(page.locator("#list [role=option]")).toHaveCount(20);
+    await expect(page.locator("#opt-0")).toHaveAttribute("aria-setsize", /^\d+$/);
+    const total = Number(await page.locator("#opt-0").getAttribute("aria-setsize"));
+    expect(total).toBeGreaterThan(30);
+    for (let i = 0; i < 3; i++) await page.keyboard.press("PageDown");
+    await expect(page.locator("#opt-30")).toHaveAttribute("aria-selected", "true");
+    await expect(box(page)).toHaveAttribute("aria-activedescendant", "opt-30");
+    await expect(page.locator("#list [role=option]")).toHaveCount(total);
+    await expect(page.locator("#preview .label")).toHaveText(
+      await page.locator("#opt-30 .lei").innerText(),
+    );
+  });
+
+  test("draws the whole list within a few frames", async ({ page }) => {
+    await open(page);
+    await box(page).fill("bank");
+    const total = Number(await page.locator("#opt-0").getAttribute("aria-setsize"));
+    await expect(page.locator("#list [role=option]")).toHaveCount(total);
+    await expect(page.locator(`#opt-${total - 1}`)).toHaveAttribute("aria-posinset", String(total));
+  });
+
   test("copies the selected LEI on enter and says so", async ({ browser }) => {
     const context = await browser.newContext({
       permissions: ["clipboard-read", "clipboard-write"],

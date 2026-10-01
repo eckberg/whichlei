@@ -47,11 +47,26 @@ describe("rowsHtml", () => {
     const hits: Hit[] = [{ entry: entry() }, { entry: entry({ lei: `${"B".repeat(18)}01` }) }];
     const out = rowsHtml(hits, ["ericsson"], 1);
     expect(out.match(/role="option"/g)).toHaveLength(2);
-    expect(out).toContain('id="opt-0" data-k="0" aria-selected="false"');
-    expect(out).toContain('id="opt-1" data-k="1" aria-selected="true"');
+    expect(out).toContain(
+      'id="opt-0" data-k="0" aria-setsize="2" aria-posinset="1" aria-selected="false"',
+    );
+    expect(out).toContain(
+      'id="opt-1" data-k="1" aria-setsize="2" aria-posinset="2" aria-selected="true"',
+    );
     expect(out).toContain('<span class="ptr" aria-hidden="true">&gt;</span>');
     expect(out).toContain("Telefonaktiebolaget LM <mark>Ericsson</mark>");
     expect(out).toContain('<span class="st st-active">active</span>');
+  });
+
+  it("numbers rows for screen readers, and draws part of the list on request", () => {
+    const hits: Hit[] = Array.from({ length: 5 }, (_, k) => ({
+      entry: entry({ lei: `${String(k).repeat(18)}01` }),
+    }));
+    const part = rowsHtml(hits, ["ericsson"], 0, 2, 4);
+    expect(part.match(/role="option"/g)).toHaveLength(2);
+    expect(part).toContain('id="opt-2" data-k="2" aria-setsize="5" aria-posinset="3"');
+    expect(part).toContain('id="opt-3" data-k="3" aria-setsize="5" aria-posinset="4"');
+    expect(rowsHtml(hits, [], 0, 3, 99).match(/role="option"/g)).toHaveLength(2);
   });
 
   it("shows the other name that matched, when the legal name does not", () => {

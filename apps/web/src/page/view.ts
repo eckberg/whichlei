@@ -33,20 +33,35 @@ function nameCell(hit: Hit, tokens: readonly string[]): Html {
   return html`${legal} <span class="aka">(${markHtml(marks.aka.name, marks.aka.ranges)})</span>`;
 }
 
-/** One result row. The selected one has a pointer and is reverse video (CSS). */
-export function rowHtml(hit: Hit, tokens: readonly string[], k: number, selected: boolean): Html {
+/**
+ * One result row. The selected one has a pointer and is reverse video (CSS). `total` is the
+ * number of results, for `aria-setsize`: rows may be drawn in parts, and a screen reader should
+ * still hear "3 of 50".
+ */
+export function rowHtml(
+  hit: Hit,
+  tokens: readonly string[],
+  k: number,
+  selected: boolean,
+  total: number,
+): Html {
   const { entry } = hit;
   const status = hit.typed ? null : statusOf(entry.status);
-  return html`<div class="row" role="option" id="opt-${k}" data-k="${k}" aria-selected="${String(selected)}"><span class="ptr" aria-hidden="true">${selected ? ">" : ""}</span><span class="lei">${entry.lei}</span><span class="nm">${nameCell(hit, tokens)}</span><span class="cc">${entry.country}</span><span class="st st-${status?.tone ?? ""}">${status?.label ?? ""}</span></div>`;
+  return html`<div class="row" role="option" id="opt-${k}" data-k="${k}" aria-setsize="${total}" aria-posinset="${k + 1}" aria-selected="${String(selected)}"><span class="ptr" aria-hidden="true">${selected ? ">" : ""}</span><span class="lei">${entry.lei}</span><span class="nm">${nameCell(hit, tokens)}</span><span class="cc">${entry.country}</span><span class="st st-${status?.tone ?? ""}">${status?.label ?? ""}</span></div>`;
 }
 
+/** Rows `from` up to `to` of `hits` (all of them by default), numbered as in the whole list. */
 export function rowsHtml(
   hits: readonly Hit[],
   tokens: readonly string[],
   selected: number,
+  from = 0,
+  to = hits.length,
 ): string {
   let out = "";
-  for (const [k, hit] of hits.entries()) out += rowHtml(hit, tokens, k, k === selected).value;
+  for (let k = from; k < Math.min(to, hits.length); k++) {
+    out += rowHtml(hits[k] as Hit, tokens, k, k === selected, hits.length).value;
+  }
   return out;
 }
 
