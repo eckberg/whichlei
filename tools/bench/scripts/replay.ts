@@ -18,18 +18,9 @@ import {
   routingTable,
   topK,
 } from "@whichlei/core";
-import { objective } from "../src/evaluation.ts";
+import { type EvalQuery, loadEval, objective, summary } from "../src/evaluation.ts";
 import { keystrokes, sessionFiles } from "../src/session.ts";
-import {
-  DATA_DIR,
-  type EvalQuery,
-  loadEntities,
-  loadEval,
-  loadFiles,
-  OUT_DIR,
-  type RefEntity,
-  summary,
-} from "./data.ts";
+import { DATA_DIR, loadEntities, loadFiles, OUT_DIR, type RefEntity } from "./data.ts";
 
 const KB = 1024;
 const log = (...args: unknown[]) =>

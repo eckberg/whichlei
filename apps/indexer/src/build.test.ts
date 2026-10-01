@@ -455,6 +455,41 @@ describe("check against a reference index", () => {
     expect(logs.join("\n")).toMatch(/0 differ by more than 1e-6/);
   });
 
+  test("entities swapped within float32 noise are expected; swapped further apart are not", async () => {
+    const swap = async (gap: number) => {
+      const reference = join(root, `ref-swap-${gap}`);
+      dump(out, reference);
+      // The first file with two entities: swap them, and give the second a prominence `gap`
+      // away from the first's in the reference (ours is unchanged).
+      const files = readFileSync(join(reference, "files.tsv"), "utf8").trimEnd().split("\n");
+      const at = files.findIndex((l) => (l.split("\t")[2] ?? "").split(" ").length >= 2);
+      const [bound, capped, ids] = (files[at] as string).split("\t") as [string, string, string];
+      const [first = "", second = "", ...rest] = ids.split(" ");
+      files[at] = [bound, capped, [second, first, ...rest].join(" ")].join("\t");
+      writeFileSync(join(reference, "files.tsv"), `${files.join("\n")}\n`);
+      const rows = readFileSync(join(reference, "entities.tsv"), "utf8").trimEnd().split("\n");
+      const f = rows.map((r) => r.split("\t"));
+      const one = f.find((r) => r[0] === first) as string[];
+      const two = f.find((r) => r[0] === second) as string[];
+      one[4] = String(Number(two[4]) - gap);
+      writeFileSync(join(reference, "entities.tsv"), `${f.map((r) => r.join("\t")).join("\n")}\n`);
+      const problems: string[] = [];
+      const logs: string[] = [];
+      await compareReference(new IndexDir(out), reference, { problems, log: (m) => logs.push(m) });
+      return { problems, logs: logs.join("\n") };
+    };
+    // Noise: the reference's two prominences differ by 5e-7 and ours (unchanged) by about the
+    // same; "first" moved by 5e-7 in the reference, within the limit.
+    const noise = await swap(5e-7);
+    expect(noise.logs).toMatch(
+      /1 differ only by order within 0\.000001 of prominence \(2 positions\)/,
+    );
+    expect(noise.logs).toMatch(/files: 0 differ in which entities/);
+    expect(noise.problems.filter((p) => /files differ/.test(p))).toEqual([]);
+    const real = await swap(0.5);
+    expect(real.problems.some((p) => /1 files differ from the reference/.test(p))).toBe(true);
+  });
+
   test("finds a changed name and a changed prominence", async () => {
     const reference = join(root, "ref-edited");
     dump(out, reference, (fields) => {

@@ -122,7 +122,7 @@ Names for the codes a record carries, so a page shows "Aktiebolag" and "Bolagsve
 
 ```json
 {
-  "elf": { "XJHM": "Aktiebolag", "2HBR": "Gesellschaft mit beschränkter Haftung" },
+  "elf": { "2HBR": "Gesellschaft mit beschränkter Haftung", "XJHM": "Aktiebolag" },
   "ra": { "RA000544": "Bolagsverket", "RA000585": "Companies House" }
 }
 ```
@@ -132,7 +132,8 @@ Names for the codes a record carries, so a page shows "Aktiebolag" and "Bolagsve
   abbreviation). Codes with no name are left out.
 - `ra`: registration authority code to the name of the organisation that keeps the
   register (its local name; else its international name; else the register's name).
-  Codes with no name are left out.
+  Codes with no name are left out. Absent when the build had no registration authorities
+  list (a local input directory without `ra-list.csv`).
 
 A code that is missing from the file is shown as the code.
 

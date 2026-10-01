@@ -17,7 +17,8 @@ import {
   roundProminence,
 } from "@whichlei/core";
 import { ENCODINGS } from "../src/encodings.ts";
-import { DUMP_DIR, loadEntities, loadFiles, OUT_DIR, type RefEntity, summary } from "./data.ts";
+import { summary } from "../src/evaluation.ts";
+import { DUMP_DIR, loadEntities, loadFiles, OUT_DIR, type RefEntity } from "./data.ts";
 
 // Build id: golden-copy date and a content hash. The reference dump fixes the contents, so
 // its hash stands in for one over the built files.

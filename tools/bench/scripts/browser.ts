@@ -17,7 +17,8 @@ import { extname, join, normalize } from "node:path";
 import { parseArgs } from "node:util";
 import { chromium } from "playwright-core";
 import type { QueryTiming } from "../page/bench.ts";
-import { loadEval, OUT_DIR, REPO, summary } from "./data.ts";
+import { loadEval, REPO, summary } from "../src/evaluation.ts";
+import { OUT_DIR } from "./data.ts";
 
 const { values: args } = parseArgs({
   options: {

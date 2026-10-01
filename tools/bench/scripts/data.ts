@@ -6,7 +6,6 @@ import { createInterface } from "node:readline";
 import type { Entry, Status } from "@whichlei/core";
 import { REPO } from "../src/evaluation.ts";
 
-export { type EvalQuery, loadEval, REPO, summary } from "../src/evaluation.ts";
 export const DATA_DIR = process.env.DATA_DIR ?? join(REPO, "research/data");
 /** The reference index, from dump_index.py. */
 export const DUMP_DIR = join(DATA_DIR, "index");

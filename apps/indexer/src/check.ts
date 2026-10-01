@@ -4,7 +4,7 @@ import { createReadStream, existsSync, readdirSync, readFileSync } from "node:fs
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { gzipSync } from "node:zlib";
-import { type EvalQuery, loadEval, objective } from "@whichlei/bench/evaluation";
+import { type EvalQuery, loadEval, objective, summary } from "@whichlei/bench/evaluation";
 import {
   decodeEntries,
   type Entry,
@@ -53,13 +53,6 @@ export class IndexDir {
   }
 }
 
-function percentile(sorted: number[], q: number): number {
-  const x = (sorted.length - 1) * q;
-  const lo = Math.floor(x);
-  const hi = Math.ceil(x);
-  return (sorted[lo] ?? 0) + ((sorted[hi] ?? 0) - (sorted[lo] ?? 0)) * (x - lo);
-}
-
 /**
  * The index is whole: the manifest is valid, every file is there, each decodes, is ordered
  * and within the cap, and the entities reachable through the files are the manifest's count.
@@ -68,18 +61,8 @@ function percentile(sorted: number[], q: number): number {
 export function checkIndex(index: IndexDir, records: number | undefined, report: Report): void {
   const { manifest } = index;
   const { problems, log } = report;
-  if (manifest.format !== 1) problems.push(`format is ${manifest.format}, not 1`);
-  if (!/^\d{8}-[0-9a-f]{8}$/.test(manifest.build)) problems.push(`build ${manifest.build} is odd`);
+  // parseManifest has already checked the manifest: format, build, bounds and capped.
   const { bounds, capped } = manifest;
-  if (bounds.some((b, i) => i > 0 && (bounds[i - 1] as string) >= b)) {
-    problems.push("bounds are not strictly ascending");
-  }
-  if (bounds.some((b) => !/^[a-z0-9]{2,}$/.test(b))) problems.push("a bound is no index term");
-  if (
-    capped.some((f, i) => f < 0 || f >= bounds.length || (i > 0 && f <= (capped[i - 1] as number)))
-  ) {
-    problems.push("capped is not an ascending list of file numbers");
-  }
 
   const present = readdirSync(join(index.dir, manifest.build)).filter((n) => /^\d+\.txt$/.test(n));
   if (present.length !== bounds.length) {
@@ -127,14 +110,14 @@ export function checkIndex(index: IndexDir, records: number | undefined, report:
     problems.push(`the files hold ${seen.size} entities, the manifest says ${manifest.entities}`);
   }
 
-  const sorted = [...gzip].sort((a, b) => a - b);
+  const kb = summary(gzip.map((bytes) => bytes / KB));
   const total = gzip.reduce((a, b) => a + b, 0);
   log(`build ${manifest.build}, golden copy ${manifest.asOf}`);
   log(`files: ${index.fileCount} (${capped.length} capped), ${entries.toLocaleString()} entries`);
   log(
     `size: ${(raw / 1e6).toFixed(1)} MB raw, ${(total / 1e6).toFixed(1)} MB gzip;` +
-      ` per file gzip median ${(percentile(sorted, 0.5) / KB).toFixed(1)} KB,` +
-      ` p90 ${(percentile(sorted, 0.9) / KB).toFixed(1)} KB, max ${((sorted.at(-1) ?? 0) / KB).toFixed(1)} KB`,
+      ` per file gzip median ${kb.median.toFixed(1)} KB, p90 ${kb.p90.toFixed(1)} KB,` +
+      ` max ${kb.max.toFixed(1)} KB`,
   );
   const reach =
     records === undefined
@@ -191,11 +174,36 @@ async function loadReference(dir: string): Promise<Reference> {
   return ref;
 }
 
+/** Two prominences this close are the same to the float32 arithmetic the research used. */
+const TIE = 1e-6;
+
+/**
+ * A file that differs from the reference only where entities swap places and each swapped
+ * pair has prominence within TIE: the same entities, order differing by float32 noise.
+ */
+function onlyTies(
+  got: readonly Entry[],
+  want: readonly string[],
+  prominence: ReadonlyMap<string, number>,
+): boolean {
+  if (got.length !== want.length) return false;
+  if ([...got.map((e) => e.lei)].sort().join() !== [...want].sort().join()) return false;
+  return got.every((e, i) => {
+    const there = want[i] as string;
+    if (e.lei === there) return true;
+    const a = prominence.get(e.lei);
+    const b = prominence.get(there);
+    return a !== undefined && b !== undefined && Math.abs(a - b) <= TIE;
+  });
+}
+
 /**
  * Compare with the research index in `referenceDir` (research/ranking/port/dump_index.py):
  * the routing table, the capped files, every file's entities in order, the data of every
  * entity, and prominence rounded to tenths as it sits in the files. Full precision needs
- * prominence.tsv from `build --dump-prominence`.
+ * prominence.tsv from `build --dump-prominence`. Entities whose prominence differs from
+ * the reference's by under 1e-6 may swap places (float32 noise); a file that differs only
+ * by such swaps is reported, not counted as a problem.
  */
 export async function compareReference(
   index: IndexDir,
@@ -225,6 +233,8 @@ export async function compareReference(
   if (cappedDiffs > 0) problems.push("capped files differ");
 
   let fileDiffs = 0;
+  let tieFiles = 0;
+  let tiePositions = 0;
   let entryDiffs = 0;
   let dataDiffs = 0;
   let tenthsDiffs = 0;
@@ -232,12 +242,9 @@ export async function compareReference(
   for (let n = 0; n < Math.min(index.fileCount, refFiles.length); n++) {
     const got = index.entries(n);
     const want = (refFiles[n]?.ids ?? []).map((id) => ref.lei.get(id) ?? `?${id}`);
-    let same = got.length === want.length;
+    let moved = 0;
     got.forEach((e, i) => {
-      if (e.lei !== want[i]) {
-        same = false;
-        entryDiffs++;
-      }
+      if (e.lei !== want[i]) moved++;
       const data = [e.country, e.status, e.name, ...e.otherNames].join("\t");
       if (data !== ref.rest.get(e.lei)) {
         dataDiffs++;
@@ -246,7 +253,21 @@ export async function compareReference(
       const p = ref.p.get(e.lei);
       if (p !== undefined && Math.round(p * 10) !== Math.round(e.prominence * 10)) tenthsDiffs++;
     });
-    if (!same) fileDiffs++;
+    if (got.length !== want.length) moved = Math.max(moved, 1);
+    if (moved === 0) continue;
+    if (onlyTies(got, want, ref.p)) {
+      tieFiles++;
+      tiePositions += moved;
+    } else {
+      fileDiffs++;
+      entryDiffs += moved;
+    }
+  }
+  if (tieFiles > 0) {
+    log(
+      `files: ${tieFiles} differ only by order within ${TIE} of prominence (${tiePositions}` +
+        " positions): expected, numpy's float32 ln(name length) differs from Math.log in the last bit",
+    );
   }
   log(
     `files: ${fileDiffs} differ in which entities they hold or in what order` +
