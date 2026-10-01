@@ -50,7 +50,7 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
     }
   });
 
-  // Set-Cookie on any response, from any host.
+  // Set-Cookie on a response from our hosts or Fathom.
   const cookieHeaders: string[] = [];
   const pending: Promise<void>[] = [];
   context.on("response", (response) => {
@@ -58,7 +58,15 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
       response
         .headerValue("set-cookie")
         .then((value) => {
-          if (value) cookieHeaders.push(`${response.url()}: ${value}`);
+          // Our hosts and Fathom must never send one. GLEIF's load balancer does; the page
+          // fetches GLEIF without credentials, so the browser ignores it, and the empty jar
+          // below proves that.
+          const host = new URL(response.url()).hostname;
+          const ours =
+            host === "whichlei.com" ||
+            host.endsWith(".whichlei.com") ||
+            host === "cdn.usefathom.com";
+          if (value && ours) cookieHeaders.push(`${response.url()}: ${value}`);
         })
         .catch(() => {}),
     );

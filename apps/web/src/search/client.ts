@@ -80,7 +80,8 @@ export class IndexClient implements IndexSource {
   /** `origin` is where `index.json` lives, such as `https://index.whichlei.com`. */
   constructor(origin: string, { fetch: fetchFn, maxFiles = 64 }: IndexClientOptions = {}) {
     this.#base = origin.replace(/\/+$/, "");
-    this.#fetch = fetchFn ?? ((input, init) => fetch(input, init));
+    // No cookies to or from the index host (spec 11).
+    this.#fetch = fetchFn ?? ((input, init) => fetch(input, { ...init, credentials: "omit" }));
     this.#maxFiles = maxFiles;
   }
 
