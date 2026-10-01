@@ -86,6 +86,23 @@ handling). In Node, `Search` and the harness cost the same (20 ms median). The n
 phone (slice 4's unknown, still open) before they decide anything. If they hold, the next step is
 the one slice 4 named: scoring in a Web Worker. Not done: it needs the owner's word.
 
+**Same session, same machine state** (one lock: slice 4's harness, `Search`, the harness again;
+4×, the same 808 queries; median / p90 / max, and the share of queries over 100 ms):
+
+| | Slowest keystroke | Over 100 ms |
+|---|---|---|
+| Slice 4 harness, before and after (single pass per key) | 70.5 / 108 / 245 and 73.7 / 114 / 318 ms | 15.5% and 17.1% |
+| `Search`, debounce on every key | 84.6 / 144 / 298 ms | 36.4% |
+| `Search`, debounce on last key | 73.3 / 123 / 248 ms | 24.1% |
+| Ratio to the harness's first run, every key / last key | 1.20 / 1.33 / 1.22 and 1.04 / 1.14 / 1.01 | |
+
+Slice 4's own run of the harness was 45 / 73 / 225 ms and 2.1%, so this host is 1.56 / 1.48 / 1.09
+times slower. Divided by that, `Search` is 54 / 97 / 274 ms with the debounce on every key (misses
+p90 by 17 ms and max by 24) and 47 / 83 / 228 ms on the last key (meets median and max, p90 by 3 ms).
+Merging the candidates once per file set (kept) did not change the numbers: scoring is the cost.
+What the harness does not do is the second pass of an every-key session: the typing pass scores
+the files that route while typing, and the pause pass scores again once a long word routes more.
+
 **Render, in the built page**, 390 px wide with touch, 4×, real key presses, a fresh page per query,
 every 16th query (202 queries, 3,097 keys), marks included: updating the DOM (build the HTML, set it,
 force layout) costs 26 / 47 / 139 ms per key (all the renders of that key together), and the slowest
