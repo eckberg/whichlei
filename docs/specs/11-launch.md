@@ -53,9 +53,15 @@ and what is counted. No cookie is set, shown in a browser against the live site.
 
 ## Approach
 Order, so nothing points at a host that does not answer yet:
-1. One PR with the code: loader, search counter, CSP, `apps/redirect`, the index route,
-   README, about page, tests. The site's `INDEX_ORIGIN` stays on workers.dev.
-2. A publish-index run by hand attaches `index.whichlei.com`. Check it serves `index.json`.
+0. Before the first deploy, the owner checks the DNS records of `www`, `index` and the apex
+   in the dashboard (below).
+1. One PR with the code: loader, search counter, CSP, `apps/redirect`, README, about page,
+   tests. The site's `INDEX_ORIGIN` stays on workers.dev. The index route is **not** in it:
+   the nightly publish (02:47 UTC) would attach the host unverified, and `wrangler deploy`
+   makes the version live before it attaches domains, so a failed attach leaves an unchecked
+   index live.
+2. A small PR adds the `index.whichlei.com` route to `apps/index/wrangler.jsonc`, merged right
+   before a publish-index run by hand, which attaches it. Check it serves `index.json`.
 3. A second PR switches every `INDEX_ORIGIN` to `index.whichlei.com` and adds the apex
    route and the indexing variables. Owner approves the deploy (CLAUDE.md: ask first).
 4. Owner sets the zone and Fathom settings. Then the live check.
@@ -63,8 +69,14 @@ Order, so nothing points at a host that does not answer yet:
 Custom domains need no DNS or ruleset API calls, which this token cannot make. If attaching
 fails for permissions, the deploy stops and the owner adds **Zone → Workers Routes → Edit**
 for `whichlei.com` to the token (the API docs list only Account → Workers Scripts → Edit,
-which the token has). If it fails because a DNS record already exists on the hostname, the
-owner deletes that record in the dashboard; the token cannot list DNS records.
+which the token has).
+
+**Existing DNS records are replaced, not refused.** In CI (no terminal) wrangler sets
+`override_existing_dns_record` and `override_existing_origin` to true for a custom domain, so a
+record already on `www`, `index` or the apex is overwritten silently. The token cannot list DNS
+records, so the owner looks in the dashboard (DNS → Records) **before the first deploy** for
+each of the three hostnames, and deletes or keeps each knowingly (mail, verification or an old
+site on it). Nothing else in the zone is touched.
 
 Rollback: set `ALLOW_INDEXING` to `"false"` and redeploy; a custom domain is detached in
 the dashboard. The workers.dev hosts keep working throughout.
@@ -92,8 +104,8 @@ For the DESIGN.md table.
 | 27 | **whichlei.com is the only canonical host**, a Workers Custom Domain on `whichlei-site`. workers.dev stays up as the preview and is never indexed | A custom domain creates its own DNS record and certificate, so no DNS or ruleset permission is needed. The Cache API starts working (decision 18). |
 | 28 | **www.whichlei.com is a separate Worker, `whichlei-redirect`**, that answers 301 to the apex with path and query | A Redirect Rule needs a proxied DNS record for www and ruleset permission, which the token lacks. Adding www to `whichlei-site` would not redirect static paths (only `/lei/*` runs the Worker), and running the Worker on every path spends the free plan's 100,000 requests a day. www traffic is small. |
 | 29 | **The index is served from index.whichlei.com**; its workers.dev host stays | The site no longer depends on the account's personal workers.dev subdomain, which can be renamed. CORS is already `*`, so previews keep working. No cost. |
-| 30 | **Fathom loads only on whichlei.com and sees `/` or `/lei/`, never an LEI or a query string** | Which record someone opened is close to what they searched for (decision 12). Per-LEI counts are not needed. Fathom's script sends `q` and similar parameters on its own, so the query string goes before it loads. |
-| 31 | **One `search` event per settled query.** A query settles when its results are on screen and the input has not changed for 2 s, or earlier when the user copies an LEI or opens a record. A query text counts once per page load; the text is held in memory only. Nothing about the query is sent: no text, length, type or hit count | Counts searches, not keystrokes. Copy and open end a search, often within 2 s ("copy it and leave"), so they count at once. 2 s is far above the 150 ms debounce and a normal pause between keys. "Name" against "identifier" would describe the input; one event keeps decision 12 checkable. |
+| 30 | **Fathom loads only on whichlei.com and sees `/` or `/lei/`, never an LEI or a query string, and only the origin of the referring site** | Which record someone opened is close to what they searched for (decision 12). Per-LEI counts are not needed. Fathom's script sends `q` and similar parameters on its own, so the query string goes before it loads. It also sends `document.referrer` whole, and another site's address can carry its own query, so the referrer is cut to its origin first. |
+| 31 | **One `search` event per settled query.** A query settles when its results are on screen and the input has not changed for 2 s, or earlier when the user copies an LEI or opens a record. A query text counts once per page load, ignoring case and spacing; the text is held in memory only. Only results that were found or found nothing count, not an error, a too short input or a bad LEI. Nothing about the query is sent: no text, length, type or hit count | Counts searches, not keystrokes. Copy and open end a search, often within 2 s ("copy it and leave"), so they count at once. 2 s is far above the 150 ms debounce and a normal pause between keys. "Name" against "identifier" would describe the input; one event keeps decision 12 checkable. |
 | 32 | **No sitemap at launch** | A sitemap offers 3.4M record pages to crawlers; each is a Worker request against 100,000 a day, shared with every other Worker on the account. Measure what crawlers take by links alone for four weeks, then decide. |
 | 23 | *Amended:* the CSP also allows `https://cdn.usefathom.com` for script, image and connect | Fathom's script, its page-view image and its beacons. |
 
@@ -124,7 +136,8 @@ for 101 queries. One locked session of six runs, order off, on, off, on, then on
 The counter is within the spread of the baselines (24-32 / 48-56 / 72-152). The host got
 slower during the session: every number rose from run 1 to run 3, counter on or off. The
 first two pairs, off before on, alone put the median 8 ms (one 16 ms frame step) over the
-baselines; run 3, on before off, shows that was the drift. Key to first results, median:
+baselines; with run 3 the same on both sides, the counter's cost is not resolvable at frame
+granularity (16 ms steps). Key to first results, median:
 off 120 / 126 / 137, on 130 / 141 / 142 ms.
 The counter does one `setTimeout` and one `clearTimeout` a render and a short string
 normalisation; it sends once, 2 s after the results, from an idle callback.
@@ -138,6 +151,11 @@ reloads the search page in Playwright (no back/forward cache), so the check expe
 for each load of the search page, not one in all.
 
 ## Deviations from the first draft
+- The `index.whichlei.com` route moved out of this PR (step 2 above), after review: see step 1.
+  `publish-index.yml`'s summary now asks Cloudflare which version is live before it says
+  anything after a failed deploy.
+- The loader trims the referrer to its origin (Fathom sends `document.referrer` whole on page
+  views and events), by overriding `document.referrer` and passing `referrer` to the page view.
 - The `www` custom domain is in `apps/redirect/wrangler.jsonc` in the code PR (step 1):
   nothing points at it, and step 3 lists only the apex. The deploy workflow deploys the
   redirect Worker after the e2e run; its environment name, `INDEX_ORIGIN` and the live-check

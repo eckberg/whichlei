@@ -191,14 +191,33 @@ jobs:
         env:
           BEFORE: ${{ steps.live.outputs.before }}
           DEPLOY: ${{ steps.deploy.outcome }}
+          RECORDED: ${{ steps.record.outputs.version }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           VERIFY: ${{ steps.verify.outcome }}
           ROLLBACK: ${{ steps.rollback.outcome }}
           VERIFY_ROLLBACK: ${{ steps.verify-rollback.outcome }}
           ACCEPT_CHANGE: ${{ inputs.accept-change }}
         run: |
           fail=0
-          if [ "$DEPLOY" != "success" ]; then
+          if [ "$DEPLOY" = "skipped" ]; then
             status="NOT PUBLISHED: nothing was deployed, the live index is unchanged"
+          elif [ "$DEPLOY" = "failure" ]; then
+            # A failed `wrangler deploy` can still have uploaded and activated the version (it
+            # attaches domains after that), so ask Cloudflare what is live before saying.
+            now=""
+            if pnpm --filter @whichlei/index exec wrangler deployments status --json > "$RUNNER_TEMP/after.json" 2>/dev/null; then
+              now=$(jq -r '[.versions[] | select(.percentage == 100)][0].version_id // empty' "$RUNNER_TEMP/after.json" 2>/dev/null || true)
+            fi
+            if [ -z "$now" ]; then
+              status="DEPLOY FAILED, LIVE VERSION UNKNOWN: Cloudflare did not say which version is live, check the index by hand"; fail=1
+            elif [ -n "$RECORDED" ] && [ "$now" = "$RECORDED" ]; then
+              status="DEPLOY FAILED: the live index is unchanged (version ${RECORDED}, build ${BEFORE})"
+            elif [ -n "$RECORDED" ]; then
+              status="DEPLOY FAILED, BUT A NEW VERSION IS LIVE AND NOT VERIFIED: ${now}, was ${RECORDED} (build ${BEFORE}). Roll it back with rollback-index.yml unless it is the one you want"; fail=1
+            else
+              status="DEPLOY FAILED, BUT A VERSION IS LIVE AND NOT VERIFIED: ${now}; there was no live index before, so there is nothing to compare with"; fail=1
+            fi
           elif [ "$VERIFY" = "success" ]; then
             status="DEPLOYED + VERIFIED"
           elif [ "$ROLLBACK" = "success" ] && [ "$VERIFY_ROLLBACK" = "success" ]; then

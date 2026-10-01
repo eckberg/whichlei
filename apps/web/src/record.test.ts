@@ -307,5 +307,8 @@ describe("renderMessagePage", () => {
     const page = renderRecordPage(await parsedRecord("record-ericsson"), context);
     expect(page).toContain('<script src="/scripts/copy.js" defer></script>');
     expect(page).toContain('<script src="/scripts/stats.js" defer></script>');
+    // The search counter is in app.js, which a record page does not load: no event is sent
+    // from a record page, where Fathom would give it the path /lei/<LEI>.
+    expect(page).not.toContain("/app.js");
   });
 });

@@ -6,15 +6,20 @@ import {
   type LoaderScript,
   loadStats,
   pageviewUrl,
+  trimReferrer,
 } from "./stats-loader.ts";
 
 const APEX = "https://whichlei.com";
 
-function rig(where: { origin?: string; pathname?: string; search?: string; hash?: string } = {}) {
+function rig(
+  where: { origin?: string; pathname?: string; search?: string; hash?: string } = {},
+  referrer = "",
+) {
   const location = { origin: APEX, pathname: "/", search: "", hash: "", ...where };
   const replaced: { state: unknown; url: string }[] = [];
   const scripts: (LoaderScript & { attributes: Record<string, string> })[] = [];
-  const views: { url: string }[] = [];
+  const views: { url: string; referrer: string }[] = [];
+  const events: string[] = [];
   const env: LoaderEnv = {
     location,
     history: {
@@ -22,6 +27,7 @@ function rig(where: { origin?: string; pathname?: string; search?: string; hash?
       replaceState: (state, _title, url) => replaced.push({ state, url }),
     },
     document: {
+      referrer,
       createElement: () => {
         const attributes: Record<string, string> = {};
         const script = {
@@ -38,9 +44,14 @@ function rig(where: { origin?: string; pathname?: string; search?: string; hash?
       },
       head: { appendChild: () => {} },
     },
-    window: { fathom: { trackPageview: (options) => views.push(options) } },
+    window: {
+      fathom: {
+        trackPageview: (options) => views.push(options),
+        trackEvent: (name: string) => events.push(name),
+      },
+    } as LoaderEnv["window"],
   };
-  return { env, replaced, scripts, views };
+  return { env, replaced, scripts, views, events };
 }
 
 describe("pageviewUrl", () => {
@@ -52,6 +63,14 @@ describe("pageviewUrl", () => {
   it("is / for the search page and anything else", () => {
     expect(pageviewUrl("/")).toBe("/");
     expect(pageviewUrl("/leisure")).toBe("/");
+  });
+});
+
+describe("trimReferrer", () => {
+  it("keeps the origin only", () => {
+    expect(trimReferrer("https://example.org/find?q=ericsson")).toBe("https://example.org");
+    expect(trimReferrer("http://example.org:8080/a/b")).toBe("http://example.org:8080");
+    expect(trimReferrer("")).toBe("");
   });
 });
 
@@ -97,14 +116,14 @@ describe("loadStats", () => {
     loadStats(r.env, APEX);
     expect(r.views).toEqual([]);
     r.scripts[0]?.onload?.();
-    expect(r.views).toEqual([{ url: "/" }]);
+    expect(r.views).toEqual([{ url: "/", referrer: "" }]);
   });
 
   it("sends /lei/ for a record page, never the LEI", () => {
     const r = rig({ pathname: "/lei/549300W9JLPW15XIFM52" });
     loadStats(r.env, APEX);
     r.scripts[0]?.onload?.();
-    expect(r.views).toEqual([{ url: "/lei/" }]);
+    expect(r.views).toEqual([{ url: "/lei/", referrer: "" }]);
     expect(JSON.stringify(r.views)).not.toContain("549300");
   });
 
@@ -115,6 +134,41 @@ describe("loadStats", () => {
     const home = rig({ search: "?q=ericsson", hash: "#about" });
     loadStats(home.env, APEX);
     expect(home.replaced).toEqual([{ state: { kept: true }, url: "/#about" }]);
+  });
+
+  it("trims the referrer to its origin, for the page view and for Fathom's own reads", () => {
+    const r = rig({}, "https://example.org/find?q=ericsson&x=1#top");
+    loadStats(r.env, APEX);
+    // Fathom reads document.referrer for events and, without an option, for page views.
+    expect(r.env.document.referrer).toBe("https://example.org");
+    r.scripts[0]?.onload?.();
+    expect(r.views).toEqual([{ url: "/", referrer: "https://example.org" }]);
+    expect(JSON.stringify([r.env.document.referrer, r.views])).not.toContain("ericsson");
+  });
+
+  it("sends no referrer when there is none or it is not an address", () => {
+    for (const referrer of ["", "not a url", "about:blank"]) {
+      const r = rig({}, referrer);
+      loadStats(r.env, APEX);
+      r.scripts[0]?.onload?.();
+      expect(r.env.document.referrer, referrer).toBe("");
+      expect(r.views, referrer).toEqual([{ url: "/", referrer: "" }]);
+    }
+  });
+
+  it("leaves the referrer alone off the canonical origin", () => {
+    const r = rig({ origin: "http://localhost:8787" }, "https://example.org/find?q=x");
+    loadStats(r.env, APEX);
+    expect(r.env.document.referrer).toBe("https://example.org/find?q=x");
+  });
+
+  it("never sends an event: that is the search page's counter, not the loader's", () => {
+    for (const pathname of ["/", "/lei/549300W9JLPW15XIFM52"]) {
+      const r = rig({ pathname });
+      loadStats(r.env, APEX);
+      r.scripts[0]?.onload?.();
+      expect(r.events, pathname).toEqual([]);
+    }
   });
 
   it("leaves the address alone when there is no query", () => {

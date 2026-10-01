@@ -351,6 +351,7 @@ describe("the static screens", () => {
     expect(out).toContain("Analytics are");
     expect(out).toContain("without cookies");
     expect(out).toContain("never the LEI");
+    expect(out).toContain("its domain, not the page");
     expect(out).toContain("a count of searches without their text");
     expect(out).toContain("It never sees what you type");
     expect(out).toContain('href="https://github.com/eckberg/whichlei"');
