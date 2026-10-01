@@ -1,7 +1,7 @@
 // Assemble the directory the Worker serves, `publish`.
 //
 //   pnpm --filter @whichlei/index assemble --build ../indexer/dist --out publish \
-//     --live https://whichlei-index.lumenspring.workers.dev
+//     --live https://index.whichlei.com
 //
 //   --build  the indexer's output directory, after `checks` passed
 //   --out    the directory to fill (default publish). Emptied first.

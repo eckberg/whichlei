@@ -1,6 +1,6 @@
 // After a deploy or a rollback: does the live index serve what it should?
 //
-//   pnpm --filter @whichlei/index verify-live --origin https://whichlei-index.lumenspring.workers.dev \
+//   pnpm --filter @whichlei/index verify-live --origin https://index.whichlei.com \
 //     --build 20260916-3f9a1c0e [--also-build <previous>]
 //   pnpm --filter @whichlei/index verify-live --origin … --not-build <build before the rollback>
 //

@@ -1,8 +1,9 @@
 name: Deploy site
 
 # By hand only: Actions → Deploy site → Run workflow. Deploys apps/web to the
-# whichlei-site Worker on workers.dev, runs the browser tests against it, then deploys
-# apps/redirect (the whichlei-redirect Worker for www.whichlei.com).
+# whichlei-site Worker (workers.dev and whichlei.com), runs the browser tests against the
+# workers.dev host, deploys apps/redirect (the whichlei-redirect Worker for www.whichlei.com),
+# then runs the live check against whichlei.com.
 on:
   workflow_dispatch:
 
@@ -16,10 +17,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     environment:
-      name: workers.dev
-      url: ${{ steps.deploy.outputs.url }}
+      name: production
+      url: https://whichlei.com
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -35,9 +36,12 @@ jobs:
       # The search page reads the index origin at build time (slice 7).
       - run: pnpm --filter @whichlei/web build
         env:
-          INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
+          INDEX_ORIGIN: https://index.whichlei.com
       - id: deploy
         working-directory: apps/web
+        # bash with pipefail: wrangler prints the workers.dev URL before it can fail on the
+        # custom domain, and `| tee` would hide its exit code.
+        shell: bash
         run: |
           pnpm exec wrangler deploy | tee deploy.log
           url=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
@@ -50,3 +54,27 @@ jobs:
       - name: Deploy the www redirect
         working-directory: apps/redirect
         run: pnpm exec wrangler deploy
+      # The apex answers a minute or so after the deploy, and an edge may still serve the old
+      # robots.txt (Disallow) for a while. The check starts when it says Allow.
+      - name: Wait for whichlei.com to allow indexing
+        timeout-minutes: 6
+        shell: bash
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 10 https://whichlei.com/robots.txt | grep -qx 'Allow: /'; then
+              echo "whichlei.com/robots.txt allows indexing"
+              exit 0
+            fi
+            echo "attempt $i of 30: whichlei.com/robots.txt does not say 'Allow: /' yet"
+            sleep 10
+          done
+          echo "::error::https://whichlei.com/robots.txt did not say 'Allow: /' within 5 minutes"
+          exit 1
+      # The live check (docs/specs/11-launch.md): a browser on the apex, Fathom let in but
+      # answered by the check itself, so nothing is counted. It fails, and cannot hang: the
+      # step and the test both have a limit.
+      - name: Live check on whichlei.com
+        timeout-minutes: 5
+        run: pnpm --filter @whichlei/web e2e live
+        env:
+          LIVE_URL: https://whichlei.com

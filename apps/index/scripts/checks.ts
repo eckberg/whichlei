@@ -1,7 +1,7 @@
 // The blocking checks before a publish. Exits 1 if any fails; then nothing is published.
 //
 //   pnpm --filter @whichlei/index checks --build ../indexer/dist --eval eval.json \
-//     --live https://whichlei-index.lumenspring.workers.dev
+//     --live https://index.whichlei.com
 //
 //   --build       the indexer's output directory
 //   --eval        the JSON `indexer check --eval --json` wrote: the evaluation objective

@@ -19,6 +19,8 @@ const blockFathom = process.env.LIVE_URL
 
 export default defineConfig({
   testDir: "e2e",
+  // The live check talks to Fathom's CDN and GLEIF: more room, and still a limit.
+  ...(process.env.LIVE_URL ? { timeout: 120_000, expect: { timeout: 15_000 } } : {}),
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
   use: {

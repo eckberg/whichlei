@@ -25,6 +25,11 @@ test("serves the page with security headers", async ({ request }) => {
   expect(csp).not.toContain("unsafe-inline");
 });
 
+test("points the search page's canonical link at the apex", async ({ request }) => {
+  const page = await (await request.get("/")).text();
+  expect(page).toContain('<link rel="canonical" href="https://whichlei.com/">');
+});
+
 test("answers unknown paths with 404", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

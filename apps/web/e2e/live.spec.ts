@@ -80,6 +80,19 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
     if (new URL(page.url()).pathname === "/") searchLoads++;
   });
 
+  // Fathom's leave pings (sent on pagehide, and not answerable by a route) would count a real
+  // view. It honours localStorage.blockFathomTracking, so each page sets it just before it is
+  // left, and each new document clears it before Fathom's script runs.
+  await context.addInitScript(() => {
+    try {
+      localStorage.removeItem("blockFathomTracking");
+    } catch {
+      // No storage: nothing to clear.
+    }
+  });
+  const leaving = (on: Page) =>
+    on.evaluate(() => localStorage.setItem("blockFathomTracking", "true"));
+
   const noCookie = async (where: string, on: Page) => {
     expect(await on.evaluate(() => document.cookie), `document.cookie on ${where}`).toBe("");
   };
@@ -100,6 +113,7 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
   await expect.poll(() => views("/").length, { message: "page view of /" }).toBe(1);
   await noCookie("the search page", page);
   // The loader stripped the query: an address with one is left clean.
+  await leaving(page);
   await page.goto("/?q=ericsson&utm_source=check");
   await expect(page.locator("#meta")).toContainText("index:");
   expect(new URL(page.url()).search).toBe("");
@@ -114,19 +128,35 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
   await expect(page.locator("#info")).toContainText(`copied ${ERICSSON_LEI}`);
   await noCookie("the search page after a search", page);
 
+  await leaving(page);
+  const recordResponse = page.waitForResponse(
+    (response) =>
+      response.request().resourceType() === "document" &&
+      new URL(response.url()).pathname === `/lei/${ERICSSON_LEI}`,
+  );
   await page.getByRole("link", { name: "open record" }).click();
   await expect(page).toHaveURL(new RegExp(`/lei/${ERICSSON_LEI}$`));
   await expect(page.locator("h1")).toHaveText(ERICSSON_LEI);
+  // Not degraded: a page built without the index's code names has a shorter max-age and shows
+  // only codes. The apex's Worker reads the index host over the public internet; if that fails
+  // the page still renders, which only these two checks would show.
+  const record = await recordResponse;
+  expect(record.status()).toBe(200);
+  expect(await record.headerValue("cache-control")).toBe("public, max-age=3600");
+  await expect(page.locator('[data-field="legal-form"]')).toContainText("Aktiebolag");
   await expect.poll(() => views("/lei/").length, { message: "page view of /lei/" }).toBe(1);
   await noCookie("the record page", page);
 
   // Back, then about.
+  await leaving(page);
   await page.goBack();
   await expect(page.locator("#meta")).toContainText("index:");
   await noCookie("the search page after back", page);
+  await expect.poll(() => views("/").length, { message: "page view after back" }).toBe(searchLoads);
   await page.getByRole("button", { name: "about" }).click();
   await expect(page.locator("#man")).toContainText("PRIVACY");
   await noCookie("the about page", page);
+  await leaving(page);
 
   await Promise.all(pending);
 
