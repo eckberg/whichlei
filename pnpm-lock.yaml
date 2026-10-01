@@ -307,6 +307,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.3
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.2
       playwright-core:
         specifier: 'catalog:'
         version: 1.63.0

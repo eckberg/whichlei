@@ -153,8 +153,6 @@ export function start(): void {
       q.setAttribute("aria-activedescendant", has ? `opt-${selected}` : "");
     }
     scheduleAnnounce();
-    // Reading a layout property forces style and layout, so the timing includes them.
-    void main.offsetHeight;
     const end = performance.now();
     performance.measure("whichlei:render", {
       start,

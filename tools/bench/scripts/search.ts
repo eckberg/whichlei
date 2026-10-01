@@ -1,22 +1,29 @@
 // Measure the production search page against the full reference index, in Chromium.
 //
 //   pnpm --filter @whichlei/bench search [--rate 4] [--every 4] [--bytes-every 1]
-//                                        [--render-every 16] [--skip bytes,timing,render]
+//       [--page-every 16] [--last-every 4] [--modes every,last,inthread]
+//       [--skip bytes,timing,page]
 //
 // Needs the lines encoding of the index in $DATA_DIR/format/lines (pnpm build-index) and
-// sizes.json. Three runs, each on the production code from apps/web, not a copy:
+// sizes.json. Three parts, each on the production code from apps/web, not a copy:
 //   bytes   Search over the test split at 1x: gzip bytes of the files fetched per query, with
 //           the debounce firing on every key and only on the last key (slice 4's two modes).
-//   timing  Search over every Nth query at the CPU slowdown --rate: main-thread time per
-//           keystroke (tokenise, route, decode new files, merge, score), both modes.
-//   render  The built page, typed into with real key presses at the same slowdown, every Nth
-//           query (--render-every): time to update the DOM per key, and Event Timing's
-//           input-to-paint time. The page reads the index from this server.
-// Writes $DATA_DIR/format/search-<rate>x.json (merged with an earlier run). Heavy: run it under the lock (CLAUDE.md).
+//   timing  Search on the page's thread over every Nth query at the CPU slowdown --rate:
+//           time per keystroke (tokenise, route, decode new files, merge, score). The cost of
+//           the search itself, as the Web Worker now carries it.
+//   page    The built page, typed into with real key presses at the same slowdown: time from
+//           the key press to the frame after its results, long tasks over 50 ms on the main
+//           thread, DOM update time. Chromium cannot throttle workers, so the worker is the
+//           production one plus a self-slowdown (page/throttled-worker.ts). Modes: `every`
+//           (the debounce fires after every key), `last` (keys 50 ms apart), `inthread` (no
+//           Worker: the old way, for the long tasks).
+// Writes $DATA_DIR/format/search-<rate>x.json (merged with an earlier run). Heavy: run it
+// under the lock (CLAUDE.md).
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { build as esbuild } from "esbuild";
 import { chromium } from "playwright-core";
 import type { SearchRun } from "../page/search.ts";
 import { loadEval, REPO, summary } from "../src/evaluation.ts";
@@ -28,7 +35,9 @@ const { values: args } = parseArgs({
     rate: { type: "string", default: "4" },
     every: { type: "string", default: "4" },
     "bytes-every": { type: "string", default: "1" },
-    "render-every": { type: "string", default: "16" },
+    "page-every": { type: "string", default: "16" },
+    "last-every": { type: "string", default: "4" },
+    modes: { type: "string", default: "every,last,inthread" },
     skip: { type: "string", default: "" },
     encoding: { type: "string", default: "lines" },
     port: { type: "string", default: "8799" },
@@ -47,7 +56,6 @@ const testQueries = [...new Set(rows.filter((r) => r.split === "test").map((r) =
   (_, i) => i % Number(args["bytes-every"]) === 0,
 );
 const timingQueries = unique.filter((_, i) => i % Number(args.every) === 0);
-const renderQueries = unique.filter((_, i) => i % Number(args["render-every"]) === 0);
 const expected = JSON.parse(readFileSync(join(OUT_DIR, "top10.json"), "utf8")) as Record<
   string,
   string[]
@@ -62,7 +70,7 @@ if (!gzip) throw new Error(`no sizes for ${args.encoding}; run build-index`);
 const siteDist = join(OUT_DIR, "site");
 const port = Number(args.port);
 const origin = `http://127.0.0.1:${port}`;
-if (!skip.has("render")) {
+if (!skip.has("page")) {
   const build = spawnSync("node", ["scripts/build.ts"], {
     cwd: join(REPO, "apps/web"),
     env: { ...process.env, INDEX_ORIGIN: origin, DIST_DIR: siteDist },
@@ -170,79 +178,184 @@ if (!skip.has("timing")) {
   result.timing = timing;
 }
 
-// ---- Render, in the real page ---------------------------------------------------------
-interface KeyRender {
-  render: number;
-  renderMax: number;
-  /** Event Timing duration of the key's events, input to next paint; 0 under the 16 ms floor. */
+// ---- The real page: time to results, long tasks and render ------------------------------
+// The built page, typed into with real key presses at the CPU slowdown --rate. The worker is
+// the production one, slowed by `throttled-worker.ts` because chromium cannot throttle workers.
+// Modes: "every" (the debounce fires after every key), "last" (keys 50 ms apart, so it fires
+// only after the last), "inthread" (no Worker: the same Search on the page, debounce on every
+// key), for comparing long tasks.
+type PageMode = "every" | "last" | "inthread";
+
+interface KeyResult {
+  /** Milliseconds from the key press to the frame after its first results were drawn. */
+  first: number | null;
+  /** The same for the last results of that text: after the pause pass, 150 ms later. */
+  final: number | null;
+  /** Event Timing: key press to the next paint of its handlers; 0 under the 16 ms floor. */
   event: number;
+  /** The DOM updates of the key (build, set, layout), summed. Only when keys are apart. */
+  render: number | null;
 }
 
-if (!skip.has("render")) {
+interface PagePerf {
+  events: number[];
+  renders: number[];
+  results: { text: string; d: number }[];
+  longtasks: number[];
+}
+
+async function runPage(mode: PageMode, queries: string[]) {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true });
   page.on("pageerror", (e) => log("page error", e));
-  await page.addInitScript(() => {
-    const perf = { renders: [] as number[], events: [] as number[] };
-    (window as unknown as { __perf: typeof perf }).__perf = perf;
+  await page.addInitScript((noWorker: boolean) => {
+    if (noWorker) (window as { Worker?: unknown }).Worker = undefined;
+    const perf: PagePerf = { events: [], renders: [], results: [], longtasks: [] };
+    (window as unknown as { __perf: PagePerf }).__perf = perf;
     new PerformanceObserver((list) => {
-      for (const e of list.getEntries())
+      for (const e of list.getEntries()) {
         if (e.name === "whichlei:render") perf.renders.push(e.duration);
+        else if (e.name === "whichlei:results") {
+          const text = ((e as PerformanceMeasure).detail as { text: string }).text;
+          perf.results.push({ text, d: e.duration });
+        }
+      }
     }).observe({ type: "measure" });
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) perf.longtasks.push(e.duration);
+    }).observe({ type: "longtask" });
     new PerformanceObserver((list) => {
       for (const e of list.getEntries()) perf.events.push(e.duration);
     }).observe({ type: "event", durationThreshold: 16 } as PerformanceObserverInit);
-  });
+  }, mode === "inthread");
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate });
   const settle = () =>
     page.waitForFunction(() => document.body.dataset.phase !== "loading", null, { polling: 5 });
-  const perQuery: { query: string; keys: KeyRender[] }[] = [];
-  const pageServer = await serve({ port, site: { dist: siteDist, encoding: args.encoding } });
-  for (const query of renderQueries) {
+  const take = () =>
+    page.evaluate(() => {
+      const perf = (window as unknown as { __perf: PagePerf }).__perf;
+      return {
+        events: perf.events.splice(0),
+        renders: perf.renders.splice(0),
+        results: perf.results.splice(0),
+        longtasks: perf.longtasks.splice(0),
+      };
+    });
+  const keyOf = (taken: { results: PagePerf["results"]; events: number[] }, text: string) => {
+    const mine = taken.results.filter((r) => r.text === text);
+    return {
+      first: mine[0]?.d ?? null,
+      final: mine.at(-1)?.d ?? null,
+      event: Math.max(0, ...taken.events),
+    };
+  };
+
+  const out: { query: string; keys: KeyResult[]; longtasks: number[] }[] = [];
+  for (const query of queries) {
     await page.goto(`${pageServer.origin}/`);
     await page.locator("#meta").getByText("index:").waitFor();
     await page.locator("#q").focus();
-    const keys: KeyRender[] = [];
-    for (const char of query) {
-      await page.keyboard.type(char);
+    await take();
+    const keys: KeyResult[] = [];
+    const longtasks: number[] = [];
+    if (mode === "last") {
+      await page.keyboard.type(query, { delay: 50 });
       await settle();
-      // The debounce is 150 ms: wait for the pause pass too, and for its files.
       await page.waitForTimeout(190);
       await settle();
-      const taken = await page.evaluate(() => {
-        const perf = (window as unknown as { __perf: { renders: number[]; events: number[] } })
-          .__perf;
-        return { renders: perf.renders.splice(0), events: perf.events.splice(0) };
-      });
-      keys.push({
-        render: taken.renders.reduce((a, b) => a + b, 0),
-        renderMax: Math.max(0, ...taken.renders),
-        event: Math.max(0, ...taken.events),
-      });
+      const taken = await take();
+      longtasks.push(...taken.longtasks);
+      for (let k = 1; k <= query.length; k++) {
+        keys.push({ ...keyOf(taken, query.slice(0, k)), event: 0, render: null });
+      }
+    } else {
+      for (let k = 1; k <= query.length; k++) {
+        await page.keyboard.type(query[k - 1] as string);
+        await settle();
+        // The debounce is 150 ms: wait for the pause pass too, and for its files.
+        await page.waitForTimeout(190);
+        await settle();
+        const taken = await take();
+        longtasks.push(...taken.longtasks);
+        keys.push({
+          ...keyOf(taken, query.slice(0, k)),
+          render: taken.renders.reduce((a, b) => a + b, 0),
+        });
+      }
     }
-    perQuery.push({ query, keys });
+    out.push({ query, keys, longtasks });
   }
   await page.close();
-  pageServer.close();
-  const all = perQuery.flatMap((q) => q.keys);
-  const slowestRender = perQuery.map((q) => Math.max(0, ...q.keys.map((k) => k.render)));
-  const slowestEvent = perQuery.map((q) => Math.max(0, ...q.keys.map((k) => k.event)));
-  const reported = all.map((k) => k.event).filter((e) => e > 0);
-  result.render = {
-    viewport: "390x844 touch",
-    queries: perQuery.length,
-    keystrokes: all.length,
-    renderEveryKey: summary(all.map((k) => k.render)),
-    slowestRenderPerQuery: summary(slowestRender),
-    eventOverFloor: reported.length / all.length,
-    eventWhenOverFloor: summary(reported),
-    slowestEventPerQuery: summary(slowestEvent),
+
+  // Keys that are only spaces have no tokens and no results to time.
+  const nums = (pick: (k: KeyResult) => number | null) =>
+    out.map((q) => q.keys.map(pick).filter((r): r is number => r !== null));
+  const first = nums((k) => k.first);
+  const final = nums((k) => k.final);
+  const keyCount = out.reduce((n, q) => n + q.keys.length, 0);
+  const slowestOf = (per: number[][]) => per.map((t) => Math.max(0, ...t));
+  const renders = out
+    .flatMap((q) => q.keys.map((k) => k.render))
+    .filter((r): r is number => r !== null);
+  const events = out.flatMap((q) => q.keys.map((k) => k.event));
+  const withLong = out.filter((q) => q.longtasks.length > 0).length;
+  const slowestFirst = slowestOf(first);
+  const summaryOf = {
+    mode,
+    queries: out.length,
+    keystrokes: keyCount,
+    withResults: first.flat().length,
+    firstResults: summary(first.flat()),
+    firstSlowestPerQuery: summary(slowestFirst),
+    firstOver100: slowestFirst.filter((s) => s > 100).length / slowestFirst.length,
+    finalResults: summary(final.flat()),
+    finalSlowestPerQuery: summary(slowestOf(final)),
+    lastKeyFinal: summary(final.map((t) => t.at(-1) ?? 0)),
+    eventOverFloor: events.filter((e) => e > 0).length / events.length,
+    eventSlowestPerQuery: summary(out.map((q) => Math.max(0, ...q.keys.map((k) => k.event)))),
+    longTasks: {
+      queriesWith: withLong / out.length,
+      total: out.reduce((n, q) => n + q.longtasks.length, 0),
+      longest: Math.max(0, ...out.flatMap((q) => q.longtasks)),
+      perQuery: summary(out.map((q) => q.longtasks.length)),
+    },
+    renderPerKey: renders.length > 0 ? summary(renders) : null,
   };
   log(
-    `render at ${rate}x, ${perQuery.length} queries, ${all.length} keystrokes: DOM update per key ms ${fmt(summary(all.map((k) => k.render)), 2)};` +
-      ` slowest per query ${fmt(summary(slowestRender), 2)}; input-to-paint over 16 ms on ${((reported.length / all.length) * 100).toFixed(1)}% of keys,` +
-      ` slowest per query ${fmt(summary(slowestEvent), 0)}`,
+    `page at ${rate}x, ${mode}, ${out.length} queries, ${keyCount} keys (${summaryOf.withResults} with results):` +
+      ` key to FIRST results painted ms ${fmt(summaryOf.firstResults, 0)}, slowest per query ${fmt(summaryOf.firstSlowestPerQuery, 0)}` +
+      ` (over 100 ms: ${(summaryOf.firstOver100 * 100).toFixed(1)}%); FINAL (after the pause pass) ${fmt(summaryOf.finalResults, 0)},` +
+      ` slowest ${fmt(summaryOf.finalSlowestPerQuery, 0)}, last key ${fmt(summaryOf.lastKeyFinal, 0)};` +
+      ` key to next paint over 16 ms on ${(summaryOf.eventOverFloor * 100).toFixed(1)}% of keys, slowest per query ${fmt(summaryOf.eventSlowestPerQuery, 0)};` +
+      ` long tasks >50 ms: ${(summaryOf.longTasks.queriesWith * 100).toFixed(1)}% of queries, ${summaryOf.longTasks.total} in all, longest ${summaryOf.longTasks.longest.toFixed(0)} ms` +
+      (renders.length > 0 ? `; DOM update per key ${fmt(summary(renders), 1)}` : ""),
   );
+  return summaryOf;
+}
+
+let pageServer: Awaited<ReturnType<typeof serve>>;
+if (!skip.has("page")) {
+  pageServer = await serve({ port, site: { dist: siteDist, encoding: args.encoding } });
+  // The production worker, with the slowdown a worker cannot get from the browser.
+  await esbuild({
+    entryPoints: [join(REPO, "tools/bench/page/throttled-worker.ts")],
+    outfile: join(siteDist, "search-worker.js"),
+    bundle: true,
+    format: "esm",
+    target: "es2024",
+    minify: true,
+    define: { __RATE__: String(rate) },
+    logLevel: "warning",
+  });
+  const modes = args.modes.split(",") as PageMode[];
+  const pageResults: Record<string, unknown> = {};
+  for (const mode of modes) {
+    const every = mode === "last" ? args["last-every"] : args["page-every"];
+    const queries = unique.filter((_, i) => i % Number(every) === 0);
+    pageResults[mode] = await runPage(mode, queries);
+  }
+  result.page = pageResults;
+  pageServer.close();
 }
 
 // A run with --skip keeps what an earlier run of the other parts wrote.
