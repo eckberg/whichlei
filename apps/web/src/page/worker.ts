@@ -1,4 +1,4 @@
-// The search worker: `Search` and `IndexClient` on their own thread (DESIGN.md decision 20).
+// The search worker: `Search` and `IndexClient` on their own thread (DESIGN.md decision 24).
 // The page starts it once and sends `init` with the index origin, then every input.
 import { IndexClient } from "../search/client.ts";
 import { SearchHost, type ToPage, type ToWorker } from "../search/host.ts";

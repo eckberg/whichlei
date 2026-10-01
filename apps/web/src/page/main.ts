@@ -31,7 +31,7 @@ function element<T extends HTMLElement>(id: string): T {
 }
 
 /**
- * The search runs in a Web Worker, so typing never waits on scoring (DESIGN.md decision 20).
+ * The search runs in a Web Worker, so typing never waits on scoring (DESIGN.md decision 24).
  * Where there is none, or no index is set up, the same `Search` runs on this thread.
  */
 function createSearch(origin: string): SearchPort {

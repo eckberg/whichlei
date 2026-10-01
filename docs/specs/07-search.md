@@ -39,7 +39,7 @@ prototype's 2,924 records encoded with `format.ts`.
   Measured with the slice 4 harness on this code.
 
 ## What was built
-- Search runs in a module Web Worker (`dist/search-worker.js`, DESIGN.md decision 20): the page
+- Search runs in a module Web Worker (`dist/search-worker.js`, DESIGN.md decision 24): the page
   sends `{ seq, text }` for every input; `SearchHost` (`src/search/host.ts`) works on the newest
   only and answers only while it is the newest; `RemoteSearch` (`src/page/remote.ts`) drops answers
   to older inputs and keeps the hits array when nothing changed. Without `Worker` the same
