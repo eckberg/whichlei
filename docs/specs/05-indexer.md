@@ -47,3 +47,55 @@ On the 2026-09-16 golden copy and the mapping files in `research/data`:
 - Reachability 96.7% and index size within 1% of slice 4's 221 MB.
 - The replayed evaluation objective equals slice 4's .6516 (tenths).
 - The workflow run on a GitHub runner succeeds with its time and memory. Link to run.
+
+## Measured
+On the 2026-09-16 golden copy and the mapping files in `research/data`, this sandbox (4
+vCPU, one build at a time). Build: `pnpm --filter @whichlei/indexer build --input-dir …
+--now-year 2026.74 --research-split --dump-prominence`; check: `check <dir> --reference
+research/data/index --eval`.
+
+- measured: **build 2 min 49 s** wall (entities 105 s, grouping 5 s, packing 8 s, writing
+  37 s; the inputs are read from disk, so a runner's download time comes on top). **Peak
+  RSS 1.79 GB** (`process.resourceUsage().maxRSS`; `/usr/bin/time -v` is not installed here,
+  the workflow uses it). Check with reference and evaluation: 3 min 8 s.
+- measured: **6,438 files, 767 capped, 3,317,220 of 3,431,742 entities reachable (96.66%)**,
+  1,301,799 terms, 7,495,587 entries (the reference's number). 523.9 MB raw, **220.6 MB
+  gzip level 6** (slice 4: 221 MB); per file gzip median 36.3 KB, p90 43.3 KB, max 81.6 KB.
+- measured: **bounds 0 differ, capped files identical, every entry's country, status and
+  names identical, 0 entries differ in prominence tenths.**
+- measured: **prominence, 3,317,220 entities: 0 differ from `entities.tsv` by more than 1e-6**
+  (largest 9.54e-7, one float32 step at that size); registration age identical; **0 round to
+  a different tenth** (list: none).
+- measured: **evaluation objective 0.6516 on the test half (1,613 rows), 0.6571 on all
+  3,229 queries**, replayed over the built files: slice 4's .6516.
+- measured: **files, 12 of 6,438 differ from `files.tsv` in 26 positions**, each an adjacent
+  swap of two entities whose prominence differs by one float32 step. Cause below.
+- Workflow run on a GitHub runner: not run yet (the branch is not pushed).
+
+### Differences from the reference, and why
+1. **Float32 log, 12 files.** numpy computes `ln(name length)` in float32 with its own
+   routine, which differs from the correctly rounded value in the last bit for about 3% of
+   lengths (7, 37, 47, 217 …). The port rounds `Math.log` to float32. A prominence then
+   differs by one step (≤ 9.54e-7), and two entities that tie to within a step swap places.
+   The reference's own order depends on the CPU's numpy kernel. No effect on the
+   objective.
+2. **Names with " | " (64 in the golden copy).** The research wrote an entity's other names
+   joined with `" | "` to a TSV and split them again, so a name holding it became two and its
+   types shifted (sometimes dropping a name). The indexer keeps such a name whole. 60
+   entries differ from the reference by this, 16 files hold different entities (2,765
+   positions). `build --research-split` reproduces the research and then shows 0 differing
+   entries and the 12 files above.
+3. **"Now" for registration age.** The research used 2026.74 for this copy; the indexer
+   uses the publish date, 2026-09-16 = 2026.708. `--now-year 2026.74` reproduces the
+   reference. Default build, same inputs: same 6,438 files, 3,317,220 reachable,
+   objective 0.6515 test, 0.6570 all.
+4. **Download of the code lists.** The page links are looked up at build time:
+   `lei-data/code-lists/iso-20275-entity-legal-forms-code-list` (the research's
+   `about-lei/…` URL moved) and `…/gleif-registration-authorities-list`; 3,597 legal forms
+   and 1,135 registration authorities in `codes.json`.
+
+### For slice 6
+Output: `index.json`, `<build>/0.txt … 6437.txt`, `<build>/codes.json` (the index, 6,440
+files, 220.6 MB gzip), plus `build.json` and optionally `prominence.tsv` (not part of the
+index). Build id `20260916-<8 hex>`; the same inputs give the same id. Peak memory leaves
+room for a 16 GB runner; the build needs `unzip` and Node 26.
