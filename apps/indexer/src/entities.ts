@@ -29,18 +29,28 @@ export interface Entities {
   registeredYear: Float32Array;
 }
 
+/** Why a row is skipped. */
+export type SkipReason =
+  | "bad LEI"
+  | "bad country"
+  | "unknown registration status"
+  | "empty legal name";
+
 export interface EntityStats {
   /** Rows of the golden copy. */
   rows: number;
-  /** Rows without an LEI, skipped. */
-  noLei: number;
-  /** Entities with a registration status GLEIF has not documented, read as MERGED. */
-  unknownStatus: number;
+  /** Rows the index cannot hold, skipped, by reason. */
+  skipped: Partial<Record<SkipReason, number>>;
+  /** The first few skipped rows: which, why and what the row had. */
+  examples: { row: number; reason: SkipReason; lei: string }[];
   /** Names that hold " | ", which the research's intermediate TSV would have split in two. */
   pipeNames: number;
   /** Entities that index no term, so no search can find them. */
   noTerms: number;
 }
+
+/** Examples of skipped rows kept for the report. */
+const MAX_EXAMPLES = 20;
 
 export interface EntityInputs {
   relationships: Relationships;
@@ -91,7 +101,10 @@ function researchSplit(
   return [pairs, joined === "" ? [] : joined.split(JOIN)];
 }
 
-/** Registration status letters, in the research's order. A status not listed reads as MERGED. */
+const LEI = /^[0-9A-Z]{20}$/;
+const COUNTRY = /^[A-Z]{2}$/;
+
+/** Registration status letters. A row with another status is skipped. */
 const STATUS = {
   ISSUED: "I",
   LAPSED: "L",
@@ -154,10 +167,14 @@ export async function readEntities(
   };
   const stats: EntityStats = {
     rows: 0,
-    noLei: 0,
-    unknownStatus: 0,
+    skipped: {},
+    examples: [],
     pipeNames: 0,
     noTerms: 0,
+  };
+  const skip = (reason: SkipReason, lei: string) => {
+    stats.skipped[reason] = (stats.skipped[reason] ?? 0) + 1;
+    if (stats.examples.length < MAX_EXAMPLES) stats.examples.push({ row: stats.rows, reason, lei });
   };
   let k = {} as Record<(typeof COLUMNS)[number], number>;
   let otherName: number[] = [];
@@ -181,13 +198,25 @@ export async function readEntities(
   function add(row: string[]): void {
     stats.rows++;
     if (stats.rows % 500_000 === 0) onProgress?.(stats.rows);
+    // One bad record must not stop the build; the caller decides how many are too many.
     const lei = row[k.LEI] as string;
-    if (lei === "") {
-      stats.noLei++;
+    const country = cleanName(row[k["Entity.LegalAddress.Country"]] as string);
+    const registration = row[k["Registration.RegistrationStatus"]] as string;
+    const name = cleanName(row[k["Entity.LegalName"]] as string);
+    const bad: SkipReason | undefined = !LEI.test(lei)
+      ? "bad LEI"
+      : !COUNTRY.test(country)
+        ? "bad country"
+        : !Object.hasOwn(STATUS, registration)
+          ? "unknown registration status"
+          : name === ""
+            ? "empty legal name"
+            : undefined;
+    if (bad !== undefined) {
+      skip(bad, lei);
       return;
     }
 
-    const name = cleanName(row[k["Entity.LegalName"]] as string);
     // The other names and their types, then the transliterated names, as the file has them.
     let others: [name: string, type: string][] = [];
     let translit: string[] = [];
@@ -251,11 +280,6 @@ export async function readEntities(
       entities.registeredYear = grow(entities.registeredYear);
     }
 
-    let registration = row[k["Registration.RegistrationStatus"]] as string;
-    if (!(registration in STATUS)) {
-      stats.unknownStatus++;
-      registration = "MERGED";
-    }
     const entityStatus = row[k["Entity.EntityStatus"]] as string;
     const letter = STATUS[registration as keyof typeof STATUS];
     const counts = relationships.parents.get(lei);
@@ -276,7 +300,7 @@ export async function readEntities(
     entities.lei.push(lei);
     entities.name.push(name);
     entities.otherNames.push(other.length > 0 ? other : undefined);
-    entities.country.push(cleanName(row[k["Entity.LegalAddress.Country"]] as string));
+    entities.country.push(country);
     // Lower case marks an INACTIVE entity. An entity with no status is not marked.
     entities.status.push((entityStatus === "INACTIVE" ? letter.toLowerCase() : letter) as Status);
     entities.registeredYear[id] = input.registeredYear;

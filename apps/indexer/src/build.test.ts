@@ -20,7 +20,7 @@ import { FILLERS, fillerLei, fixtureGolden, LEI, writeInputs } from "./fixture.t
 import { CAP } from "./pack.ts";
 import { readRelationships } from "./signals.ts";
 
-const records = 10 + FILLERS;
+const records = 9 + FILLERS;
 let root: string;
 let out: string;
 let manifest: Manifest;
@@ -90,6 +90,7 @@ describe("build, end to end on a tiny golden copy", () => {
       expect(entries.has(lei), lei).toBe(true);
     }
     expect(entries.size).toBe(records - 1);
+    expect(report.stats.skipped).toEqual({});
   });
 
   test("an entity is in the file of each of its terms, found by routing", () => {
@@ -123,9 +124,6 @@ describe("build, end to end on a tiny golden copy", () => {
     expect(entries.get(LEI.fund)?.status).toBe("R");
     // Lower case marks an inactive entity.
     expect(entries.get(LEI.inactive)?.status).toBe("i");
-    // A status GLEIF has not documented reads as merged, not as a crash.
-    expect(entries.get(LEI.unknownStatus)?.status).toBe("M");
-    expect(report.stats.unknownStatus).toBe(1);
   });
 
   test("other names: trading, alternative-language and transliterated; not previous names", () => {
@@ -239,6 +237,79 @@ describe("build, end to end on a tiny golden copy", () => {
     expect(text).not.toContain("\n");
   });
 
+  describe("bad records", () => {
+    const bad = {
+      specs: [
+        { lei: "GOOD0000000000000001", name: "Good Company" },
+        { lei: "BLANK000000000000002", name: "  \t " },
+        { lei: "NOCOUNTRY0000000003X", name: "No Country Ltd", country: " " },
+        { lei: "lower000000000000004", name: "Lower Case Ltd" },
+        { lei: "SHORT", name: "Short Id Ltd" },
+        { lei: "NEWSTATUS00000000005", name: "New Status Ltd", registration: "SOMETHING_NEW" },
+        {
+          lei: "OTHERS0000000000006X",
+          name: "Names Ltd",
+          others: [
+            ["", "TRADING_OR_OPERATING_NAME"],
+            ["  ", "TRADING_OR_OPERATING_NAME"],
+            ["Names Trading", "TRADING_OR_OPERATING_NAME"],
+            ["Names\tTrading", "TRADING_OR_OPERATING_NAME"],
+            ["Names Ltd", "ALTERNATIVE_LANGUAGE_LEGAL_NAME"],
+          ] as [string, string][],
+        },
+      ],
+      relations: [],
+      isins: {},
+      bics: [],
+    };
+
+    test("are skipped and counted by reason, with examples; the rest is built", async () => {
+      const inputs = writeInputs(join(root, "bad"), bad);
+      const dir = join(root, "bad-out");
+      const logs: string[] = [];
+      const built = await buildIndex({
+        inputs,
+        out: dir,
+        skipLimit: { count: 10, share: 1 },
+        log: (m) => logs.push(m),
+      });
+      expect(built.records).toBe(7);
+      expect(built.stats.skipped).toEqual({
+        "empty legal name": 1,
+        "bad country": 1,
+        "bad LEI": 2,
+        "unknown registration status": 1,
+      });
+      expect(built.stats.examples.map((e) => [e.row, e.reason, e.lei])).toEqual([
+        [2, "empty legal name", "BLANK000000000000002"],
+        [3, "bad country", "NOCOUNTRY0000000003X"],
+        [4, "bad LEI", "lower000000000000004"],
+        [5, "bad LEI", "SHORT"],
+        [6, "unknown registration status", "NEWSTATUS00000000005"],
+      ]);
+      expect(logs.join("\n")).toMatch(/WARNING: 5 of 7 rows skipped/);
+      const report = JSON.parse(readFileSync(join(dir, "build.json"), "utf8"));
+      expect(report.stats.skipped["bad LEI"]).toBe(2);
+      // The good rows are in, with their other names cleaned: no empty or repeated names,
+      // none equal to the legal name.
+      const index = new IndexDir(dir);
+      const all = index.manifest.bounds.flatMap((_, n) => index.entries(n));
+      expect(new Set(all.map((e) => e.lei))).toEqual(
+        new Set(["GOOD0000000000000001", "OTHERS0000000000006X"]),
+      );
+      expect(all.find((e) => e.lei.startsWith("OTHERS"))?.otherNames).toEqual(["Names Trading"]);
+    });
+
+    test("too many fail the build, naming reasons and examples, and write nothing", async () => {
+      const inputs = writeInputs(join(root, "bad"), bad);
+      const dir = join(root, "bad-fail");
+      await expect(buildIndex({ inputs, out: dir })).rejects.toThrow(
+        /5 of 7 rows skipped: .*bad LEI.*; e\.g\. row 2 BLANK000000000000002 \(empty legal name\).*more than 1000 or 0\.1% of the rows/,
+      );
+      expect(() => readFileSync(join(dir, "index.json"))).toThrow();
+    });
+  });
+
   test("without a registration authorities list the build goes on, and codes.json has no ra", async () => {
     const dir = join(root, "no-ra");
     const inputs = { ...writeInputs(join(root, "in"), fixtureGolden()), ra: undefined };
@@ -287,7 +358,7 @@ describe("check", () => {
     checkIndex(new IndexDir(out), records, { problems, log: (m) => logs.push(m) });
     expect(problems).toEqual([]);
     expect(logs.join("\n")).toMatch(/files: \d+ \(3 capped\)/);
-    expect(logs.join("\n")).toMatch(/reachability: 1,609 of 1,610 records, 99\.94%/);
+    expect(logs.join("\n")).toMatch(/reachability: 1,608 of 1,609 records, 99\.94%/);
   });
 
   test("finds a missing file, an edited file and a wrong count", () => {

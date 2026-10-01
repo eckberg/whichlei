@@ -203,7 +203,6 @@ export const LEI = {
   quoted: "QUOTED00000000000006",
   noTerm: "NOTERM00000000000007",
   gazprom: "GAZPROM0000000000008",
-  unknownStatus: "UNKNOWN0000000000009",
   previous: "PREVIOUS000000000010",
 } as const;
 
@@ -249,12 +248,6 @@ export function fixtureGolden(): Golden {
       country: "RU",
       others: [["Gazprom Export", "ALTERNATIVE_LANGUAGE_LEGAL_NAME"]],
       transliterated: ["Gazprom", "Gazprom Export"],
-    },
-    {
-      lei: LEI.unknownStatus,
-      name: "Mystery Holding",
-      registration: "SOMETHING_NEW",
-      country: "NO",
     },
     {
       lei: LEI.previous,

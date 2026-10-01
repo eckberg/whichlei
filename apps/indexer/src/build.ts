@@ -26,6 +26,8 @@ export interface BuildOptions {
    * research used 2026.74 for the 2026-09-16 copy; pass that to reproduce its numbers.
    */
   nowYear?: number;
+  /** The most rows of the golden copy that may be skipped as bad before the build fails. */
+  skipLimit?: { count: number; share: number };
   /** Split other names at " | " as the research did, for comparing with its index. */
   researchSplit?: boolean;
   /** Also write prominence.tsv. */
@@ -98,6 +100,7 @@ function prepare(out: string): void {
 
 export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   const { inputs, out, dumpProminence = false, researchSplit = false, log = () => {} } = options;
+  const skipLimit = options.skipLimit ?? { count: 1000, share: 0.001 };
   const nowYear = options.nowYear ?? yearFraction(inputs.asOf);
   const seconds: Record<string, number> = {};
   const step = async <T>(name: string, run: () => Promise<T> | T): Promise<T> => {
@@ -124,11 +127,25 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   );
   log(
     `  ${entities.count.toLocaleString()} entities, ${postings.size.toLocaleString()} postings` +
-      `, ${stats.noTerms} with no index term, ${stats.unknownStatus} with an unknown status`,
+      `, ${stats.noTerms} with no index term`,
   );
-  if (stats.noLei > 0) log(`  WARNING: ${stats.noLei} rows without an LEI were skipped`);
-  if (inputs.records !== undefined && inputs.records !== entities.count) {
-    log(`  WARNING: GLEIF announced ${inputs.records} records, the file has ${entities.count}`);
+  const skipped = Object.values(stats.skipped).reduce((a, b) => a + b, 0);
+  if (skipped > 0) {
+    const what = Object.entries(stats.skipped)
+      .map(([reason, n]) => `${n} ${reason}`)
+      .join(", ");
+    const examples = stats.examples.slice(0, 5).map((e) => `row ${e.row} ${e.lei} (${e.reason})`);
+    const message = `${skipped} of ${stats.rows} rows skipped: ${what}; e.g. ${examples.join("; ")}`;
+    // A few odd records are GLEIF's. Many mean the file or this code is wrong.
+    if (skipped > skipLimit.count || skipped > skipLimit.share * stats.rows) {
+      throw new Error(
+        `${message}; more than ${skipLimit.count} or ${100 * skipLimit.share}% of the rows`,
+      );
+    }
+    log(`  WARNING: ${message}`);
+  }
+  if (inputs.records !== undefined && inputs.records !== stats.rows) {
+    log(`  WARNING: GLEIF announced ${inputs.records} records, the file has ${stats.rows}`);
   }
 
   const grouped = await step("group", () => postings.finish());
@@ -208,7 +225,7 @@ export async function buildIndex(options: BuildOptions): Promise<BuildReport> {
   const report: BuildReport = {
     build,
     asOf: inputs.asOf,
-    records: entities.count,
+    records: stats.rows,
     entities: packing.reachable,
     files: packing.files.length,
     capped: packing.capped.length,
