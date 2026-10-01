@@ -157,6 +157,81 @@ describe("fields", () => {
   });
 });
 
+describe("names for codes", () => {
+  const codes = {
+    elf: { XJHM: "Aktiebolag", "2HBR": "Gesellschaft mit beschränkter Haftung" },
+    ra: { RA000544: "Bolagsverket" },
+  };
+
+  it("shows the legal form and the register by name, with the code beside it", async () => {
+    const page = renderRecordPage(await parsedRecord("record-ericsson"), { ...context, codes });
+    expect(text(field(page, "legal-form"))).toBe("Aktiebolag XJHM");
+    expect(field(page, "legal-form")).toBe('Aktiebolag <span class="none">XJHM</span>');
+    expect(text(field(page, "register"))).toBe("556016-0680 Bolagsverket · RA000544");
+  });
+
+  it("shows the code alone when the names lack it, or there are no names", async () => {
+    const record = await parsedRecord("record-ericsson");
+    for (const given of [undefined, null, { elf: {}, ra: {} }]) {
+      const page = renderRecordPage(record, { ...context, codes: given });
+      expect(text(field(page, "legal-form"))).toBe("XJHM");
+      expect(text(field(page, "register"))).toBe("556016-0680 RA000544");
+    }
+  });
+
+  it("names the form of a record whose form has a name and a register that has none", async () => {
+    const page = renderRecordPage(await parsedRecord("record-exception"), { ...context, codes });
+    expect(text(field(page, "legal-form"))).toBe("Gesellschaft mit beschränkter Haftung 2HBR");
+    expect(text(field(page, "register"))).toContain("RA000279");
+    expect(text(field(page, "register"))).not.toContain("·");
+  });
+
+  it("prefers GLEIF's own text for a form that is 'other' to a name from the codes", async () => {
+    const record = await parsedRecord("record-fund");
+    expect(record.legalForm.code).toBe("8888");
+    const page = renderRecordPage(record, { ...context, codes: { ...codes, elf: { 8888: "x" } } });
+    expect(text(field(page, "legal-form"))).toBe(record.legalForm.other ?? "x");
+    expect(text(field(page, "legal-form"))).not.toContain("8888 ");
+  });
+
+  it("escapes a name", async () => {
+    const page = renderRecordPage(await parsedRecord("record-ericsson"), {
+      ...context,
+      codes: { elf: { XJHM: "<b>AB</b>" }, ra: { RA000544: '"><i>' } },
+    });
+    expect(page).not.toContain("<b>");
+    expect(page).not.toContain("<i>");
+    expect(page).toContain("&lt;b&gt;AB&lt;/b&gt;");
+  });
+});
+
+describe("copy json", () => {
+  const block = (page: string) =>
+    /<script type="application\/json" id="record-json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
+
+  it.each(recordFixtures)("%s carries its normalised record, and a button for it", async (name) => {
+    const record = await parsedRecord(name);
+    const page = renderRecordPage(record, context);
+    expect(JSON.parse(block(page))).toEqual(JSON.parse(JSON.stringify(record)));
+    expect(page).toContain(
+      '<button class="btn" type="button" data-copy-json="record-json" hidden>copy json</button>',
+    );
+  });
+
+  it("keeps a name from closing the data block", async () => {
+    const record = await parsedRecord("record-ericsson");
+    record.legalName.name = "</script><b>&";
+    const json = block(renderRecordPage(record, context));
+    expect(json).not.toMatch(/[<>&]/);
+    expect(JSON.parse(json).legalName.name).toBe("</script><b>&");
+  });
+
+  it("has no copy button on a page with no record", () => {
+    const page = renderMessagePage({ title: "t", heading: "h", detail: "d" });
+    expect(page).not.toContain("copy json");
+  });
+});
+
 describe("escaping", () => {
   const hostile = `<script>alert("x")</script> & 'quote' </title><img src=x onerror=alert(1)>`;
 
@@ -192,7 +267,7 @@ describe("escaping", () => {
   it("keeps the name from closing the JSON-LD script", async () => {
     const page = await hostilePage();
     const scripts = page.match(/<script\b/g) ?? [];
-    expect(scripts).toHaveLength(2); // JSON-LD and the copy script
+    expect(scripts).toHaveLength(3); // JSON-LD, the record as JSON and the copy script
     const json = /<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
     expect(JSON.parse(json).name).toBe(hostile);
     expect(json).not.toContain("<");
@@ -202,7 +277,9 @@ describe("escaping", () => {
     const record = await parsedRecord("record-ericsson");
     record.source.apiUrl = 'javascript:alert("x")';
     const page = renderRecordPage(record, context);
-    expect(page).not.toContain("javascript:");
+    // The record's JSON, a data block that nothing runs, still holds what GLEIF sent.
+    const visible = page.replace(/<script type="application\/json".*?<\/script>/s, "");
+    expect(visible).not.toContain("javascript:");
     expect(page).toContain("source: GLEIF API ·");
   });
 

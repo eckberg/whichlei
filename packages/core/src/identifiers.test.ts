@@ -142,12 +142,47 @@ describe("isValidBic", () => {
 describe("identifierReadings", () => {
   test("normalises spaces and case", () => {
     expect(identifierReadings(" 529900grz2bqy5zm9n49 ")).toEqual({ lei: "529900GRZ2BQY5ZM9N49" });
-    expect(identifierReadings("us9220 4Q1031")).toEqual({ isin: "US92204Q1031" });
+    expect(identifierReadings(" us92204q1031 ")).toEqual({ isin: "US92204Q1031" });
+    expect(identifierReadings("5299 00GR Z2BQ Y5ZM 9N49")).toEqual({ lei: "529900GRZ2BQY5ZM9N49" });
   });
 
   test("lists every reading", () => {
     expect(identifierReadings("Ericsson")).toEqual({ bic: "ERICSSON" });
     expect(identifierReadings("Volvo")).toEqual({});
+  });
+
+  test("reads a BIC with spaces only between all its groups", () => {
+    expect(identifierReadings("TEER SE SS XXX")).toEqual({ bic: "TEERSESSXXX" });
+    expect(identifierReadings(" teer se ss ")).toEqual({ bic: "TEERSESS" });
+    expect(identifierReadings("TEERSESSXXX")).toEqual({ bic: "TEERSESSXXX" });
+  });
+
+  test.each([
+    "Sony Corp",
+    "Sanofi SA",
+    "Barclays PLC",
+    "Nokia Oyj",
+    "TEERSE SS",
+    "TEERSESS XXX",
+    "TEER  SE SS",
+    "TEER SE SS XX X",
+  ])("does not read %s as a BIC: the spaces are not between its groups", (input) => {
+    expect(identifierReadings(input).bic).toBeUndefined();
+  });
+
+  test("reads an ISIN only without spaces, and an LEI only in groups of four", () => {
+    // "Volvo Car 2020" is one of the ~1 in 10 names that pass the check digit once spaces go.
+    expect(identifierReadings("US9220 4Q1031").isin).toBeUndefined();
+    expect(identifierReadings("US 92204Q1031").isin).toBeUndefined();
+    expect(identifierReadings("529900GR Z2BQY5ZM9N49").lei).toBeUndefined();
+    expect(identifierReadings("5299 00GR Z2BQY5ZM 9N49").lei).toBeUndefined();
+    expect(identifierReadings("5299  00GR Z2BQ Y5ZM 9N49").lei).toBeUndefined();
+  });
+
+  test("never reads a name with spaces as an ISIN", () => {
+    // Twelve letters and digits with a valid check digit once the spaces are gone.
+    const names = ["Volvo Car 2020", "Fond 1999 2000", "Volvo Car 1998", "Fond 2019 2020"];
+    for (const name of names) expect(identifierReadings(name).isin).toBeUndefined();
   });
 
   test("upper-cases only ASCII letters", () => {

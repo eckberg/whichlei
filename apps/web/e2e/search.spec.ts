@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { FIXTURE_ORIGIN } from "./env.ts";
+import { KNOWN, type MockGleif, mockGleif, recordAs } from "./gleif.ts";
 
 const ERICSSON = "549300W9JLPW15XIFM52";
 // Valid check digits, and the same code with the last digit changed.
@@ -35,6 +36,13 @@ test.describe("search", () => {
 
   const box = (page: Page) => page.getByRole("combobox");
 
+  // No test reaches the real GLEIF API: every page of the context gets the mock. By default it
+  // knows the fixtures' ISIN, BIC, register number and Ericsson's LEI, and nothing else.
+  let gleif: MockGleif;
+  test.beforeEach(async ({ page }) => {
+    gleif = await mockGleif(page.context());
+  });
+
   /** Open the page and wait until the manifest is in, so requests after this are the search's. */
   async function open(page: Page) {
     await page.goto("/");
@@ -50,7 +58,8 @@ test.describe("search", () => {
     });
     page.on("pageerror", (error) => errors.push(error.message));
     await open(page);
-    await box(page).fill("ericsson");
+    // A name that is no identifier: "ericsson" is also a valid BIC, and would call GLEIF.
+    await box(page).fill("telefonaktiebolaget");
     await expect(page.locator("#opt-0")).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     expect([...hosts].sort()).toEqual(["http://localhost:8787", FIXTURE_ORIGIN].sort());
@@ -219,6 +228,7 @@ test.describe("search", () => {
     const context = await browser.newContext({
       permissions: ["clipboard-read", "clipboard-write"],
     });
+    await mockGleif(context);
     const page = await context.newPage();
     await open(page);
     await box(page).fill("ericsson");
@@ -364,6 +374,7 @@ test.describe("search", () => {
   test("puts the row of a valid LEI first, with the names that are that code below it", async ({
     page,
   }) => {
+    gleif.records.set(VALID_LEI, { status: 200, body: recordAs(VALID_LEI, "Test Holding AB") });
     await open(page);
     await box(page).fill(VALID_LEI.toLowerCase());
     await expect(page.locator("#opt-0 .lei")).toHaveText(VALID_LEI);
@@ -515,6 +526,254 @@ test.describe("search", () => {
     expect(overflow).toBe(0);
   });
 
+  test.describe("lookups at GLEIF", () => {
+    const BIC_ENTITY = "5493006W3QUS5LMH6R84";
+    const info = (page: Page) => page.locator("#info");
+
+    test("finds the issuer of an ISIN, tagged isin, above the names", async ({ page }) => {
+      await open(page);
+      await box(page).fill(KNOWN.isin.toLowerCase());
+      await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+      await expect(page.locator("#opt-0 .nm")).toContainText("Telefonaktiebolaget LM Ericsson");
+      await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+      await expect(page.locator("#opt-0 .cc")).toHaveText("SE");
+      await expect(page.locator("#opt-0 .st")).toHaveText("active");
+      await expect(info(page)).toContainText("isin · 1 hit");
+      await expect(page.locator("#preview")).toContainText("found by");
+      expect(gleif.requests).toHaveLength(1);
+      expect(gleif.requests[0]).toContain("filter%5Bisin%5D=SE0000108656");
+    });
+
+    test("shows nothing for an ISIN that GLEIF has no issuer for", async ({ page }) => {
+      await open(page);
+      await box(page).fill("US0378331005");
+      await expect.poll(() => gleif.requests.length).toBe(1);
+      await page.waitForTimeout(200);
+      await expect(page.locator("#list")).toBeHidden();
+      await expect(info(page)).not.toContainText("isin");
+    });
+
+    test("finds a BIC of 8 characters, which GLEIF stores with 11", async ({ page }) => {
+      await open(page);
+      await box(page).fill("tomcjp22");
+      await expect(page.locator("#opt-0 .via")).toHaveText("bic");
+      await expect(page.locator("#opt-0 .lei")).toHaveText(BIC_ENTITY);
+      await expect(info(page)).toContainText("bic · 1 hit");
+      expect(gleif.requests).toHaveLength(1);
+      expect(gleif.requests[0]).toContain("filter%5Bbic%5D=TOMCJP22XXX");
+    });
+
+    test("finds a BIC of 11 characters", async ({ page }) => {
+      await open(page);
+      await box(page).fill(KNOWN.bic);
+      await expect(page.locator("#opt-0 .via")).toHaveText("bic");
+      await expect(page.locator("#opt-0 .lei")).toHaveText(BIC_ENTITY);
+      expect(gleif.requests[0]).toContain("filter%5Bbic%5D=TOMCJP22XXX");
+    });
+
+    test("finds the entities with a register number", async ({ page }) => {
+      await open(page);
+      await box(page).fill(KNOWN.register);
+      await expect(page.locator("#opt-0 .via")).toHaveText("reg.no");
+      await expect(page.locator("#list [role=option]")).toHaveCount(3);
+      await expect(info(page)).toContainText("reg.no · 3 hits");
+      expect(gleif.requests).toHaveLength(1);
+      expect(gleif.requests[0]).toContain("filter%5Bentity.registeredAs%5D=HRB+30000");
+    });
+
+    test("names an LEI from GLEIF, once it has answered", async ({ page }) => {
+      await open(page);
+      await box(page).fill(ERICSSON);
+      // At once: the row of a valid LEI. Then GLEIF names it.
+      await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+      await expect(page.locator("#opt-0 .nm")).toContainText("Telefonaktiebolaget LM Ericsson");
+      await expect(page.locator("#opt-0 .st")).toHaveText("active");
+      await expect(page.locator("#opt-0 .via")).toHaveCount(0);
+      await expect(info(page)).toContainText("check digits ok");
+      await expect(page.locator("#list [role=option]")).toHaveCount(1);
+    });
+
+    test("says there is no such LEI when GLEIF does not know it", async ({ page }) => {
+      await open(page);
+      await box(page).fill(KNOWN.unknownLei);
+      await expect(info(page)).toHaveText("no such LEI at GLEIF");
+      await expect(page.locator("#list")).toBeHidden();
+      await expect(page.locator("#opt-0")).toHaveCount(0);
+      await expect(page.locator("#status")).toHaveText("no such LEI at GLEIF");
+    });
+
+    test("sends one request when an LEI is typed slower than the pause", async ({ page }) => {
+      await open(page);
+      // 400 ms a key: longer than the 350 ms that counts as a pause.
+      await box(page).pressSequentially(ERICSSON, { delay: 400 });
+      await expect(page.locator("#opt-0 .nm")).toContainText("Telefonaktiebolaget LM Ericsson");
+      await page.waitForTimeout(1000);
+      expect(gleif.requests).toHaveLength(1);
+      expect(gleif.requests[0]).toContain(`/lei-records/${ERICSSON}`);
+    });
+
+    test("sends at most two requests when a register number is typed at 400 ms a key", async ({
+      page,
+    }) => {
+      await open(page);
+      await box(page).pressSequentially(KNOWN.register, { delay: 400 });
+      await expect(page.locator("#opt-0 .via")).toHaveText("reg.no");
+      await page.waitForTimeout(1200);
+      expect(gleif.requests.length).toBeLessThanOrEqual(2);
+      expect(gleif.requests.at(-1)).toContain("filter%5Bentity.registeredAs%5D=HRB+30000");
+    });
+
+    test("sends nothing for names that are shaped like identifiers once spaces go", async ({
+      page,
+    }) => {
+      await open(page);
+      for (const name of ["Sony Corp", "Sanofi SA", "Nokia Oyj", "Fund 2021", "AP7 2021"]) {
+        await box(page).fill(name);
+        await page.waitForTimeout(1200);
+      }
+      expect(gleif.requests).toEqual([]);
+    });
+
+    test("sends nothing for a name, and one request for a name that is also a BIC", async ({
+      page,
+    }) => {
+      await open(page);
+      await box(page).pressSequentially("telefonaktiebolaget lm ericsson", { delay: 10 });
+      await expect(page.locator("#opt-0")).toBeVisible();
+      await page.waitForTimeout(700);
+      expect(gleif.requests).toEqual([]);
+      await box(page).fill("ericsson");
+      await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+      await expect.poll(() => gleif.requests.length).toBe(1);
+      await page.waitForTimeout(500);
+      expect(gleif.requests).toHaveLength(1);
+      expect(gleif.requests[0]).toContain("filter%5Bbic%5D=ERICSSONXXX");
+      // GLEIF has no entity with that BIC: no row says so, and the names stay.
+      await expect(page.locator("#list .via")).toHaveCount(0);
+      await expect(info(page)).toContainText("matches");
+    });
+
+    test("asks again for nothing it has been asked before", async ({ page }) => {
+      await open(page);
+      await box(page).fill(KNOWN.isin);
+      await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+      await box(page).fill("");
+      await expect(page.locator("#list")).toBeHidden();
+      await box(page).fill(KNOWN.isin);
+      // At once, from the page's memory.
+      await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+      await page.waitForTimeout(600);
+      expect(gleif.requests).toHaveLength(1);
+    });
+
+    test("waits for a pause in typing", async ({ page }) => {
+      await open(page);
+      await box(page).pressSequentially(KNOWN.isin, { delay: 60 });
+      expect(gleif.requests).toHaveLength(0);
+      await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+      expect(gleif.requests).toHaveLength(1);
+    });
+
+    test("says GLEIF is busy on a 429, keeps the names, and tries again on retry", async ({
+      page,
+    }) => {
+      gleif.mode = "busy";
+      gleif.retryAfter = "1";
+      await open(page);
+      await box(page).fill("ericsson");
+      await expect(info(page)).toContainText("GLEIF is busy, try again in a minute");
+      await expect(page.locator("#status")).toContainText("GLEIF is busy");
+      // The names are not blocked.
+      await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+      await expect(info(page)).toContainText("matches");
+      // GLEIF asked for a second: a retry before that sends nothing, one after it asks again.
+      gleif.mode = "ok";
+      await info(page).getByRole("button", { name: "retry" }).click();
+      await expect(info(page)).toContainText("GLEIF is busy");
+      expect(gleif.requests).toHaveLength(1);
+      await page.waitForTimeout(1100);
+      await info(page).getByRole("button", { name: "retry" }).click();
+      await expect(info(page)).not.toContainText("GLEIF is busy");
+      await expect(info(page)).toContainText("matches");
+      expect(gleif.requests).toHaveLength(2);
+    });
+
+    test("says it could not reach GLEIF when offline, and a retry finds the ISIN", async ({
+      page,
+    }) => {
+      gleif.mode = "offline";
+      await open(page);
+      await box(page).fill(KNOWN.isin);
+      await expect(info(page)).toHaveText(/could not reach GLEIF/);
+      await expect(page.locator("#list")).toBeHidden();
+      gleif.mode = "ok";
+      await info(page).getByRole("button", { name: "retry" }).click();
+      await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+      await expect(info(page)).not.toContainText("could not reach GLEIF");
+    });
+
+    test("keeps the message and the retry button on a phone's screen", async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 700 });
+      gleif.mode = "busy";
+      await open(page);
+      await box(page).fill(KNOWN.isin);
+      await expect(info(page)).toContainText("GLEIF is busy, try again in a minute");
+      await expect(info(page).getByRole("button", { name: "retry" })).toBeInViewport({ ratio: 1 });
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow).toBe(0);
+    });
+
+    test("shows the names at once, while GLEIF is slow", async ({ page }) => {
+      gleif.delayMs = 1500;
+      await open(page);
+      await box(page).fill("ericsson");
+      await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+      await expect(page.locator("#opt-0 .via")).toHaveCount(0);
+      await expect(info(page)).toContainText("matches");
+    });
+
+    test("copies a looked-up LEI on enter and opens its record on the right arrow", async ({
+      browser,
+    }) => {
+      const context = await browser.newContext({
+        permissions: ["clipboard-read", "clipboard-write"],
+      });
+      await mockGleif(context);
+      await context.route("**/lei/*", (route) => route.fulfill({ status: 200, body: "record" }));
+      const page = await context.newPage();
+      await open(page);
+      await box(page).fill("tomcjp22");
+      await expect(page.locator("#opt-0 .via")).toHaveText("bic");
+      await expect(box(page)).toHaveAttribute("aria-activedescendant", "opt-0");
+      await page.keyboard.press("Enter");
+      await expect(info(page)).toHaveText(`copied ${BIC_ENTITY}`);
+      expect(await page.evaluate("navigator.clipboard.readText()")).toBe(BIC_ENTITY);
+      await page.keyboard.press("ArrowRight");
+      await expect(page).toHaveURL(new RegExp(`/lei/${BIC_ENTITY}$`));
+      await context.close();
+    });
+
+    test("says in the empty state how to look up an ISIN, a BIC and a register number", async ({
+      page,
+    }) => {
+      await open(page);
+      for (const example of ["US0378331005", "TEERSESSXXX", "556016-0680"]) {
+        await expect(page.getByRole("button", { name: example })).toBeVisible();
+      }
+      await page.getByRole("button", { name: "TEERSESSXXX" }).click();
+      await expect(box(page)).toHaveValue("TEERSESSXXX");
+      await expect.poll(() => gleif.requests.length).toBe(1);
+    });
+
+    test("says on the about page that identifiers go to GLEIF", async ({ page }) => {
+      await page.goto("/#about");
+      await expect(page.locator("#man")).toContainText("sent to the GLEIF API");
+      await expect(page.locator("#man")).toContainText("Nothing else you type goes anywhere");
+    });
+  });
+
   for (const scheme of ["light", "dark"] as const) {
     test.describe(`axe, ${scheme}`, () => {
       test.use({ colorScheme: scheme });
@@ -538,6 +797,18 @@ test.describe("search", () => {
         expect(await violations(page)).toEqual([]);
       });
 
+      test("lookup results and their messages have no violations", async ({ page }) => {
+        await open(page);
+        await box(page).fill(KNOWN.isin);
+        await expect(page.locator("#opt-0 .via")).toBeVisible();
+        expect(await violations(page)).toEqual([]);
+        gleif.mode = "busy";
+        await box(page).fill("tomcjp22x");
+        await box(page).fill("tomcjp22");
+        await expect(page.locator("#info .warn")).toBeVisible();
+        expect(await violations(page)).toEqual([]);
+      });
+
       test("an error message has no violations", async ({ page }) => {
         await open(page);
         await box(page).fill(UNKNOWN_BAD_LEI);
@@ -553,4 +824,18 @@ test.describe("search", () => {
       });
     });
   }
+});
+
+// The deployed site, with the real GLEIF API: one lookup, to see that nothing in between (the
+// CSP, CORS, the API's answer) has broken it.
+test.describe("live lookups", () => {
+  test.skip(!process.env.BASE_URL, "needs BASE_URL: a deployed site that can reach GLEIF");
+
+  test("finds Apple by its ISIN", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("combobox").fill("US0378331005");
+    await expect(page.locator("#opt-0 .nm")).toContainText("Apple Inc.");
+    await expect(page.locator("#opt-0 .via")).toHaveText("isin");
+    await expect(page.locator("#info")).toContainText("isin · 1 hit");
+  });
 });
