@@ -1,204 +1,54 @@
 // The record page: one LEI record as a server-rendered HTML document. A pure function of the
-// record, so the search page can reuse it later. Every value goes through `html`, which
-// escapes. The styles (fonts included) and the copy script are static assets (see scripts/build.ts).
+// record document, so the search page can reuse it later. Every value goes through `html`,
+// which escapes. The styles (fonts included) and the copy script are static assets (see
+// scripts/build.ts).
 
-import type { Address, LeiRecord, ParentLink } from "@whichlei/gleif";
-import type { Codes } from "./codes.ts";
+import type { LeiRecord } from "@whichlei/gleif";
 import { type Html, html, raw } from "./html.ts";
-import { stateOf, type Tone, words } from "./status.ts";
+import {
+  buildDocument,
+  type DocumentContext,
+  documentUrl,
+  type RecordDocument,
+  safeUrl,
+} from "./record-document.ts";
+import { day, type Part, recordRows, statusOf } from "./rows.ts";
+import type { Tone } from "./status.ts";
 
-export interface RecordPageContext {
-  /** Origin of the canonical URL, such as `https://whichlei.com`, without a trailing slash. */
-  canonicalOrigin: string;
-  /**
-   * Names for legal form and registration authority codes, from the published index. Without
-   * them, or for a code they lack, the page shows the code.
-   */
-  codes?: Codes | null | undefined;
-}
+export type RecordPageContext = DocumentContext;
 
 const leiPath = (lei: string) => `/lei/${encodeURIComponent(lei)}`;
-
-/** The date part of an ISO 8601 timestamp, `2026-09-30`. */
-const day = (iso: string | null): string | null => (iso === null ? null : iso.slice(0, 10));
 
 /** ` lang="sv"`, only when GLEIF's code looks like a language code. */
 const langAttr = (code: string | null): Html =>
   code !== null && /^[A-Za-z0-9-]{1,35}$/.test(code) ? html` lang="${code}"` : html``;
 
-/** Only http(s) links from GLEIF are followed. */
-const safeUrl = (url: string): string | null => (/^https?:\/\//i.test(url) ? url : null);
-
 export type { Tone };
+export { statusOf };
 
-/** One word for the state of the record, as the prototype shows it. */
-export function statusOf(record: LeiRecord): { label: string; tone: Tone } {
-  return stateOf(record.entityStatus, record.registrationStatus);
-}
-
-function addressText(address: Address | null): string | null {
-  if (address === null) return null;
-  const street = [
-    address.mailRouting,
-    ...address.lines,
-    address.number,
-    address.numberWithinBuilding,
-  ];
-  const place = [address.postalCode, address.city].filter(Boolean).join(" ");
-  const parts = [...street, place, address.region ?? address.country].filter(
-    (part): part is string => typeof part === "string" && part !== "",
-  );
-  return parts.length === 0 ? null : parts.join(", ");
-}
-
-const none = (text = "none reported") => html`<span class="none">${text}</span>`;
-
-function leiLink(lei: string, label: string = lei): Html {
-  return html`<a href="${leiPath(lei)}">${label}</a>`;
-}
-
-function parentCell(link: ParentLink): Html {
-  switch (link.kind) {
-    case "reported":
-      return leiLink(link.lei);
-    case "exception":
-      return none(link.reason === null ? "none: no reason given" : `none: ${words(link.reason)}`);
-    case "none":
-      return none();
+function partHtml(part: Part): Html {
+  switch (part.kind) {
+    case "text":
+    case "punct":
+      return html`${part.text}`;
+    case "dim":
+      return html`<span class="none">${part.text}</span>`;
+    case "tone":
+      return html`<span class="st-${part.tone}">${part.text}</span>`;
+    case "link":
+      return html`<a href="${leiPath(part.lei)}">${part.text}</a>`;
   }
-}
-
-/** The form's name: GLEIF's own text for "other", else the code's name, else the code. */
-function legalFormName(form: LeiRecord["legalForm"], codes: Codes | null): string {
-  if (form.other) return form.other;
-  const code = form.code ?? "";
-  return codes?.elf[code] ?? code;
-}
-
-/** "Bolagsverket · RA000544", or the code alone when the register has no name here. */
-function registerKeeper(
-  authority: LeiRecord["registrationAuthority"],
-  codes: Codes | null,
-): string {
-  if (authority.id === null) return authority.other ?? "";
-  const name = codes?.ra[authority.id];
-  return name ? `${name} · ${authority.id}` : authority.id;
-}
-
-type Row = [label: string, field: string, value: Html];
-
-function rows(record: LeiRecord, codes: Codes | null): Row[] {
-  const status = statusOf(record);
-  const legal = addressText(record.legalAddress);
-  const hq = addressText(record.headquartersAddress);
-  const { expiration, registrationAuthority: authority, legalForm } = record;
-  const out: (Row | null)[] = [];
-  const add = (label: string, field: string, value: Html | null) => {
-    out.push(value === null ? null : [label, field, value]);
-  };
-
-  add(
-    "status",
-    "status",
-    html`<span class="st-${status.tone}">${status.label}</span>${
-      expiration.date || expiration.reason
-        ? html` · ended${expiration.date ? ` ${day(expiration.date)}` : ""}${
-            expiration.reason ? ` (${words(expiration.reason)})` : ""
-          }`
-        : ""
-    }`,
-  );
-  add(
-    "registration",
-    "registration",
-    html`${words(record.registrationStatus)}${
-      record.nextRenewalDate ? ` · renews ${day(record.nextRenewalDate)}` : ""
-    }`,
-  );
-  add(
-    "also known as",
-    "other-names",
-    record.otherNames.length === 0
-      ? null
-      : html`${record.otherNames.map(
-          (name) =>
-            html`<div${langAttr(name.language)}>${name.name} <span class="none">${words(name.kind)}${
-              name.language ? ` · ${name.language}` : ""
-            }</span></div>`,
-        )}`,
-  );
-  add("address", "legal-address", legal === null ? null : html`${legal}`);
-  add("headquarters", "hq-address", hq === null || hq === legal ? null : html`${hq}`);
-  add(
-    "register",
-    "register",
-    record.registerNumber === null && authority.id === null && authority.other === null
-      ? null
-      : html`${record.registerNumber ?? ""}${
-          authority.id || authority.other
-            ? html` <span class="none">${registerKeeper(authority, codes)}</span>`
-            : ""
-        }`,
-  );
-  add(
-    "legal form",
-    "legal-form",
-    legalForm.code === null && legalForm.other === null
-      ? null
-      : html`${legalFormName(legalForm, codes)}${
-          legalForm.code &&
-          legalForm.code !== "8888" &&
-          legalFormName(legalForm, codes) !== legalForm.code
-            ? html` <span class="none">${legalForm.code}</span>`
-            : ""
-        }`,
-  );
-  add("jurisdiction", "jurisdiction", record.jurisdiction ? html`${record.jurisdiction}` : null);
-  add(
-    "category",
-    "category",
-    record.category
-      ? html`${words(record.category)}${record.subCategory ? ` · ${words(record.subCategory)}` : ""}`
-      : null,
-  );
-  add("bic", "bic", record.bics.length > 0 ? html`${record.bics.join(" ")}` : null);
-  add("parent", "parent", parentCell(record.directParent));
-  add(
-    "ultimate",
-    "ultimate-parent",
-    record.ultimateParent.kind === "none" ? null : parentCell(record.ultimateParent),
-  );
-  add(
-    "successor",
-    "successors",
-    record.successors.length === 0
-      ? null
-      : html`${record.successors.map((successor) => {
-          const label = successor.name ?? successor.lei ?? "";
-          return html`<div>${successor.lei === null ? label : leiLink(successor.lei, label)}</div>`;
-        })}`,
-  );
-  add("since", "created", record.creationDate ? html`${day(record.creationDate)}` : null);
-  add(
-    "registered",
-    "registered",
-    record.initialRegistrationDate ? html`${day(record.initialRegistrationDate)}` : null,
-  );
-  add("updated", "updated", record.lastUpdateDate ? html`${day(record.lastUpdateDate)}` : null);
-  add(
-    "corroboration",
-    "corroboration",
-    record.corroborationLevel ? html`${words(record.corroborationLevel)}` : null,
-  );
-  add("managed by", "managing-lou", record.managingLou ? leiLink(record.managingLou) : null);
-  return out.filter((row): row is Row => row !== null);
 }
 
 // Characters that could end a script element or start a comment inside one.
 const JSON_UNSAFE = /[<>&]/g;
 
+/** JSON text that cannot close a script element or start a comment inside one. */
+const scriptSafe = (json: string): string =>
+  json.replace(JSON_UNSAFE, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
+
 /** schema.org Organization, with the LEI as `leiCode`. */
-function jsonLd(record: LeiRecord, canonicalUrl: string): string {
+function jsonLd(record: RecordDocument, canonicalUrl: string, origin: string): string {
   const address = record.legalAddress;
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -225,14 +75,58 @@ function jsonLd(record: LeiRecord, canonicalUrl: string): string {
       ...(address.country ? { addressCountry: address.country } : {}),
     };
   }
+  const parent = record.directParent;
+  if (parent.kind === "reported") {
+    data.parentOrganization = {
+      "@type": "Organization",
+      "@id": documentUrl(origin, parent.lei),
+      leiCode: parent.lei,
+      ...(parent.name === undefined ? {} : { name: parent.name }),
+    };
+  }
+  // The BICs, and the register number named by its register (`RA000544`).
+  const authority = record.registrationAuthority.id;
+  const identifiers = [
+    ...record.bics.map((bic) => ({ "@type": "PropertyValue", propertyID: "BIC", value: bic })),
+    ...(record.registerNumber !== null && authority !== null
+      ? [{ "@type": "PropertyValue", propertyID: authority, value: record.registerNumber }]
+      : []),
+  ];
+  if (identifiers.length > 0) data.identifier = identifiers;
   return scriptSafe(JSON.stringify(data));
 }
 
-/** JSON text that cannot close a script element or start a comment inside one. */
-const scriptSafe = (json: string): string =>
-  json.replace(JSON_UNSAFE, (char) => `\\u${char.charCodeAt(0).toString(16).padStart(4, "0")}`);
+/**
+ * Open Graph and Twitter card tags, for link previews. The URL and the image need an origin;
+ * without one (no canonical origin is set) they are left out.
+ */
+export function socialTags(tags: {
+  title: string;
+  description: string;
+  origin: string;
+  /** The page's canonical URL, when it has one. */
+  url: string | null;
+}): Html {
+  const { title, description, origin, url } = tags;
+  const lines = [
+    html`<meta property="og:type" content="website">`,
+    html`<meta property="og:site_name" content="whichlei">`,
+    html`<meta property="og:title" content="${title}">`,
+    html`<meta property="og:description" content="${description}">`,
+    ...(url === null ? [] : [html`<meta property="og:url" content="${url}">`]),
+    ...(origin === "" ? [] : [html`<meta property="og:image" content="${origin}/icon-512.png">`]),
+    html`<meta name="twitter:card" content="summary">`,
+  ];
+  return raw(lines.map((line) => line.value).join("\n"));
+}
 
-function shell(parts: { title: string; head?: Html; body: Html; scripts?: boolean }): string {
+/** The page around a body: the head with its icons and styles, the header, optional scripts. */
+export function renderPage(parts: {
+  title: string;
+  head?: Html;
+  body: Html;
+  scripts?: boolean;
+}): string {
   return html`<!doctype html>
 <html lang="en">
 <head>
@@ -240,6 +134,9 @@ function shell(parts: { title: string; head?: Html; body: Html; scripts?: boolea
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>${parts.title}</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 ${parts.head ?? ""}
 <link rel="stylesheet" href="/styles/record.css">
 </head>
@@ -256,13 +153,14 @@ ${parts.scripts ? html`<script src="/scripts/copy.js" defer></script>\n<script s
 `.value;
 }
 
-/** The page for one record: title, description, canonical link, JSON-LD and the fields. */
-export function renderRecordPage(record: LeiRecord, context: RecordPageContext): string {
+/** The page for one record document: title, description, links, JSON-LD and the fields. */
+export function renderDocumentPage(record: RecordDocument, origin: string): string {
   const name = record.legalName.name;
   const status = statusOf(record);
   const golden = day(record.source.goldenCopyDate);
-  const canonicalUrl = `${context.canonicalOrigin}${leiPath(record.lei)}`;
+  const canonicalUrl = documentUrl(origin, record.lei);
   const place = record.legalAddress?.country ?? record.jurisdiction;
+  const title = `${name} · LEI ${record.lei} · whichlei`;
   const description =
     `${name}${place ? ` (${place})` : ""}: LEI ${record.lei}, ${status.label}. ` +
     `Source: GLEIF${golden ? `, golden copy ${golden}` : ""}.`;
@@ -271,14 +169,13 @@ export function renderRecordPage(record: LeiRecord, context: RecordPageContext):
 
   const head = html`<meta name="description" content="${description}">
 <link rel="canonical" href="${canonicalUrl}">
-<script type="application/ld+json">${raw(jsonLd(record, canonicalUrl))}</script>`;
+${socialTags({ title, description, origin, url: canonicalUrl })}
+<script type="application/ld+json">${raw(jsonLd(record, canonicalUrl, origin))}</script>`;
 
   const body = html`<main class="record">
 <div class="inner">
-<div>
-<h1 class="lei" id="lei">${record.lei}</h1>
-<div class="name"${langAttr(record.legalName.language)}>${name}</div>
-</div>
+<h1 class="title"><span class="lei" id="lei">${record.lei}</span>
+<span class="name"${langAttr(record.legalName.language)}>${name}</span></h1>
 <div class="actions">
 <button class="btn" type="button" data-copy="${record.lei}" hidden>copy lei</button>
 <button class="btn" type="button" data-copy-json="record-json" hidden>copy json</button>
@@ -286,8 +183,12 @@ ${webUrl ? html`<a class="btn" href="${webUrl}" rel="noopener">gleif.org</a>` : 
 <span class="copied" role="status" data-copy-status></span>
 </div>
 <dl class="kv">
-${rows(record, context.codes ?? null).map(
-  ([label, field, value]) => html`<dt>${label}</dt><dd data-field="${field}">${value}</dd>
+${recordRows(record).map(
+  (row) => html`<dt>${row.label}</dt><dd data-field="${row.field}">${
+    "items" in row
+      ? row.items.map((item) => html`<div${langAttr(item.lang)}>${item.parts.map(partHtml)}</div>`)
+      : row.parts.map(partHtml)
+  }</dd>
 `,
 )}</dl>
 <script type="application/json" id="record-json">${raw(scriptSafe(JSON.stringify(record)))}</script>
@@ -295,7 +196,16 @@ ${rows(record, context.codes ?? null).map(
 </div>
 </main>`;
 
-  return shell({ title: `${name} · LEI ${record.lei} · whichlei`, head, body, scripts: true });
+  return renderPage({ title, head, body, scripts: true });
+}
+
+/**
+ * The page for a record as GLEIF gave it, with names for its codes and linked entities when
+ * the context has them. For tests and the bench; the Worker builds the document once and
+ * renders from that.
+ */
+export function renderRecordPage(record: LeiRecord, context: RecordPageContext): string {
+  return renderDocumentPage(buildDocument(record, context), context.canonicalOrigin);
 }
 
 /** A short page for an answer that has no record: 404, 503 and the like. */
@@ -313,5 +223,5 @@ export function renderMessagePage(message: {
 <div class="actions"><a class="btn" href="/">search</a></div>
 </div>
 </main>`;
-  return shell({ title: `${message.title} · whichlei`, body });
+  return renderPage({ title: `${message.title} · whichlei`, body });
 }

@@ -11,6 +11,22 @@
 .record .lei {
   user-select: all;
 }
+/* The heading holds the LEI and the legal name: the LEI large, the name on its own line below
+   in the size and weight of the text around it. */
+.record h1.title {
+  font-size: var(--fs);
+  font-weight: 500;
+  letter-spacing: normal;
+}
+.record .title .lei {
+  display: block;
+  font-size: var(--fs-prompt);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.record .title .name {
+  display: block;
+}
 .record .actions {
   display: flex;
   flex-wrap: wrap;
@@ -29,6 +45,45 @@
 .record .src {
   overflow-wrap: anywhere;
 }
+
+/* The about page: the man page of the search page (search.css), set in the same column. */
+.page > .about {
+  border-top: 1px solid var(--rule);
+}
+.doc {
+  padding-block: 16px 24px;
+  max-width: 76ch;
+}
+.doc h2 {
+  font: inherit;
+  font-weight: 700;
+  margin: 18px 0 2px;
+}
+.doc p,
+.doc dl {
+  margin: 0 0 8px 7ch;
+}
+.man-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 2ch;
+  color: var(--dim);
+}
+.man-head span:nth-child(2) {
+  text-align: center;
+}
+.man-head.foot {
+  margin-top: 18px;
+}
+.doc .keys {
+  display: grid;
+  grid-template-columns: 14ch minmax(0, 1fr);
+  margin-left: 7ch;
+  row-gap: 2px;
+}
+.doc .keys dd {
+  margin: 0;
+}
 /* Narrow screens: the label sits above its value, so long labels never clip. */
 @media (max-width: 640px) {
   .record .kv {
@@ -37,5 +92,13 @@
   }
   .record .kv dd {
     margin-bottom: 8px;
+  }
+  .doc p,
+  .doc dl,
+  .doc .keys {
+    margin-left: 2ch;
+  }
+  .man-head span:nth-child(2) {
+    display: none;
   }
 }

@@ -10,6 +10,8 @@ export const DEFAULT_BASE_URL = "https://api.gleif.org/api/v1";
 
 const DEFAULT_LOOKUP_PAGE_SIZE = 10;
 const DEFAULT_ISIN_PAGE_SIZE = 100;
+/** GLEIF's largest page: `fetchNames` asks about no more LEIs than this in one call. */
+const MAX_NAMES = 200;
 
 const baseUrl = (options: GleifOptions) =>
   (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, "");
@@ -127,6 +129,31 @@ async function lookup(
   const { page, pageSize, params } = pageParams(options, DEFAULT_LOOKUP_PAGE_SIZE);
   const document = await get("/lei-records", [[`filter[${filter}]`, value], ...params], options);
   return parseSummaries(document, { page, pageSize });
+}
+
+/**
+ * The legal names of up to 200 LEIs, in one request. An LEI GLEIF does not have is absent from
+ * the map. No LEIs: an empty map and no request. The LEIs are not checked here.
+ */
+export async function fetchNames(
+  leis: readonly string[],
+  options: GleifOptions = {},
+): Promise<Map<string, string>> {
+  const wanted = new Set(leis);
+  const asked = [...wanted].slice(0, MAX_NAMES);
+  if (asked.length === 0) return new Map();
+  const document = await get(
+    "/lei-records",
+    [
+      ["filter[lei]", asked.join(",")],
+      ["page[size]", String(asked.length)],
+    ],
+    options,
+  );
+  const page = parseSummaries(document, { page: 1, pageSize: asked.length });
+  return new Map(
+    page.items.filter((hit) => wanted.has(hit.lei)).map((hit) => [hit.lei, hit.legalName]),
+  );
 }
 
 /** The entities that issue this ISIN. No hits is an empty page, not an error. */

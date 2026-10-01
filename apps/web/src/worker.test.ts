@@ -14,6 +14,31 @@ function unknownLei(): string {
 }
 const UNKNOWN = unknownLei();
 
+// What robots.txt says on the canonical host once indexing is on, word for word.
+const OPEN_ROBOTS = `# whichlei. Every record comes from GLEIF under CC0. For bulk data, use GLEIF's golden copy:
+# https://www.gleif.org/en/lei-data/gleif-golden-copy/download-the-golden-copy/
+
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+# Crawlers that collect training data: the static pages, not the records.
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Applebot-Extended
+User-agent: Bytespider
+User-agent: Meta-ExternalAgent
+User-agent: Amazonbot
+User-agent: cohere-training-data-crawler
+User-agent: Diffbot
+User-agent: omgili
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Disallow: /lei/
+
+Sitemap: https://whichlei.test/sitemap.xml
+`;
+
 it("uses an unknown LEI with valid check digits, and bad ones without", () => {
   expect(isValidLei(UNKNOWN)).toBe(true);
   expect(isValidLei(BAD_DIGITS)).toBe(false);
@@ -86,7 +111,7 @@ describe("an unknown LEI", () => {
     expect(await response.text()).toContain("GLEIF has no record");
     expect(t.cache.puts).toEqual([
       {
-        url: `https://whichlei.test/lei/${UNKNOWN}`,
+        url: `https://whichlei.test/lei/${UNKNOWN}?doc=1`,
         status: 404,
         cacheControl: "public, max-age=3600",
       },
@@ -116,7 +141,7 @@ describe("a record", () => {
     // The golden copy is dated 2026-09-30T08:00Z: it expires 2026-10-01T09:00Z, 23 hours on.
     expect(t.cache.puts).toEqual([
       {
-        url: `https://whichlei.test/lei/${ERICSSON}`,
+        url: `https://whichlei.test/lei/${ERICSSON}?doc=1`,
         status: 200,
         cacheControl: "public, max-age=82800",
       },
@@ -158,7 +183,7 @@ describe("a record", () => {
     expect(t.cache.puts[0]?.cacheControl).toBe("public, max-age=3600");
   });
 
-  it("ignores the query string in the cache key", async () => {
+  it("ignores the visitor's query string in the cache key", async () => {
     const t = harness();
     await t.get(`/lei/${ERICSSON}`);
     const hit = await t.get(`/lei/${ERICSSON}?x=${Math.random()}`);
@@ -166,14 +191,19 @@ describe("a record", () => {
     expect(hit.headers.get("x-cache")).toBe("HIT");
     expect(t.gleif.calls).toHaveLength(1);
     expect(t.cache.puts).toHaveLength(1);
-    expect(t.cache.puts[0]?.url).not.toContain("?");
+    // The key is ours alone: not the page's URL, which the production Worker before this one
+    // kept rendered pages under.
+    expect(t.cache.puts[0]?.url).toBe(`https://whichlei.test/lei/${ERICSSON}?doc=1`);
+    const visitor = await t.get(`/lei/${ERICSSON}?doc=2&x=1`);
+    expect(visitor.headers.get("x-cache")).toBe("HIT");
+    expect(t.cache.puts).toHaveLength(1);
   });
 
   it("shares one cache entry between hosts when a canonical origin is set", async () => {
     const t = harness();
     const env = { CANONICAL_ORIGIN: "https://whichlei.com" };
     await t.get(`/lei/${ERICSSON}`, undefined, env);
-    expect(t.cache.puts[0]?.url).toBe(`https://whichlei.com/lei/${ERICSSON}`);
+    expect(t.cache.puts[0]?.url).toBe(`https://whichlei.com/lei/${ERICSSON}?doc=1`);
   });
 
   it("links the canonical URL and JSON-LD to CANONICAL_ORIGIN, else the request origin", async () => {
@@ -342,16 +372,54 @@ describe("indexing", () => {
     const robots = async (env: Record<string, string>) =>
       (await t.get("/robots.txt", undefined, env)).text();
 
-    expect(await robots(launched)).toBe("User-agent: *\nAllow: /\n");
+    expect(await robots(launched)).toBe(OPEN_ROBOTS);
     for (const value of ["false", "", "1", "TRUE", "yes"]) {
-      expect(await robots({ ...launched, ALLOW_INDEXING: value }), value).toContain("Disallow: /");
+      expect(await robots({ ...launched, ALLOW_INDEXING: value }), value).toBe(
+        "User-agent: *\nDisallow: /\n",
+      );
     }
+  });
+
+  it("names the canonical origin as the sitemap's, and keeps records from training crawlers only", async () => {
+    const t = harness();
+    const text = await (
+      await t.get("/robots.txt", undefined, {
+        ...launched,
+        CANONICAL_ORIGIN: "https://whichlei.test/",
+      })
+    ).text();
+    expect(text).toContain("\nSitemap: https://whichlei.test/sitemap.xml\n");
+    // Search crawlers and agents that fetch a page for a person stay under `*`.
+    for (const agent of [
+      "Googlebot",
+      "Bingbot",
+      "OAI-SearchBot",
+      "ChatGPT-User",
+      "Claude-SearchBot",
+      "Claude-User",
+      "PerplexityBot",
+      "Perplexity-User",
+    ]) {
+      expect(text, agent).not.toContain(agent);
+    }
+    // Google-Extended also covers Gemini's grounding, which `ai-input=yes` wants.
+    expect(text).not.toContain("Google-Extended");
+    for (const agent of ["GPTBot", "ClaudeBot", "CCBot", "Applebot-Extended", "Bytespider"]) {
+      expect(text, agent).toContain(`User-agent: ${agent}\n`);
+    }
+    // The signal is said in both groups: a crawler that matches a named group ignores `*`.
+    expect(text.match(/^Content-Signal: search=yes, ai-input=yes, ai-train=no$/gm)).toHaveLength(2);
+    // One `Disallow` for the whole group of training crawlers.
+    expect(text.match(/^Disallow:.*$/gm)).toEqual(["Disallow: /lei/"]);
   });
 
   it("never allows a host that is not the canonical one, such as workers.dev", async () => {
     const workersDev = harness({ origin: "https://whichlei-site.example.workers.dev" });
     expect(await (await workersDev.get("/robots.txt", undefined, launched)).text()).toBe(
       "User-agent: *\nDisallow: /\n",
+    );
+    expect(await (await workersDev.get("/robots.txt", undefined, launched)).text()).not.toContain(
+      "Sitemap",
     );
     const page = await workersDev.get(`/lei/${ERICSSON}`, undefined, launched);
     expect(page.headers.get("x-robots-tag")).toBe("noindex");
@@ -362,7 +430,9 @@ describe("indexing", () => {
       { ALLOW_INDEXING: "true", CANONICAL_ORIGIN: "" },
     ]) {
       const t = harness();
-      expect(await (await t.get("/robots.txt", undefined, env)).text()).toContain("Disallow: /");
+      expect(await (await t.get("/robots.txt", undefined, env)).text()).toBe(
+        "User-agent: *\nDisallow: /\n",
+      );
       expect((await t.get(`/lei/${ERICSSON}`, undefined, env)).headers.get("x-robots-tag")).toBe(
         "noindex",
       );

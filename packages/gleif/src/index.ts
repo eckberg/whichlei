@@ -1,6 +1,7 @@
 export {
   DEFAULT_BASE_URL,
   fetchIsins,
+  fetchNames,
   fetchRecord,
   findByBic,
   findByIsin,

@@ -20,6 +20,7 @@ be tried on a real URL and a real phone.
 | 9 | Record pages | `/lei/<code>` is rendered by a Worker, cached, readable without JavaScript and indexable. |
 | 10 | Ranking gaps | Acronyms and short queries improve on the evaluation set, with no regressions. |
 | 11 | Launch | Live on whichlei.com with analytics, README and about page. No cookies set, checked in a browser. |
+| 12 | Search engines and agents | Favicon, a static about page, a sitemap of the static pages, `llms.txt`, a robots policy for crawlers; record pages name their parents and come as JSON and Markdown. Tests pass; live on whichlei.com, checked with `curl`. |
 
 ## Hosting
 

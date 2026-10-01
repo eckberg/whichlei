@@ -20,6 +20,10 @@ body {
   font: inherit;
   margin: 0;
 }
+/* The about control is a link (it opens /about without JavaScript) that looks like a button. */
+.top .btn:not(:hover) {
+  text-decoration: none;
+}
 .prompt {
   display: flex;
   align-items: baseline;

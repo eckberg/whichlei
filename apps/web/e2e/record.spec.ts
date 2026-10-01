@@ -2,9 +2,11 @@ import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { parseCodes } from "../src/codes.ts";
 import { renderRecordPage } from "../src/record.ts";
+import { buildDocument } from "../src/record-document.ts";
 import { parsedRecord } from "../src/test-helpers.ts";
 
 const ERICSSON = "549300W9JLPW15XIFM52";
+const BAD_DIGITS = "549300W9JLPW15XIFM51";
 
 // These need no GLEIF: the Worker answers before it would call it.
 test("redirects a lower-case LEI to the canonical URL", async ({ request }) => {
@@ -32,10 +34,59 @@ test("answers 404 for something that is not an LEI", async ({ request }) => {
   expect(response.status()).toBe(404);
 });
 
-test("keeps crawlers out until launch", async ({ request }) => {
+// The same record as JSON and Markdown: `.json` and `.md`, or `Accept` on the page's own URL.
+test("redirects a lower-case LEI to the canonical URL, keeping .json and .md", async ({
+  request,
+}) => {
+  for (const extension of [".json", ".md"]) {
+    const response = await request.get(`/lei/${ERICSSON.toLowerCase()}${extension}`, {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(301);
+    expect(new URL(response.headers().location ?? "").pathname).toBe(
+      `/lei/${ERICSSON}${extension}`,
+    );
+  }
+});
+
+test("answers a bad LEI as JSON, as Markdown, or as HTML, by extension or by Accept", async ({
+  request,
+}) => {
+  const json = await request.get(`/lei/${BAD_DIGITS}.json`);
+  expect(json.status()).toBe(404);
+  expect(json.headers()["content-type"]).toBe("application/json; charset=utf-8");
+  expect(await json.json()).toMatchObject({ error: "Not a valid LEI" });
+  expect(json.headers()["x-robots-tag"]).toBe("noindex");
+  // The canonical URL is on CANONICAL_ORIGIN, not on the host asked.
+  expect(json.headers().link).toMatch(
+    new RegExp(`^<https?://[^/]+/lei/${BAD_DIGITS}>; rel="canonical"$`),
+  );
+
+  const markdown = await request.get(`/lei/${BAD_DIGITS}.md`);
+  expect(markdown.status()).toBe(404);
+  expect(markdown.headers()["content-type"]).toBe("text/markdown; charset=utf-8");
+  expect(await markdown.text()).toMatch(/^# Not a valid LEI\n\n/);
+
+  const accept = (value: string) =>
+    request.get(`/lei/${BAD_DIGITS}`, { headers: { accept: value } });
+  for (const [value, type] of [
+    ["application/json", "application/json; charset=utf-8"],
+    ["text/markdown", "text/markdown; charset=utf-8"],
+    ["text/html", "text/html; charset=utf-8"],
+    ["*/*", "text/html; charset=utf-8"],
+  ] as const) {
+    const response = await accept(value);
+    expect(response.status(), value).toBe(404);
+    expect(response.headers()["content-type"], value).toBe(type);
+    // The page's URL answers in several formats: caches must keep them apart.
+    expect(response.headers().vary, value).toBe("accept");
+  }
+});
+
+test("keeps crawlers out of a host that is not the canonical one", async ({ request }) => {
   const robots = await request.get("/robots.txt");
   expect(robots.status()).toBe(200);
-  expect(await robots.text()).toContain("Disallow: /");
+  expect(await robots.text()).toBe("User-agent: *\nDisallow: /\n");
   const page = await request.get("/lei/549300W9JLPW15XIFM51");
   expect(page.headers()["x-robots-tag"]).toBe("noindex");
 });
@@ -55,16 +106,17 @@ test.describe("record page with names and copy json", () => {
   const codes = parseCodes(
     JSON.parse(readFileSync(new URL("../fixtures/codes.json", import.meta.url), "utf8")),
   );
+  const names = new Map([[ERICSSON, "Telefonaktiebolaget LM Ericsson"]]);
 
-  async function open(page: import("@playwright/test").Page) {
-    const record = await parsedRecord("record-ericsson");
-    await page.route(`**/lei/${ERICSSON}`, async (route) => {
+  async function open(page: import("@playwright/test").Page, fixture = "record-ericsson") {
+    const record = await parsedRecord(fixture);
+    await page.route(`**/lei/${record.lei}`, async (route) => {
       await route.fulfill({
         contentType: "text/html; charset=utf-8",
-        body: renderRecordPage(record, { canonicalOrigin: "http://localhost:8787", codes }),
+        body: renderRecordPage(record, { canonicalOrigin: "http://localhost:8787", codes, names }),
       });
     });
-    await page.goto(`/lei/${ERICSSON}`);
+    await page.goto(`/lei/${record.lei}`);
     return record;
   }
 
@@ -78,7 +130,44 @@ test.describe("record page with names and copy json", () => {
     );
   });
 
-  test("copies the normalised record as JSON", async ({ browser }) => {
+  test("shows a parent by name, linked to its page, with its LEI beside it", async ({ page }) => {
+    await open(page, "record-subsidiary");
+    const parent = page.locator('[data-field="parent"]');
+    await expect(parent).toHaveText(`Telefonaktiebolaget LM Ericsson ${ERICSSON}`);
+    await expect(parent.getByRole("link")).toHaveAttribute("href", `/lei/${ERICSSON}`);
+    await expect(page.locator('[data-field="ultimate-parent"]')).toHaveText(
+      `Telefonaktiebolaget LM Ericsson ${ERICSSON}`,
+    );
+  });
+
+  test("heads the page with the LEI large and the name on its own line below", async ({ page }) => {
+    await open(page);
+    await expect(page.locator("h1")).toHaveText(`${ERICSSON} Telefonaktiebolaget LM Ericsson`);
+    const lei = page.locator("h1 #lei");
+    const name = page.locator("h1 .name");
+    await expect(lei).toHaveText(ERICSSON);
+    await expect(name).toHaveText("Telefonaktiebolaget LM Ericsson");
+    const [leiBox, nameBox] = [await lei.boundingBox(), await name.boundingBox()];
+    // One above the other, the name starting below the LEI's line.
+    expect(nameBox?.y ?? 0).toBeGreaterThanOrEqual((leiBox?.y ?? 0) + (leiBox?.height ?? 0) - 1);
+    const size = (locator: typeof lei) =>
+      locator.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+    expect(await size(lei)).toBeGreaterThan(await size(name));
+    expect(await lei.evaluate((element) => getComputedStyle(element).fontWeight)).toBe("700");
+    expect(await name.evaluate((element) => getComputedStyle(element).fontWeight)).toBe("500");
+  });
+
+  test("links the icons, and not the JSON and Markdown URLs", async ({ page }) => {
+    await open(page);
+    await expect(page.locator('link[rel="icon"]')).toHaveCount(2);
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+      "href",
+      "/apple-touch-icon.png",
+    );
+    await expect(page.locator('link[rel="alternate"]')).toHaveCount(0);
+  });
+
+  test("copies the record document as JSON", async ({ browser }) => {
     const context = await browser.newContext({
       permissions: ["clipboard-read", "clipboard-write"],
     });
@@ -87,9 +176,12 @@ test.describe("record page with names and copy json", () => {
     await page.getByRole("button", { name: "copy json" }).click();
     await expect(page.getByRole("status")).toHaveText("copied json");
     const copied = await page.evaluate("navigator.clipboard.readText()");
-    expect(JSON.parse(copied as string)).toEqual(JSON.parse(JSON.stringify(record)));
-    // Readable: indented, one field to a line.
-    expect(copied).toContain('\n  "lei": "549300W9JLPW15XIFM52"');
+    const doc = buildDocument(record, { canonicalOrigin: "http://localhost:8787", codes, names });
+    expect(JSON.parse(copied as string)).toEqual(JSON.parse(JSON.stringify(doc)));
+    // Readable: indented, one field to a line, the page's URL after the LEI.
+    expect(copied).toContain(
+      `{\n  "lei": "549300W9JLPW15XIFM52",\n  "url": "http://localhost:8787/lei/${ERICSSON}",`,
+    );
     await context.close();
   });
 
@@ -98,7 +190,7 @@ test.describe("record page with names and copy json", () => {
     const page = await context.newPage();
     await open(page);
     await expect(page.getByRole("button", { name: "copy json" })).toBeHidden();
-    await expect(page.locator("h1")).toHaveText(ERICSSON);
+    await expect(page.locator("#lei")).toHaveText(ERICSSON);
     await context.close();
   });
 });
@@ -114,8 +206,8 @@ test.describe("live record", () => {
     const response = await page.goto(`/lei/${ERICSSON}`);
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/Telefonaktiebolaget LM Ericsson · LEI 549300W9JLPW15XIFM52/);
-    await expect(page.locator("h1")).toHaveText(ERICSSON);
-    await expect(page.getByText("Telefonaktiebolaget LM Ericsson").first()).toBeVisible();
+    await expect(page.locator("#lei")).toHaveText(ERICSSON);
+    await expect(page.locator("h1")).toContainText("Telefonaktiebolaget LM Ericsson");
     await expect(page.locator('[data-field="status"]')).toContainText("active");
     await expect(page.locator('[data-field="golden-copy"]')).toHaveText(/^\d{4}-\d{2}-\d{2}$/);
     // The names of the codes come from the published index.
@@ -149,5 +241,37 @@ test.describe("live record", () => {
     const response = await request.get("/lei/549300ZZZZZZZZZZZZ46");
     expect(response.status()).toBe(404);
     expect(await response.text()).toContain("No such LEI");
+  });
+
+  test("answers the record as JSON, by extension and by Accept", async ({ request }) => {
+    for (const response of [
+      await request.get(`/lei/${ERICSSON}.json`),
+      await request.get(`/lei/${ERICSSON}`, { headers: { accept: "application/json" } }),
+    ]) {
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toBe("application/json; charset=utf-8");
+      expect(response.headers()["x-robots-tag"]).toBe("noindex");
+      const doc = await response.json();
+      expect(doc.lei).toBe(ERICSSON);
+      expect(doc.url).toMatch(new RegExp(`/lei/${ERICSSON}$`));
+      expect(doc.legalName.name).toBe("Telefonaktiebolaget LM Ericsson");
+      // Names for the codes come from the published index.
+      expect(doc.legalForm.name).toBe("Aktiebolag");
+      expect(doc.registrationAuthority.name).toBe("Bolagsverket");
+    }
+  });
+
+  test("answers the record as Markdown, by extension and by Accept", async ({ request }) => {
+    for (const response of [
+      await request.get(`/lei/${ERICSSON}.md`),
+      await request.get(`/lei/${ERICSSON}`, { headers: { accept: "text/markdown" } }),
+    ]) {
+      expect(response.status()).toBe(200);
+      expect(response.headers()["content-type"]).toBe("text/markdown; charset=utf-8");
+      expect(response.headers()["x-robots-tag"]).toBe("noindex");
+      const text = await response.text();
+      expect(text).toMatch(new RegExp(`^# Telefonaktiebolaget LM Ericsson\n\nLEI: ${ERICSSON}\n`));
+      expect(text).toContain("- **status:** active");
+    }
   });
 });

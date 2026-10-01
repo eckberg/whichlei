@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Find the LEI of a company, fund or public body while you type. Copy it and leave.">
-<title>whichlei</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2317191e'/%3E%3Cpath d='M4 4.5l4 3.5-4 3.5' fill='none' stroke='%23fbfbfc' stroke-width='1.8'/%3E%3C/svg%3E">
+<meta name="description" content="Find the LEI of a company, fund or public body by name, ISIN, BIC or national register number, while you type. Data from GLEIF, updated daily. No account, no cookies.">
+<title>whichlei · LEI lookup by name, ISIN, BIC or register number</title>
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/red-hat-mono-latin-500.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/styles/app.css">
 <script src="/scripts/stats.js" defer></script>
@@ -16,7 +18,7 @@
 <div class="app">
   <header class="top">
     <h1><a class="mark" href="/" id="home">whichlei</a></h1>
-    <nav><button class="btn" type="button" id="about-btn">about</button></nav>
+    <nav><a class="btn" href="/about" id="about-btn">about</a></nav>
   </header>
   <search class="find">
   <div class="prompt">
@@ -32,7 +34,7 @@
     <div class="list" id="list" role="listbox" aria-label="Results" hidden></div>
     <section class="preview" id="preview" aria-label="Selected record" hidden></section>
     <div id="doc">
-      <noscript><div class="doc"><p class="lead">whichlei needs JavaScript to search. To open a record without it, go to /lei/ followed by the LEI.</p></div></noscript>
+      <noscript><div class="doc"><p class="lead">whichlei needs JavaScript to search. To open a record without it, go to /lei/ followed by the LEI.</p><p><a href="/about">About whichlei</a></p></div></noscript>
     </div>
   </main>
   <footer class="keys-bar">

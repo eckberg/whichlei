@@ -1,5 +1,6 @@
 // Build the site into dist/: the search page, the styles and script it and the record pages
-// (src/worker.ts) link, the fonts, and the headers for static files.
+// (src/worker.ts) link, the fonts, the icons, the about page, the headers for static files, and
+// (once the canonical origin is set) the sitemap, the OpenSearch description and llms.txt.
 //
 //   INDEX_ORIGIN=https://index.example pnpm build        [DIST_DIR=/elsewhere]
 //
@@ -9,7 +10,16 @@ import { copyFileSync, cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } 
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
-import { canonicalOrigin, indexOrigin, pageCsp, searchPage } from "./site.ts";
+import { renderAboutPage } from "../src/about-page.ts";
+import {
+  canonicalOrigin,
+  headersFile,
+  indexOrigin,
+  llmsTxt,
+  openSearch,
+  searchPage,
+  sitemap,
+} from "./site.ts";
 
 const statics = new URL("../static/", import.meta.url);
 // DIST_DIR builds somewhere else, as tools/bench does for its copy of the site.
@@ -70,6 +80,8 @@ write("styles/app.css", `${base}\n${read("search.css")}`);
 write("styles/record.css", `${base}\n${read("record.css")}`);
 copyFileSync(new URL("copy.js", statics), new URL("scripts/copy.js", dist));
 write("index.html", searchPage(read("index.html"), canonical));
+// /about, the same man page the search page shows for `?`, readable without JavaScript.
+write("about.html", renderAboutPage(canonical));
 write(
   "404.html",
   `<!doctype html>
@@ -78,15 +90,19 @@ write(
 </html>
 `,
 );
-write(
-  "_headers",
-  `/*
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: no-referrer
-  Permissions-Policy: interest-cohort=()
-  Content-Security-Policy: ${pageCsp(origin)}
-`,
-);
+write("_headers", headersFile(origin));
+
+// The icons are rendered from favicon.svg by scripts/favicon.ts and committed.
+for (const icon of ["favicon.svg", "favicon.ico", "apple-touch-icon.png", "icon-512.png"]) {
+  copyFileSync(new URL(icon, statics), new URL(icon, dist));
+}
+
+// These name the canonical origin in their links, so there is nothing to write before launch.
+if (canonical !== "") {
+  write("sitemap.xml", sitemap(canonical));
+  write("opensearch.xml", openSearch(canonical));
+  write("llms.txt", llmsTxt(canonical));
+}
 
 const size = (name: string) => readFileSync(new URL(name, dist)).length.toLocaleString("en-US");
 console.log(

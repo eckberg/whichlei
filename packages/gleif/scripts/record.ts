@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import {
   type Fetch,
   fetchIsins,
+  fetchNames,
   fetchRecord,
   findByBic,
   findByIsin,
@@ -42,6 +43,8 @@ const cases: [name: string, run: (options: GleifOptions) => Promise<unknown>][] 
   // Three entities, in three registers.
   ["lookup-register-number", (o) => findByRegisterNumber("HRB 30000", { ...o, pageSize: 3 })],
   ["lookup-no-hits", (o) => findByIsin("ZZ0000108656", o)],
+  // Two LEIs in one request: Ericsson and its managing LOU.
+  ["lookup-names", (o) => fetchNames([ERICSSON, "549300O897ZC5H7CY412"], o)],
 ];
 
 const only = process.argv.slice(2);

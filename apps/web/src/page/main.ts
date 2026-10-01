@@ -6,6 +6,7 @@ import { Lookups } from "../lookups/lookups.ts";
 import { IndexClient } from "../search/client.ts";
 import type { Hit } from "../search/entry.ts";
 import { initialState, Search, type SearchPort, type SearchState } from "../search/search.ts";
+import { isPlainClick, queryFromHash } from "./deeplink.ts";
 import { type KeyContext, keyAction } from "./keys.ts";
 import { ResilientSearch } from "./resilient.ts";
 import { browserCounter } from "./stats.ts";
@@ -326,8 +327,25 @@ export function start(): void {
     }
   }
 
+  /**
+   * A search link, `/#q=text` (deeplink.ts): the text goes into the box as if typed, and the
+   * fragment goes. The text is input, not state: a reload must not search it again.
+   */
+  function openLink() {
+    if (!location.hash.startsWith("#q=")) return;
+    const text = queryFromHash(location.hash);
+    if (text !== null) {
+      q.value = text;
+      setQuery(text);
+    }
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
   function route() {
     view = location.hash === "#about" ? "about" : "search";
+    // After the view is set, so setQuery finds no about page to leave: it would take a
+    // history entry off.
+    openLink();
     render();
     if (view === "search" && !touch) q.focus();
     else if (view === "about") {
@@ -366,6 +384,9 @@ export function start(): void {
     );
     if (!target) return;
     if (target.id === "about-btn") {
+      // A link to /about: a click with a modifier (new tab, new window) follows it.
+      if (!isPlainClick(event)) return;
+      event.preventDefault();
       if (view === "about") back();
       else showAbout();
       return;

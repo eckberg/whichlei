@@ -35,6 +35,146 @@ test("answers unknown paths with 404", async ({ request }) => {
   expect(response.status()).toBe(404);
 });
 
+test("serves the icons, with the favicon's own policy so its inline style applies", async ({
+  request,
+  page,
+}) => {
+  const wanted: [path: string, type: RegExp][] = [
+    ["/favicon.ico", /^image\/(vnd\.microsoft\.icon|x-icon)/],
+    ["/favicon.svg", /^image\/svg\+xml/],
+    ["/apple-touch-icon.png", /^image\/png/],
+    ["/icon-512.png", /^image\/png/],
+  ];
+  for (const [path, type] of wanted) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    expect(response.headers()["content-type"], path).toMatch(type);
+  }
+  // An ICO file starts with a zero, then the type 1.
+  expect([...(await (await request.get("/favicon.ico")).body()).subarray(0, 4)]).toEqual([
+    0, 0, 1, 0,
+  ]);
+  const svg = await request.get("/favicon.svg");
+  // The site-wide policy (style-src 'self') is detached: this one stands alone.
+  expect(svg.headers()["content-security-policy"]).toBe(
+    "default-src 'none'; style-src 'unsafe-inline'",
+  );
+  // Opened as a page, the style applies: without it the tile would be the default black.
+  await page.goto("/favicon.svg");
+  const fill = () => page.locator("rect").evaluate((el) => getComputedStyle(el).fill);
+  expect(await fill()).toBe("rgb(23, 25, 30)");
+  await page.emulateMedia({ colorScheme: "dark" });
+  expect(await fill()).toBe("rgb(228, 228, 225)");
+});
+
+test("serves the sitemap, the search description and llms.txt", async ({ request }) => {
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  expect(sitemap.headers()["content-type"]).toContain("xml");
+  const urls = [...(await sitemap.text()).matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => m[1]);
+  expect(urls).toEqual(["https://whichlei.com/", "https://whichlei.com/about"]);
+
+  const opensearch = await request.get("/opensearch.xml");
+  expect(opensearch.status()).toBe(200);
+  expect(opensearch.headers()["content-type"]).toContain("xml");
+  const description = await opensearch.text();
+  expect(description).toContain("<ShortName>whichlei</ShortName>");
+  expect(description).toContain('template="https://whichlei.com/#q={searchTerms}"');
+
+  const llms = await request.get("/llms.txt");
+  expect(llms.status()).toBe(200);
+  expect(llms.headers()["content-type"]).toMatch(/^text\/plain/);
+  const text = await llms.text();
+  expect(text.startsWith("# whichlei\n")).toBe(true);
+  expect(text).toContain("`https://whichlei.com/lei/<LEI>.json`");
+  expect(text).toContain("`https://whichlei.com/#q=<text>`");
+  expect(text).not.toContain("<origin>");
+});
+
+test("describes the search page for people and for sharing", async ({ request }) => {
+  const page = await (await request.get("/")).text();
+  expect(page).toContain(
+    "<title>whichlei · LEI lookup by name, ISIN, BIC or register number</title>",
+  );
+  for (const tag of [
+    '<link rel="icon" href="/favicon.ico" sizes="32x32">',
+    '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+    '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+    '<link rel="search" type="application/opensearchdescription+xml" title="whichlei" href="/opensearch.xml">',
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="whichlei">',
+    '<meta property="og:url" content="https://whichlei.com/">',
+    '<meta property="og:image" content="https://whichlei.com/icon-512.png">',
+    '<meta name="twitter:card" content="summary">',
+  ]) {
+    expect(page, tag).toContain(tag);
+  }
+  const block = /<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "{}";
+  expect(JSON.parse(block)).toMatchObject({
+    "@type": "WebSite",
+    name: "whichlei",
+    url: "https://whichlei.com/",
+  });
+  expect(page).toContain('<a href="/about">About whichlei</a>');
+});
+
+test("serves /about as a page of its own, with the man page and no script", async ({
+  page,
+  request,
+}) => {
+  const response = await request.get("/about");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("text/html");
+  const text = await response.text();
+  expect(text).toContain('<link rel="canonical" href="https://whichlei.com/about">');
+  expect(text).not.toMatch(/<script[^>]*\ssrc=/);
+
+  const scripts: string[] = [];
+  page.on("request", (asked) => {
+    if (asked.resourceType() === "script" || new URL(asked.url()).pathname.endsWith(".js")) {
+      scripts.push(asked.url());
+    }
+  });
+  await page.goto("/about");
+  await expect(page.getByRole("heading", { name: "NAME" })).toBeVisible();
+  await expect(page.locator("#man")).toContainText("WHICHLEI(1)");
+  await expect(page.locator("#man")).toContainText("PRIVACY");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://whichlei.com/about",
+  );
+  // Back to the search, from the mark and from the nav.
+  for (const link of [
+    page.getByRole("link", { name: "whichlei", exact: true }),
+    page.getByRole("link", { name: "search", exact: true }),
+  ]) {
+    await expect(link).toHaveAttribute("href", "/");
+  }
+  // No script: not the analytics loader, which Fathom's page views would come from.
+  expect(scripts).toEqual([]);
+  expect(await page.evaluate(() => document.scripts.length)).toBe(0);
+});
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`the /about page has no accessibility violations, ${scheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto("/about");
+    await expect(page.locator("#man")).toBeVisible();
+    const { violations } = await new AxeBuilder({ page }).analyze();
+    expect(violations.map((v) => `${v.id}: ${v.nodes.length} nodes`)).toEqual([]);
+  });
+}
+
+test("the about link on the search page points to /about, which is there", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  const href = await page.getByRole("link", { name: "about" }).getAttribute("href");
+  expect(href).toBe("/about");
+  expect((await request.get(href as string)).status()).toBe(200);
+});
+
 // Everything below reads the fixture index, which only a local run serves.
 test.describe("search", () => {
   test.skip(!!process.env.BASE_URL, "needs the fixture index of a local run");
@@ -320,8 +460,8 @@ test.describe("search", () => {
     await expect(page).not.toHaveURL(/#about/);
     await expect(page.locator("#man")).toBeHidden();
     await expect(box(page)).toBeFocused();
-    // The button does the same, and q leaves.
-    await page.getByRole("button", { name: "about" }).click();
+    // The link does the same, and q leaves.
+    await page.getByRole("link", { name: "about" }).click();
     await expect(page.locator("#man")).toBeVisible();
     await page.keyboard.press("q");
     await expect(page.locator("#man")).toBeHidden();
@@ -338,7 +478,7 @@ test.describe("search", () => {
     page,
   }) => {
     await open(page);
-    await page.getByRole("button", { name: "about" }).click();
+    await page.getByRole("link", { name: "about" }).click();
     await expect(page.locator("#man")).toBeVisible();
     // Typing leaves the about page, and its history entry goes with it.
     await page.keyboard.type("e");
@@ -347,6 +487,78 @@ test.describe("search", () => {
     await expect(box(page)).toHaveValue("e");
     await page.goBack();
     expect(page.url()).toBe("about:blank");
+  });
+
+  test("links to /about, and a plain click shows the page's own about view", async ({ page }) => {
+    await open(page);
+    const about = page.getByRole("link", { name: "about" });
+    await expect(about).toHaveAttribute("href", "/about");
+    await about.click();
+    await expect(page).toHaveURL(/#about$/);
+    await expect(page.locator("#man")).toBeVisible();
+  });
+
+  test("follows the about link on a click that opens it elsewhere", async ({ page, context }) => {
+    await open(page);
+    const opened = context.waitForEvent("page");
+    await page.getByRole("link", { name: "about" }).click({ modifiers: ["ControlOrMeta"] });
+    const other = await opened;
+    await other.waitForURL(/\/about$/);
+    // This page stays as it was.
+    await expect(page).not.toHaveURL(/#about/);
+    await expect(page.locator("#man")).toBeHidden();
+  });
+
+  test("opens a search link: the text is searched as if typed, and the fragment goes", async ({
+    page,
+  }) => {
+    await page.goto("/#q=telefonaktiebolaget+lm+ericsson");
+    await expect(box(page)).toHaveValue("telefonaktiebolaget lm ericsson");
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    await expect(box(page)).toBeFocused();
+    expect(new URL(page.url()).hash).toBe("");
+    expect(new URL(page.url()).pathname).toBe("/");
+    // The text was input, not state: a reload does not search it again.
+    await page.reload();
+    await expect(page.locator("#meta")).toContainText("index:");
+    await expect(box(page)).toHaveValue("");
+    await expect(page.locator("#list")).toBeHidden();
+  });
+
+  test("reads a percent-encoded search link", async ({ page }) => {
+    await page.goto("/#q=M%C3%A6rsk");
+    await expect(box(page)).toHaveValue("Mærsk");
+    expect(new URL(page.url()).hash).toBe("");
+  });
+
+  test("searches the text of a search link that a page already open is given", async ({ page }) => {
+    await open(page);
+    await page.keyboard.press("?");
+    await expect(page.locator("#man")).toBeVisible();
+    await page.evaluate(() => {
+      location.hash = "#q=ericsson";
+    });
+    await expect(page.locator("#man")).toBeHidden();
+    await expect(box(page)).toHaveValue("ericsson");
+    await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
+    expect(new URL(page.url()).hash).toBe("");
+  });
+
+  test("ignores a search link with no text or a broken escape, and clears it", async ({ page }) => {
+    for (const hash of ["#q=", "#q=%E0%A4%A", "#q=%20"]) {
+      await page.goto("/");
+      await page.goto(`/${hash}`);
+      await expect(page.locator("#meta")).toContainText("index:");
+      await expect(box(page), hash).toHaveValue("");
+      await expect(page.locator("#list"), hash).toBeHidden();
+      expect(new URL(page.url()).hash, hash).toBe("");
+    }
+  });
+
+  test("leaves the about address alone: #about still opens the about view", async ({ page }) => {
+    await page.goto("/#about");
+    await expect(page.locator("#man")).toBeVisible();
+    expect(new URL(page.url()).hash).toBe("#about");
   });
 
   test("keeps what was typed out of the performance timeline", async ({ page }) => {
