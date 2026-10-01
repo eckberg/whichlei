@@ -46,8 +46,6 @@ jobs:
     timeout-minutes: 120
     env:
       INDEX_ORIGIN: https://whichlei-index.lumenspring.workers.dev
-      INDEX_DIR: ${{ runner.temp }}/index
-      EVAL_JSON: ${{ runner.temp }}/eval.json
       WRANGLER_SEND_METRICS: "false"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -60,6 +58,9 @@ jobs:
 
       - name: Tools
         run: |
+          # The runner context is not available in job-level env, so the paths are set here.
+          echo "INDEX_DIR=$RUNNER_TEMP/index" >> "$GITHUB_ENV"
+          echo "EVAL_JSON=$RUNNER_TEMP/eval.json" >> "$GITHUB_ENV"
           command -v unzip >/dev/null || sudo apt-get install -y unzip
           test -x /usr/bin/time || sudo apt-get install -y time
           # Each later step adds its wall time to timings.txt, for the summary.
