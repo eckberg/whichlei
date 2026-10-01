@@ -20,9 +20,6 @@ import {
 } from "./view.ts";
 
 const FLASH_MS = 2400;
-/** Rows drawn at once; the rest follow in later frames, so one keystroke is not one long task. */
-const FIRST_ROWS = 20;
-const CHUNK_ROWS = 15;
 const RELOADED = "whichlei:reloaded";
 /** How long the results must hold still before a screen reader is told about them. */
 const ANNOUNCE_MS = 600;
@@ -73,13 +70,6 @@ export function start(): void {
   /** What the list and preview were last built from. */
   let shown: { hits: SearchState["hits"]; tokens: SearchState["tokens"] } | null = null;
   let shownDoc = "";
-  /** Rows of the current results not yet drawn, and the frame that will draw the next ones. */
-  let pendingRows: {
-    hits: SearchState["hits"];
-    tokens: SearchState["tokens"];
-    next: number;
-  } | null = null;
-  let rowsFrame = 0;
   /** When the last change of the box happened, for the keystroke-to-results measure. */
   let inputAt = 0;
   /** Entries this page added to the history, so "back" never leaves the page. */
@@ -112,31 +102,7 @@ export function start(): void {
     info.innerHTML = infoLine(state()).html.value;
   }
 
-  /** Draw the rows still waiting, now. */
-  function flushRows() {
-    while (pendingRows) drawNextRows();
-  }
-
-  function drawNextRows() {
-    if (!pendingRows) return;
-    const { hits, tokens, next } = pendingRows;
-    const end = Math.min(next + CHUNK_ROWS, hits.length);
-    list.insertAdjacentHTML("beforeend", rowsHtml(hits, tokens, selected, next, end));
-    pendingRows = end < hits.length ? { hits, tokens, next: end } : null;
-  }
-
-  function scheduleRows() {
-    cancelAnimationFrame(rowsFrame);
-    if (!pendingRows) return;
-    rowsFrame = requestAnimationFrame(() => {
-      drawNextRows();
-      scheduleRows();
-    });
-  }
-
   function setSelected(next: number) {
-    // Moving past the rows drawn so far: draw the rest first, so the row exists.
-    if (next >= list.children.length) flushRows();
     const rows = list.children;
     const before = rows[selected];
     const after = rows[next];
@@ -173,12 +139,7 @@ export function start(): void {
       if (shown?.hits !== s.hits || shown?.tokens !== s.tokens) {
         shown = { hits: s.hits, tokens: s.tokens };
         selected = 0;
-        // New results replace the rows still waiting for the old ones.
-        cancelAnimationFrame(rowsFrame);
-        list.innerHTML = rowsHtml(s.hits, s.tokens, 0, 0, FIRST_ROWS);
-        pendingRows =
-          s.hits.length > FIRST_ROWS ? { hits: s.hits, tokens: s.tokens, next: FIRST_ROWS } : null;
-        scheduleRows();
+        list.innerHTML = rowsHtml(s.hits, s.tokens, 0);
         list.scrollTop = 0;
         preview.innerHTML = previewHtml(hit());
       }
