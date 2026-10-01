@@ -1,7 +1,8 @@
 name: Deploy site
 
 # By hand only: Actions → Deploy site → Run workflow. Deploys apps/web to the
-# whichlei-site Worker on workers.dev, then runs the browser tests against it.
+# whichlei-site Worker on workers.dev, runs the browser tests against it, then deploys
+# apps/redirect (the whichlei-redirect Worker for www.whichlei.com).
 on:
   workflow_dispatch:
 
@@ -46,3 +47,6 @@ jobs:
       - run: pnpm --filter @whichlei/web e2e
         env:
           BASE_URL: ${{ steps.deploy.outputs.url }}
+      - name: Deploy the www redirect
+        working-directory: apps/redirect
+        run: pnpm exec wrangler deploy

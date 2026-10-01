@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SearchCounter, SETTLE_MS } from "./stats.ts";
+import { SETTLE_MS, SearchCounter } from "./stats.ts";
 
 /** A clock, an idle queue and a sender, all by hand. */
 function rig(options: { throws?: boolean } = {}) {
