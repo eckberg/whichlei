@@ -28,6 +28,8 @@ export const REGISTER_DEBOUNCE_MS = 800;
 export const LOOKUP_TIMEOUT_MS = 8000;
 /** The longest wait a Retry-After is believed for, in seconds. */
 const MAX_HOLD_SECONDS = 300;
+/** The wait when a 429 has no readable Retry-After: browsers hide it from another origin. */
+const DEFAULT_HOLD_SECONDS = 60;
 
 /** What a lookup shows per hit: what the result row and the preview need. */
 export interface LookupHit {
@@ -210,7 +212,8 @@ export class Lookups {
       const busy = error instanceof GleifError && error.kind === "rate-limited";
       if (busy) {
         // Browsers hide Retry-After from another origin; when it is there, it is believed.
-        const seconds = Math.min((error as GleifError).retryAfter ?? 0, MAX_HOLD_SECONDS);
+        const asked = (error as GleifError).retryAfter ?? DEFAULT_HOLD_SECONDS;
+        const seconds = Math.min(asked, MAX_HOLD_SECONDS);
         this.#heldUntil = Math.max(this.#heldUntil, this.#now() + seconds * 1000);
       }
       this.#set(reading, { phase: busy ? "busy" : "offline", hits: [], total: 0 });

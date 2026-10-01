@@ -39,11 +39,14 @@ every lookup sends the input to GLEIF (DESIGN.md decision 25): a BIC has spaces 
 all its groups; a register number has at least 5 characters of letters, digits, spaces and
 `. - /`, at least 5 digits, digits at least half of the letters and digits, a run of digits that
 is not a year ("Fund 2021" is a name), and is not 19 or 20 characters in one piece; an input of
-more than 35 characters has no reading. Each reading fires its lookup after 350 ms without a
+more than 35 characters has no reading. An ISIN has no spaces, an LEI only between groups of 4
+(each is otherwise a name: about 1 in 10 names of 12 letters and digits pass an ISIN's check digit).
+A register number of 4 digits ("HRB 8689") is not looked up: that is the cost of keeping names
+with years out, and the user can type the LEI. Each reading fires its lookup after 350 ms without a
 key (800 ms for a register number, which has no check digit, so every prefix is one too), once per
 distinct reading, cached for the page session; a request for a reading no longer in the box is
-aborted, and one that takes over 8 s ends as "could not reach GLEIF". After a 429 with a
-Retry-After, no lookup is sent until it has passed. Hits are rows above the names, tagged `isin`,
+aborted, and one that takes over 8 s ends as "could not reach GLEIF". After a 429, no lookup is sent until its
+Retry-After has passed (60 s when the browser cannot read it). Hits are rows above the names, tagged `isin`,
 `bic` or `reg.no`. An LEI row gains its legal name and status when `fetchRecord` answers, and
 goes ("no such LEI at GLEIF") when GLEIF says not found. A 429 is "GLEIF is busy, try again in a
 minute", anything else "could not reach GLEIF", each with a retry; the names never wait.

@@ -221,6 +221,8 @@ describe("the cache", () => {
     await settle();
     expect(phases(lookups)).toEqual({ isin: "busy" });
     answer = 200;
+    // GLEIF gave no Retry-After: no request goes for the next 60 s.
+    await settle(61_000);
     lookups.input("");
     lookups.input(ISIN);
     await settle();
@@ -323,6 +325,7 @@ describe("failures", () => {
     await settle(REGISTER_DEBOUNCE_MS);
     expect(gleif.calls).toHaveLength(2);
     up = true;
+    await settle(61_000);
     lookups.retry();
     expect(phases(lookups)).toEqual({ bic: "done", "reg.no": "loading" });
     await settle(0);
@@ -423,17 +426,30 @@ describe("Retry-After", () => {
     expect(gleif.calls).toHaveLength(2);
   });
 
-  it("does not believe an absurd wait, and holds nothing without the header", async () => {
+  it("does not believe an absurd wait", async () => {
     const absurd = setup(busy(86_400));
     absurd.lookups.input(ISIN);
     await settle();
-    await settle(301_000);
+    await settle(299_000);
+    absurd.lookups.retry();
+    expect(absurd.gleif.calls).toHaveLength(1);
+    await settle(2000);
     absurd.lookups.retry();
     expect(absurd.gleif.calls).toHaveLength(2);
+  });
 
+  it("holds 60 seconds when a 429 has no readable Retry-After", async () => {
     const none = setup(busy(null));
     none.lookups.input(ISIN);
     await settle();
+    expect(phases(none.lookups)).toEqual({ isin: "busy" });
+    none.lookups.retry();
+    expect(none.gleif.calls).toHaveLength(1);
+    expect(phases(none.lookups)).toEqual({ isin: "busy" });
+    await settle(59_000);
+    none.lookups.retry();
+    expect(none.gleif.calls).toHaveLength(1);
+    await settle(2000);
     none.lookups.retry();
     expect(none.gleif.calls).toHaveLength(2);
   });

@@ -678,6 +678,7 @@ test.describe("search", () => {
       page,
     }) => {
       gleif.mode = "busy";
+      gleif.retryAfter = "1";
       await open(page);
       await box(page).fill("ericsson");
       await expect(info(page)).toContainText("GLEIF is busy, try again in a minute");
@@ -685,7 +686,12 @@ test.describe("search", () => {
       // The names are not blocked.
       await expect(page.locator("#opt-0 .lei")).toHaveText(ERICSSON);
       await expect(info(page)).toContainText("matches");
+      // GLEIF asked for a second: a retry before that sends nothing, one after it asks again.
       gleif.mode = "ok";
+      await info(page).getByRole("button", { name: "retry" }).click();
+      await expect(info(page)).toContainText("GLEIF is busy");
+      expect(gleif.requests).toHaveLength(1);
+      await page.waitForTimeout(1100);
       await info(page).getByRole("button", { name: "retry" }).click();
       await expect(info(page)).not.toContainText("GLEIF is busy");
       await expect(info(page)).toContainText("matches");

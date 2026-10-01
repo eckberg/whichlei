@@ -8,7 +8,8 @@ describe("lookupReadings", () => {
     expect(lookupReadings("549300w9jlpw15xifm52")).toEqual([
       { kind: "lei", code: "549300W9JLPW15XIFM52" },
     ]);
-    expect(kinds("549300W9 JLPW15XI FM52")).toEqual(["lei"]);
+    expect(kinds("5493 00W9 JLPW 15XI FM52")).toEqual(["lei"]);
+    expect(kinds("549300W9 JLPW15XI FM52")).toEqual([]);
   });
 
   it("reads a valid ISIN as an ISIN only: it is also twelve characters with ten digits", () => {
@@ -49,6 +50,8 @@ describe("lookupReadings", () => {
     ["a ticker, a number and a year", "AP7 2021"],
     ["only years", "1999 2021"],
     ["names that become BIC shapes", "Sony Corp"],
+    ["a name that is an ISIN with its check digit once spaces go", "Volvo Car 2020"],
+    ["a name of years that is an ISIN once spaces go", "Fond 1999 2000"],
     ["a name of one BIC-shaped word and a suffix", "Sanofi SA"],
     ["an LEI with its last character missing", "HWUPKR0MPOU8FGXBT39"],
     ["an LEI with a character missing, in groups", "HWUP KR0M POU8 FGXB T39"],

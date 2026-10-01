@@ -51,6 +51,8 @@ export class MockGleif {
   records = new Map<string, Reply>([[KNOWN.lei, ok(fixture("record-ericsson").body)]]);
   /** `busy`: every request gets a 429. `offline`: every request fails. */
   mode: "ok" | "busy" | "offline" = "ok";
+  /** Seconds in the Retry-After of a 429, as a string; empty: the page cannot read one. */
+  retryAfter = "";
   /** Milliseconds to hold every answer back. */
   delayMs = 0;
 
@@ -81,7 +83,15 @@ export class MockGleif {
     if (this.mode === "offline") return route.abort("connectionrefused");
     const cors = { "access-control-allow-origin": "*" };
     if (this.mode === "busy") {
-      return route.fulfill({ status: 429, headers: cors, body: "Too Many Requests" });
+      // Like GLEIF's, a 429 shows its Retry-After to the page only if it is exposed.
+      const headers = this.retryAfter
+        ? {
+            ...cors,
+            "retry-after": this.retryAfter,
+            "access-control-expose-headers": "retry-after",
+          }
+        : cors;
+      return route.fulfill({ status: 429, headers, body: "Too Many Requests" });
     }
     const { status, body, headers } = this.reply(url);
     return route.fulfill({

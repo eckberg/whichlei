@@ -77,19 +77,23 @@ export interface IdentifierReadings {
 // names that become BIC shapes once their spaces are gone.
 const BIC_GROUPED = /^\S{4} \S{2} \S{2}( \S{3})?$/;
 
+// An LEI written in groups of four, as it is printed: five groups, one space between them.
+const LEI_GROUPED = /^\S{4}( \S{4}){4}$/;
+
 /**
- * Every identifier an input could be, normalised: spaces removed, upper case. More than one
- * reading is possible; an input with none is a name or a register number. Spaces are ignored
- * for an LEI and an ISIN, whose check digits keep names out. A BIC has none, so it may have
- * spaces only between its groups (4, 2, 2 and 3 characters, all of them).
+ * Every identifier an input could be, normalised: upper case, spaces removed. More than one
+ * reading is possible; an input with none is a name or a register number. Spaces are allowed
+ * only where the identifier is written with them, so a name does not turn into a code: an LEI
+ * between groups of 4, a BIC between all its groups (4, 2, 2 and 3 characters), an ISIN never.
  */
 export function identifierReadings(input: string): IdentifierReadings {
   // Upper-case a-z only: toUpperCase() would turn "ß" into "SS" and "ı" into "I".
   const code = input.replace(/\s+/g, "").replace(/[a-z]/g, (char) => char.toUpperCase());
-  const readings: IdentifierReadings = {};
-  if (isValidLei(code)) readings.lei = code;
-  if (isValidIsin(code)) readings.isin = code;
   const trimmed = input.trim();
-  if ((!/\s/.test(trimmed) || BIC_GROUPED.test(trimmed)) && isValidBic(code)) readings.bic = code;
+  const spaced = /\s/.test(trimmed);
+  const readings: IdentifierReadings = {};
+  if ((!spaced || LEI_GROUPED.test(trimmed)) && isValidLei(code)) readings.lei = code;
+  if (!spaced && isValidIsin(code)) readings.isin = code;
+  if ((!spaced || BIC_GROUPED.test(trimmed)) && isValidBic(code)) readings.bic = code;
   return readings;
 }
