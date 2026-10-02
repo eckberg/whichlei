@@ -33,7 +33,7 @@ export interface Env {
   ALLOW_INDEXING?: string;
   /**
    * The site's own origin, such as `https://whichlei.com`. Canonical links, JSON-LD and
-   * redirects point at it. Empty until launch: then they use the origin of the request, and
+   * redirects point at it. When empty, they use the origin of the request, and
    * no host is indexable.
    */
   CANONICAL_ORIGIN?: string;

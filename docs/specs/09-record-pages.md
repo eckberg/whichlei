@@ -1,6 +1,6 @@
 # 09 · Record pages
 
-Status: approved
+Status: done
 
 ## Goal
 Every LEI has a page, `/lei/<code>`, that a person can read without JavaScript, a link can
@@ -21,15 +21,15 @@ and date, and copies the LEI.
   (the next publish plus an hour), kept at least 5 minutes and at most 24 hours; 1 hour when
   the record has no golden copy date. A 404 for an hour, a failure never. Browsers may keep
   a page for an hour.
-- Until launch, nothing is indexed: `robots.txt` (served by the Worker) disallows and pages
-  send `X-Robots-Tag: noindex`. Indexing is on only when `ALLOW_INDEXING` is `"true"` and the
-  request came to `CANONICAL_ORIGIN`, so workers.dev is never indexed. Both are variables in
-  `wrangler.jsonc`; `CANONICAL_ORIGIN` is empty until launch. It also sets the origin of
+- Indexing is on only when `ALLOW_INDEXING` is `"true"` and the request came to
+  `CANONICAL_ORIGIN` (whichlei.com), so workers.dev is never indexed: `robots.txt` (served by
+  the Worker) disallows and pages send `X-Robots-Tag: noindex`. Both are variables in
+  `wrangler.jsonc`; with `CANONICAL_ORIGIN` empty nothing is indexed. It also sets the origin of
   canonical links, JSON-LD and redirects.
 
 ## Not in scope
-- Sitemaps: they need the LEI list, and nothing is indexed before launch, so they come
-  with launch (slice 11).
+- Sitemaps: they need the LEI list. Decision 32 in DESIGN.md: none at launch; decide after
+  four weeks.
 - Fetching parent names: one GLEIF request per page. Parents show as linked LEIs.
 
 ## Approach

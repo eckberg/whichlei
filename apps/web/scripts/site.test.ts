@@ -53,7 +53,7 @@ describe("canonicalOrigin", () => {
     expect(canonicalOrigin(text)).toBe("https://whichlei.com");
   });
 
-  it("is empty before launch and refuses a missing variable or a bad one", () => {
+  it("is empty when the setting is empty, and refuses a missing variable or a bad one", () => {
     expect(canonicalOrigin('{ "CANONICAL_ORIGIN": "" }')).toBe("");
     expect(() => canonicalOrigin("{}")).toThrow();
     expect(() => canonicalOrigin('{ "CANONICAL_ORIGIN": "whichlei.com" }')).toThrow();
@@ -74,7 +74,7 @@ describe("searchPage", () => {
     );
   });
 
-  it("adds nothing before launch", () => {
+  it("adds nothing when the origin is empty", () => {
     expect(searchPage(page, "")).toBe(page);
   });
 });

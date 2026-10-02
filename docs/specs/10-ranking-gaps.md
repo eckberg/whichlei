@@ -1,6 +1,6 @@
 # 10 · Ranking gaps
 
-Status: approved
+Status: done
 
 ## Goal
 An acronym finds the entity it stands for ("ibm" → International Business Machines

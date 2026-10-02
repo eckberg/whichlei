@@ -10,8 +10,8 @@ behind it. Keep it in sync with the code.
 
 ## Process
 The agent executes. The owner sets intent and reviews.
-- Work is split into the slices in PLAN.md. Each slice gets a spec in `docs/specs/`,
-  approved before work starts.
+- Work is split into slices. Each slice gets a spec in `docs/specs/`, approved before work
+  starts.
 - Done means evidenced: a number, a passing test, a screenshot. Not an assertion.
 - Measure before deciding. Estimates do not become architecture.
 - A new product decision goes into the DESIGN.md decisions table, with its reason.
@@ -40,6 +40,8 @@ Node version is in `.node-version`; pnpm version is in `package.json`.
 - `pnpm lint`: Biome lint and format check. `pnpm format` applies fixes.
 - `pnpm typecheck`: `tsc` in every package.
 - `pnpm test`: Vitest, all packages.
+- `pnpm e2e`: Playwright against a local site and a fixture index. Needs Chromium:
+  `pnpm --filter @whichlei/web exec playwright install chromium`.
 - `DATA_DIR=../../research/data pnpm --filter @whichlei/core parity`: compare `packages/core`
   with the Python reference at full scale. Needs the data from
   `research/ranking/port/dump_parity.py`. Not in CI.
@@ -47,7 +49,15 @@ Node version is in `.node-version`; pnpm version is in `package.json`.
   measurements (docs/specs/04-index-format.md, "Re-run") and slice 7's `search`
   (docs/specs/07-search.md). Needs `DATA_DIR`. Not in CI.
 
-CI runs install, lint, typecheck and test on every pull request and push to `main`.
+CI runs install, lint, typecheck, test, actionlint and e2e on every pull request and push to
+`main`.
+
+Workflows (`.github/workflows/`):
+- `deploy-site.yml`, by hand: deploys the site and the www redirect, then a live check on
+  whichlei.com.
+- `publish-index.yml`: builds, checks and publishes the index. Nightly at 02:47 UTC and by hand.
+- `rollback-index.yml`, by hand: restores an earlier index build.
+- `build-index.yml`, by hand: builds and checks the index, publishes nothing.
 
 ## Gotchas
 - Unicode NFKD does not fold `æ ø ß ł đ ð þ œ`. Apply an explicit table first, or Nordic,

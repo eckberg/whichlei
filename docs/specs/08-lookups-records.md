@@ -1,6 +1,6 @@
 # 08 · Lookups and records
 
-Status: approved
+Status: done
 
 ## Goal
 An LEI, ISIN, BIC or register number typed into the search resolves live through the GLEIF

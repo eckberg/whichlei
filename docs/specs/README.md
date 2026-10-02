@@ -1,6 +1,6 @@
 # Specs
 
-One spec per slice in PLAN.md, written before the slice starts and approved by the owner.
+One spec per slice, written before the slice starts and approved by the owner.
 Name it `NN-slug.md`. Keep it under a page; if it runs longer, split the slice.
 
 ```markdown

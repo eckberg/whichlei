@@ -17,7 +17,7 @@ function originOf(name: string, value: string | undefined): string {
 export const indexOrigin = (value: string | undefined): string => originOf("INDEX_ORIGIN", value);
 
 /**
- * CANONICAL_ORIGIN as `wrangler.jsonc` sets it, the one place it is set, or "" before launch.
+ * CANONICAL_ORIGIN as `wrangler.jsonc` sets it, the one place it is set, or "" when it is empty.
  * The file is JSONC with comments, so the variable is read by name, as the tests read it.
  */
 export function canonicalOrigin(wranglerJsonc: string): string {
@@ -28,7 +28,7 @@ export function canonicalOrigin(wranglerJsonc: string): string {
 
 /**
  * The search page with its canonical link: the apex, so a preview host's copy points at the
- * page that may be indexed. No link before launch, when there is no apex.
+ * page that may be indexed. No link when the setting is empty, as there is no apex.
  */
 export function searchPage(html: string, canonical: string): string {
   if (canonical === "") return html;

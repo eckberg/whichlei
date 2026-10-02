@@ -37,7 +37,7 @@ and what is counted. No cookie is set, shown in a browser against the live site.
   off. **Fathom** (owner): site firewall "Allowed domains" = `whichlei.com`.
 - **README:** what it is and the live link; data from GLEIF under CC0 with a link to the
   golden copy; not affiliated with GLEIF; how to develop (install, `pnpm dev`, lint,
-  typecheck, test, e2e); links to DESIGN.md, PLAN.md, `research/ranking`; MIT for the code.
+  typecheck, test, e2e); links to DESIGN.md, `research/ranking`; MIT for the code.
 - **About page.** It already says: data from GLEIF, CC0, rebuilt daily, records live from
   the API, the golden copy date and entity count, no account, no cookies, analytics never
   see what you type. Add: analytics are Fathom, which gets the page (`/` or `/lei/`, never

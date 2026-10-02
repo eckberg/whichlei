@@ -38,8 +38,7 @@ exec playwright install chromium`) and serves its own small index.
 ## More
 
 - [DESIGN.md](DESIGN.md): what this is, and the decisions behind it.
-- [PLAN.md](PLAN.md): the build plan, in slices, with a spec for each in
-  [docs/specs](docs/specs/).
+- [docs/specs](docs/specs/): one spec per build slice.
 - [research/ranking](research/ranking/): how results are ranked, and the evidence.
 
 Licence: [MIT](LICENSE).

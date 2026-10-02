@@ -52,8 +52,8 @@ These are deliberate. Requests that cross them are closed with a link here.
 | 14 | **Enter copies the LEI** of the selected result; → opens the full record | Copying the LEI is the job. Opening the record is the exception. |
 | 15 | The index is its **own Worker with static assets**, published by a scheduled workflow after automatic checks. The site deploys by hand | Static requests are free and unlimited. A publish swaps every file at once and can be rolled back, and new data never redeploys the site. |
 | 16 | **TypeScript throughout**. Python stays in `research/` as the reference | One language for the indexer and the browser means one tokeniser. The reference checks it. |
-| 17 | **Record pages are not indexed until launch, and workers.dev never is.** `robots.txt` disallows everything and `/lei/*` answers `X-Robots-Tag: noindex`, unless `ALLOW_INDEXING` is `"true"` and the request came to the host in `CANONICAL_ORIGIN` (both in `apps/web/wrangler.jsonc`, the second empty until launch) | The pre-launch workers.dev host must not end up in search results, even after launch: it would duplicate the canonical site. Each crawled page is also a Worker request against the free plan's 100,000 a day (slice 9 spec). Indexing starts at launch, on the real domain, once the draw is measured. |
-| 18 | A **record page is cached until 25 hours after its golden copy** (at least 5 minutes, at most 24 h; 1 h if undated), an unknown LEI for 1 h, a failure never. Browsers keep a page for 1 h | GLEIF publishes about daily, but the hour is not measured, so a record expires at the next publish plus an hour of slack and is never older than a day. A failure cached would outlast the fault. |
+| 17 | **Record pages are indexed on whichlei.com only. workers.dev is never indexed.** On workers.dev `robots.txt` disallows everything and `/lei/*` answers `X-Robots-Tag: noindex`. Indexing is on only when `ALLOW_INDEXING` is `"true"` and the request came to the host in `CANONICAL_ORIGIN` (both in `apps/web/wrangler.jsonc`) | The workers.dev host would duplicate the canonical site in search results. Each crawled page is also a Worker request against the free plan's 100,000 a day (slice 9 spec), so indexing is limited to the one real domain, where the draw can be watched (see Open). |
+| 18 | A **record page is cached until 25 hours after its golden copy** (at least 5 minutes, at most 24 h; 1 h if undated), an unknown LEI for 1 h, a failure never. Browsers keep a page for 1 h. The Cache API works on the custom domain | GLEIF publishes about daily, but the hour is not measured, so a record expires at the next publish plus an hour of slack and is never older than a day. A failure cached would outlast the fault. Measured on whichlei.com: the same LEI twice gives `x-cache: MISS`, then `HIT`. |
 | 19 | The indexer measures **registration age to the golden copy's publish date** | The research used a fixed 2026.74 for the 2026-09-16 copy, a day count nobody maintains. The date gives 2026.708: the same 6,438 files and objective .6515 against .6516. `--now-year 2026.74` reproduces the research. |
 | 20 | **Names are kept whole**, also when one holds " \| " | The research joined an entity's names with " \| " in an intermediate file and split them again, cutting 64 names in two and shifting their types. Reading the golden copy directly has no such step, so a name stays what GLEIF has. 60 entries differ from the research index for this reason. |
 | 21 | Entities of **equal prominence go in LEI order**, in a file and at the 1,500 cap | A rule a reader can check with nothing but the file. The golden copy is in LEI order, so it is also the research's order by entity number. |
@@ -96,6 +96,17 @@ Two paths, split by latency.
 
 4× CPU slowdown is Lighthouse's stand-in for a mid-range phone, not a real one. The targets
 search has to meet are in [docs/specs/04-index-format.md](docs/specs/04-index-format.md).
+
+### Hosting
+
+- **Site:** a Worker with static assets, `whichlei-site`, on whichlei.com (decision 27),
+  deployed by hand from GitHub Actions.
+- **Index:** a second Worker holding only static assets, on index.whichlei.com (decision 29),
+  published by the scheduled data workflow (decision 15).
+- **Build:** GitHub-hosted runners (4 vCPU, 16 GB RAM, 14 GB disk, 6 h per job), free for
+  public repositories. A publish keeps the build it replaces (decision 22). GitHub stops
+  scheduled workflows after 60 days without repository activity, so each run re-enables its
+  own workflow ([slice 6](docs/specs/06-data-publishing.md)).
 
 Two packings were rejected. Uniform 3-character buckets give 25,867 files, over the
 20,000-file limit. Closing files by word count rather than entries left 65% of LEIs in no
@@ -150,11 +161,29 @@ GLEIF publishes under CC0, daily: the level 1 golden copy (entities, ~500 MB zip
 level 2 golden copy (relationships, ~23 MB zipped), and ISIN and BIC mapping files. The
 build uses nothing else. Wikidata is used only to build the evaluation set.
 
-## 6. Open questions
+## 6. Open
 
-- **Record pages** are rendered by a Worker on request, as 3.4M pages exceed the static-asset
-  file limit: see decisions 17 and 18. Open: the crawler draw on the free plan's 100,000
-  Worker requests a day, known only after launch ([slice 9](docs/specs/09-record-pages.md)).
+Not settled, each with where it is tracked.
+
+- **Real-phone search speed.** The numbers above are at 4× CPU slowdown on a desktop, not a
+  phone. Check on a real phone. [Slice 7](docs/specs/07-search.md), "Not measurable here".
+- **Slice 7's 4× targets are only partly met.** Bytes per query are met. The slowest keystroke
+  was 85 / 141 / 298 ms (median / p90 / max) against ≤ 50 / 80 / 250 ms, with 36% of queries
+  over 100 ms, before search moved to a Web Worker (decision 24); scoring cost did not change,
+  it left the main thread. Render frames over 50 ms remain for 91% of queries (every key) and
+  60% (last key). [Slice 7](docs/specs/07-search.md), "Done when".
+- **Crawler draw on the free plan's 100,000 Worker requests a day.** Record pages are
+  rendered by a Worker, as 3.4M pages exceed the static-asset file limit (decisions 17, 18).
+  Watch Workers analytics. [Slice 9](docs/specs/09-record-pages.md).
+- **Sitemap.** None at launch. Decide after four weeks of crawling by links alone
+  (decision 32).
+- **Fathom dashboard check.** The owner confirms the dashboard shows `/`, `/lei/` and a
+  `search` event. [Slice 11](docs/specs/11-launch.md).
+- **60-day schedule keep-alive.** Each publish run re-enables its workflow. Whether that
+  resets GitHub's clock is watched at the first 60-day mark.
+  [Slice 6](docs/specs/06-data-publishing.md).
+- **Names with no Latin-script form** (~92k) are not searchable by those names. Deferred past
+  launch; not scheduled. Listed under known gaps in §4.
 - **Corporate hierarchy** in the first release, or later?
 - **Funds** rank slightly above other entities (fitted weight +0.32, no measurable effect).
   Keep, or set to zero?
