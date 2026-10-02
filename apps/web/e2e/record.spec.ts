@@ -32,7 +32,7 @@ test("answers 404 for something that is not an LEI", async ({ request }) => {
   expect(response.status()).toBe(404);
 });
 
-test("keeps crawlers out until launch", async ({ request }) => {
+test("keeps crawlers off a host that is not canonical", async ({ request }) => {
   const robots = await request.get("/robots.txt");
   expect(robots.status()).toBe(200);
   expect(await robots.text()).toContain("Disallow: /");

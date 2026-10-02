@@ -97,6 +97,10 @@ Two paths, split by latency.
 4× CPU slowdown is Lighthouse's stand-in for a mid-range phone, not a real one. The targets
 search has to meet are in [docs/specs/04-index-format.md](docs/specs/04-index-format.md).
 
+Two packings were rejected. Uniform 3-character buckets give 25,867 files, over the
+20,000-file limit. Closing files by word count rather than entries left 65% of LEIs in no
+file at all.
+
 ### Hosting
 
 - **Site:** a Worker with static assets, `whichlei-site`, on whichlei.com (decision 27),
@@ -107,10 +111,6 @@ search has to meet are in [docs/specs/04-index-format.md](docs/specs/04-index-fo
   public repositories. A publish keeps the build it replaces (decision 22). GitHub stops
   scheduled workflows after 60 days without repository activity, so each run re-enables its
   own workflow ([slice 6](docs/specs/06-data-publishing.md)).
-
-Two packings were rejected. Uniform 3-character buckets give 25,867 files, over the
-20,000-file limit. Closing files by word count rather than entries left 65% of LEIs in no
-file at all.
 
 ## 4. Ranking
 
@@ -177,8 +177,8 @@ Not settled, each with where it is tracked.
   Watch Workers analytics. [Slice 9](docs/specs/09-record-pages.md).
 - **Sitemap.** None at launch. Decide after four weeks of crawling by links alone
   (decision 32).
-- **Fathom dashboard check.** The owner confirms the dashboard shows `/`, `/lei/` and a
-  `search` event. [Slice 11](docs/specs/11-launch.md).
+- **Owner settings, unconfirmed.** A Fathom dashboard showing `/`, `/lei/` and a `search`
+  event; minimum TLS 1.2; Bot Fight Mode off; Fathom allowed domains. [Slice 11](docs/specs/11-launch.md).
 - **60-day schedule keep-alive.** Each publish run re-enables its workflow. Whether that
   resets GitHub's clock is watched at the first 60-day mark.
   [Slice 6](docs/specs/06-data-publishing.md).

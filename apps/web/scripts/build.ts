@@ -20,7 +20,7 @@ const read = (name: string) => readFileSync(new URL(name, statics), "utf8");
 const write = (name: string, content: string) => writeFileSync(new URL(name, dist), content);
 
 const origin = indexOrigin(process.env.INDEX_ORIGIN);
-// The site's own origin, from the one place that sets it. Empty when the setting is empty.
+// The site's own origin, from the one place that sets it.
 const canonical = canonicalOrigin(
   readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"),
 );

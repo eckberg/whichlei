@@ -8,8 +8,7 @@
   // workers.dev stays: previews and the e2e target read the index from it.
   "workers_dev": true,
   // The index host (DESIGN.md decision 29). A custom domain creates its own DNS record and
-  // certificate. The publish run attaches it; the site reads it once every INDEX_ORIGIN is
-  // switched (docs/specs/11-launch.md).
+  // certificate. The publish run attaches it; the site reads it (INDEX_ORIGIN).
   "routes": [{ "pattern": "index.whichlei.com", "custom_domain": true }],
   "send_metrics": false,
   "assets": {

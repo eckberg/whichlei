@@ -64,7 +64,7 @@ export function trimReferrer(referrer: string): string {
 /** Returns true when it set Fathom up, false when it did nothing. */
 export function loadStats(env: LoaderEnv, canonicalOrigin: string): boolean {
   try {
-    // An empty origin (before launch) matches nothing.
+    // An empty origin matches nothing.
     if (canonicalOrigin === "" || env.location.origin !== canonicalOrigin) return false;
     const { pathname, search, hash } = env.location;
     if (search !== "") env.history.replaceState(env.history.state, "", pathname + hash);
