@@ -26,6 +26,8 @@ export default defineConfig({
   use: {
     baseURL,
     browserName: "chromium",
+    // A failed test leaves its trace in test-results/, which CI and the deploy workflow keep.
+    trace: "retain-on-failure",
     launchOptions: { args: blockFathom, ...(executablePath ? { executablePath } : {}) },
   },
   ...(deployed

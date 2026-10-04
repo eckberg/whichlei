@@ -53,7 +53,17 @@ export interface Env {
    * unreachable: a record page shows the codes.
    */
   INDEX_ORIGIN?: string;
+  /**
+   * The Worker version serving this request (`version_metadata` in wrangler.jsonc). Its id is
+   * sent as `x-whichlei-version`, so the deploy workflow can wait until a host serves the
+   * version it deployed (scripts/wait-for-version.ts).
+   */
+  CF_VERSION_METADATA?: { id: string };
 }
+
+// Names the Worker version on every answer of the Worker's own. Not exported: the runtime takes
+// every named export of this module for an entrypoint.
+const VERSION_HEADER = "x-whichlei-version";
 
 export interface Deps {
   /** The Cache API's default cache. Null where there is none: nothing is cached then. */
@@ -143,6 +153,7 @@ function respond(request: Request, env: Env, answer: Answer): Response {
   if (extension !== "" || !indexable(env, url)) headers.set("x-robots-tag", "noindex");
   // `/lei/<code>` answers in the format `Accept` asks for, whatever the status.
   if (url.pathname.startsWith("/lei/") && extension === "") headers.set("vary", "accept");
+  if (env.CF_VERSION_METADATA?.id) headers.set(VERSION_HEADER, env.CF_VERSION_METADATA.id);
   return new Response(request.method === "HEAD" ? null : answer.body, {
     status: answer.status,
     headers,

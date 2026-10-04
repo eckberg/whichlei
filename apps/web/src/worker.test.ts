@@ -517,6 +517,32 @@ describe("security headers", () => {
   });
 });
 
+describe("the version header", () => {
+  const VERSION = { CF_VERSION_METADATA: { id: "6ea33c29-2bd4-465a-93c1-26cce04efee6" } };
+
+  it("names the Worker version on every answer of its own", async () => {
+    const t = harness();
+    const failing = harness({ gleif: fakeGleif(() => new Response("boom", { status: 500 })) });
+    const responses = [
+      await t.get("/robots.txt", { method: "HEAD" }, VERSION),
+      await t.get(`/lei/${ERICSSON}`, undefined, VERSION),
+      await t.get(`/lei/${ERICSSON}.json`, undefined, VERSION), // from the cache
+      await t.get(`/lei/${BAD_DIGITS}`, undefined, VERSION),
+      await t.get(`/lei/${ERICSSON.toLowerCase()}`, undefined, VERSION),
+      await t.get("/robots.txt", { method: "POST" }, VERSION),
+      await failing.get(`/lei/${ERICSSON}`, undefined, VERSION),
+    ];
+    for (const response of responses) {
+      expect(response.headers.get("x-whichlei-version")).toBe(VERSION.CF_VERSION_METADATA.id);
+    }
+  });
+
+  it("is left out without the binding", async () => {
+    const t = harness();
+    expect((await t.get("/robots.txt")).headers.get("x-whichlei-version")).toBeNull();
+  });
+});
+
 describe("other paths", () => {
   it("leave everything but /lei/* and /robots.txt to the static assets", async () => {
     const t = harness();
