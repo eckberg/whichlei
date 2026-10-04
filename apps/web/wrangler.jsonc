@@ -20,6 +20,10 @@
     "not_found_handling": "404-page",
     "run_worker_first": ["/lei/*", "/robots.txt"]
   },
+  // The Worker names its version in `x-whichlei-version`. Right after a deploy, a host can
+  // answer with the previous version for a while: the deploy workflow waits until it names
+  // the new one before testing it.
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "vars": {
     // Crawlers are let in only when ALLOW_INDEXING is "true" AND the request came to
     // CANONICAL_ORIGIN, so the workers.dev host is never indexed (DESIGN.md decision 17).

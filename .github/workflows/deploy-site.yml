@@ -3,7 +3,8 @@ name: Deploy site
 # By hand only: Actions → Deploy site → Run workflow. Deploys apps/web to the
 # whichlei-site Worker (workers.dev and whichlei.com), runs the browser tests against the
 # workers.dev host, deploys apps/redirect (the whichlei-redirect Worker for www.whichlei.com),
-# then runs the live check against whichlei.com.
+# then runs the live check against whichlei.com. Each test run waits until its host serves
+# the version just deployed. The traces of failed tests are kept as the run's artifact.
 on:
   workflow_dispatch:
 
@@ -45,9 +46,20 @@ jobs:
         run: |
           pnpm exec wrangler deploy | tee deploy.log
           url=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          version=$(grep -oE 'Current Version ID: [0-9a-f-]+' deploy.log | head -1 | cut -d' ' -f4)
           test -n "$url"
+          test -n "$version"
           echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - run: pnpm --filter @whichlei/web exec playwright install --with-deps chromium
+      # Right after a deploy a host can still serve the previous version (apps/web/scripts/
+      # wait-for-version.ts). The tests start when the new one answers.
+      - name: Wait for workers.dev to serve this version
+        timeout-minutes: 4
+        run: pnpm --filter @whichlei/web wait-for-version "$BASE_URL" "$VERSION"
+        env:
+          BASE_URL: ${{ steps.deploy.outputs.url }}
+          VERSION: ${{ steps.deploy.outputs.version }}
       - run: pnpm --filter @whichlei/web e2e
         env:
           BASE_URL: ${{ steps.deploy.outputs.url }}
@@ -70,6 +82,11 @@ jobs:
           done
           echo "::error::https://whichlei.com/robots.txt did not say 'Allow: /' within 5 minutes"
           exit 1
+      - name: Wait for whichlei.com to serve this version
+        timeout-minutes: 4
+        run: pnpm --filter @whichlei/web wait-for-version https://whichlei.com "$VERSION"
+        env:
+          VERSION: ${{ steps.deploy.outputs.version }}
       # The live check (docs/specs/11-launch.md): a browser on the apex, Fathom let in but
       # answered by the check itself, so nothing is counted. It fails, and cannot hang: the
       # step and the test both have a limit.
@@ -78,3 +95,11 @@ jobs:
         run: pnpm --filter @whichlei/web e2e live
         env:
           LIVE_URL: https://whichlei.com
+      # The traces of failed tests (playwright.config.ts). Open one with
+      # `pnpm --filter @whichlei/web exec playwright show-trace <trace.zip>`.
+      - if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: e2e-results-${{ github.run_attempt }}
+          path: apps/web/test-results/
+          retention-days: 14

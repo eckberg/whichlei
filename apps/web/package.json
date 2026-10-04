@@ -9,7 +9,8 @@
     "deploy": "wrangler deploy",
     "e2e": "playwright test",
     "favicon": "node scripts/favicon.ts",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "wait-for-version": "node scripts/wait-for-version.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "catalog:",
