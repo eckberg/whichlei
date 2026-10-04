@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { escapeHtml } from "./html.ts";
-import { renderMessagePage, renderRecordPage, statusOf } from "./record.ts";
+import { escapeHtml, html } from "./html.ts";
+import {
+  renderDocumentPage,
+  renderMessagePage,
+  renderPage,
+  renderRecordPage,
+  socialTags,
+  statusOf,
+} from "./record.ts";
+import { buildDocument } from "./record-document.ts";
 import { leiOf, parsedRecord, recordFixtures } from "./test-helpers.ts";
 
 const context = { canonicalOrigin: "https://whichlei.test" };
@@ -30,10 +38,11 @@ describe("every recorded fixture", () => {
         escapeHtml(`${record.legalName.name} · LEI ${record.lei} · whichlei`),
       );
       expect(record.lei).toBe(leiOf(name));
-      expect(page).toContain(`<h1 class="lei" id="lei">${record.lei}</h1>`);
+      // One heading holds the LEI and the name, so the name is part of what a crawler reads.
+      expect(page).toContain(`<h1 class="title"><span class="lei" id="lei">${record.lei}</span>\n`);
       expect(page).toMatch(
         new RegExp(
-          `<div class="name"[^>]*>${escapeHtml(record.legalName.name).replace(/[$()*+.?[\\\]^{|}]/g, "\\$&")}</div>`,
+          `<span class="name"[^>]*>${escapeHtml(record.legalName.name).replace(/[$()*+.?[\\\]^{|}]/g, "\\$&")}</span></h1>`,
         ),
       );
       expect(text(field(page, "status"))).toContain(STATUS[name] ?? "active");
@@ -66,6 +75,128 @@ describe("every recorded fixture", () => {
     expect(data["@id"]).toBe(`https://whichlei.test/lei/${record.lei}`);
     expect(data).not.toHaveProperty("url");
     expect(json).not.toContain("<");
+  });
+});
+
+describe("head", () => {
+  const meta = (page: string, attribute: string, key: string) =>
+    new RegExp(`<meta ${attribute}="${key}" content="([^"]*)">`).exec(page)?.[1];
+
+  it.each(recordFixtures)("%s has icons and social tags", async (name) => {
+    const record = await parsedRecord(name);
+    const page = renderRecordPage(record, context);
+    const url = `https://whichlei.test/lei/${record.lei}`;
+    expect(page).toContain('<link rel="icon" href="/favicon.ico" sizes="32x32">');
+    expect(page).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml">');
+    expect(page).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png">');
+    // The JSON and Markdown URLs are not linked: they would invite crawlers to fetch three
+    // URLs per record.
+    expect(page).not.toContain('rel="alternate"');
+    expect(meta(page, "property", "og:type")).toBe("website");
+    expect(meta(page, "property", "og:site_name")).toBe("whichlei");
+    expect(meta(page, "property", "og:title")).toBe(title(page));
+    expect(meta(page, "property", "og:description")).toBe(meta(page, "name", "description"));
+    expect(meta(page, "property", "og:url")).toBe(url);
+    expect(meta(page, "property", "og:image")).toBe("https://whichlei.test/icon-512.png");
+    expect(meta(page, "name", "twitter:card")).toBe("summary");
+  });
+
+  it("escapes what GLEIF sent in the social tags", async () => {
+    const record = await parsedRecord("record-ericsson");
+    record.legalName.name = '"><script>x</script>';
+    const page = renderRecordPage(record, context);
+    expect(page).not.toContain("<script>x");
+    expect(meta(page, "property", "og:title")).toContain("&quot;&gt;&lt;script&gt;");
+    expect(meta(page, "property", "og:description")).toContain("&quot;&gt;&lt;script&gt;");
+  });
+
+  it("gives the icons to the message pages too, and no social tags", () => {
+    const page = renderMessagePage({ title: "t", heading: "h", detail: "d" });
+    expect(page).toContain('<link rel="icon" href="/favicon.ico" sizes="32x32">');
+    expect(page).toContain('<link rel="icon" href="/favicon.svg" type="image/svg+xml">');
+    expect(page).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png">');
+    expect(page).not.toContain("og:");
+  });
+
+  it("leaves the URL and the image out of the social tags when there is no origin", () => {
+    const tags = socialTags({ title: "T", description: "D", origin: "", url: null }).value;
+    expect(tags).toContain('<meta property="og:title" content="T">');
+    expect(tags).toContain('<meta name="twitter:card" content="summary">');
+    expect(tags).not.toContain("og:url");
+    expect(tags).not.toContain("og:image");
+  });
+
+  it("is a shell that takes any body, with scripts only when asked", () => {
+    const page = renderPage({ title: "T", body: html`<main>x</main>` });
+    expect(page).toContain("<title>T</title>");
+    expect(page).toContain("<main>x</main>");
+    expect(page).not.toContain("<script");
+    expect(renderPage({ title: "T", body: html``, scripts: true })).toContain("copy.js");
+  });
+});
+
+describe("JSON-LD links and identifiers", () => {
+  const ld = (page: string) =>
+    JSON.parse(/<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "");
+  const PARENT = "549300W9JLPW15XIFM52";
+
+  it("names a reported parent by its LEI, and by its name when it is known", async () => {
+    const record = await parsedRecord("record-subsidiary");
+    expect(ld(renderRecordPage(record, context)).parentOrganization).toEqual({
+      "@type": "Organization",
+      "@id": `https://whichlei.test/lei/${PARENT}`,
+      leiCode: PARENT,
+    });
+    const named = renderRecordPage(record, {
+      ...context,
+      names: new Map([[PARENT, "Telefonaktiebolaget LM Ericsson"]]),
+    });
+    expect(ld(named).parentOrganization).toEqual({
+      "@type": "Organization",
+      "@id": `https://whichlei.test/lei/${PARENT}`,
+      leiCode: PARENT,
+      name: "Telefonaktiebolaget LM Ericsson",
+    });
+  });
+
+  it("has no parent organization when none is reported", async () => {
+    for (const name of ["record-ericsson", "record-branch"]) {
+      const data = ld(renderRecordPage(await parsedRecord(name), context));
+      expect(data, name).not.toHaveProperty("parentOrganization");
+    }
+  });
+
+  it("lists each BIC, and the register number under the register's id", async () => {
+    const data = ld(renderRecordPage(await parsedRecord("record-ericsson"), context));
+    expect(data.identifier).toEqual([
+      { "@type": "PropertyValue", propertyID: "BIC", value: "TEERSESSXXX" },
+      { "@type": "PropertyValue", propertyID: "RA000544", value: "556016-0680" },
+    ]);
+  });
+
+  it("lists only what the record has", async () => {
+    const subsidiary = ld(renderRecordPage(await parsedRecord("record-subsidiary"), context));
+    expect(subsidiary.identifier).toEqual([
+      { "@type": "PropertyValue", propertyID: "RA000602", value: "4437638" },
+    ]);
+    // A register number without the register's id is not an identifier anyone can use.
+    const record = await parsedRecord("record-ericsson");
+    record.bics = [];
+    record.registrationAuthority = { id: null, other: "Some register" };
+    expect(ld(renderRecordPage(record, context))).not.toHaveProperty("identifier");
+  });
+
+  it("keeps a hostile name, BIC and parent from closing the script", async () => {
+    const record = await parsedRecord("record-subsidiary");
+    record.bics = ["</script><b>&"];
+    const page = renderRecordPage(record, {
+      ...context,
+      names: new Map([[PARENT, "</script><i>&"]]),
+    });
+    const json = /<script type="application\/ld\+json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
+    expect(json).not.toMatch(/[<>&]/);
+    expect(JSON.parse(json).parentOrganization.name).toBe("</script><i>&");
+    expect(JSON.parse(json).identifier[0].value).toBe("</script><b>&");
   });
 });
 
@@ -136,7 +267,7 @@ describe("fields", () => {
 
   it("marks up a foreign name and the alternative-language name", async () => {
     const page = renderRecordPage(await parsedRecord("record-toyota"), context);
-    expect(page).toContain('<div class="name" lang="ja">トヨタ自動車株式会社</div>');
+    expect(page).toContain('<span class="name" lang="ja">トヨタ自動車株式会社</span></h1>');
     expect(field(page, "other-names")).toContain("Toyota Motor Corporation");
     expect(field(page, "other-names")).toContain("alternative language");
   });
@@ -154,6 +285,73 @@ describe("fields", () => {
     expect(statusOf(lapsed)).toEqual({ label: "lapsed", tone: "lapsed" });
     const retired = await parsedRecord("record-retired");
     expect(statusOf(retired)).toEqual({ label: "inactive", tone: "retired" });
+  });
+});
+
+describe("names of linked entities", () => {
+  const PARENT = "549300W9JLPW15XIFM52";
+  const names = new Map([[PARENT, "Telefonaktiebolaget LM Ericsson"]]);
+
+  it("shows a parent by name, with its LEI beside it", async () => {
+    const page = renderRecordPage(await parsedRecord("record-subsidiary"), { ...context, names });
+    const expected = `<a href="/lei/${PARENT}">Telefonaktiebolaget LM Ericsson</a> <span class="none">${PARENT}</span>`;
+    expect(field(page, "parent")).toBe(expected);
+    expect(field(page, "ultimate-parent")).toBe(expected);
+  });
+
+  it("shows the LEI as the link when the name is not known", async () => {
+    const record = await parsedRecord("record-subsidiary");
+    for (const given of [undefined, null, new Map(), new Map([["OTHER", "Other AB"]])]) {
+      const page = renderRecordPage(record, { ...context, names: given });
+      expect(field(page, "parent"), String(given)).toBe(`<a href="/lei/${PARENT}">${PARENT}</a>`);
+    }
+  });
+
+  it("names a successor that GLEIF gave only an LEI for", async () => {
+    const record = await parsedRecord("record-retired", (body) => {
+      const entity = (
+        body as { data: { attributes: { entity: { successorEntities: unknown[] } } } }
+      ).data.attributes.entity;
+      entity.successorEntities = [{ lei: PARENT, name: null }];
+      return body;
+    });
+    const bare = renderRecordPage(record, context);
+    expect(field(bare, "successors")).toBe(`<div><a href="/lei/${PARENT}">${PARENT}</a></div>`);
+    const named = renderRecordPage(record, { ...context, names });
+    expect(field(named, "successors")).toBe(
+      `<div><a href="/lei/${PARENT}">Telefonaktiebolaget LM Ericsson</a> <span class="none">${PARENT}</span></div>`,
+    );
+  });
+
+  it("keeps GLEIF's own name for a successor", async () => {
+    const record = await parsedRecord("record-retired", (body) => {
+      const entity = (
+        body as { data: { attributes: { entity: { successorEntities: unknown[] } } } }
+      ).data.attributes.entity;
+      entity.successorEntities = [{ lei: PARENT, name: "Ericsson, as GLEIF has it" }];
+      return body;
+    });
+    const page = renderRecordPage(record, { ...context, names });
+    expect(field(page, "successors")).toContain(">Ericsson, as GLEIF has it</a>");
+    expect(field(page, "successors")).not.toContain("Telefonaktiebolaget");
+  });
+
+  it("leaves the managing LOU as its LEI: it is not looked up", async () => {
+    const lou = "549300O897ZC5H7CY412";
+    const page = renderRecordPage(await parsedRecord("record-ericsson"), {
+      ...context,
+      names: new Map([[lou, "Nordic Legal Entity Identifier AB"]]),
+    });
+    expect(field(page, "managing-lou")).toBe(`<a href="/lei/${lou}">${lou}</a>`);
+  });
+
+  it("escapes a name", async () => {
+    const page = renderRecordPage(await parsedRecord("record-subsidiary"), {
+      ...context,
+      names: new Map([[PARENT, '<img src=x onerror=alert(1)>"']]),
+    });
+    expect(page).not.toContain("<img");
+    expect(field(page, "parent")).toContain("&lt;img src=x onerror=alert(1)&gt;&quot;</a>");
   });
 });
 
@@ -205,17 +403,113 @@ describe("names for codes", () => {
   });
 });
 
-describe("copy json", () => {
+describe("the record document", () => {
   const block = (page: string) =>
     /<script type="application\/json" id="record-json">(.*?)<\/script>/s.exec(page)?.[1] ?? "";
+  const codes = { elf: { XJHM: "Aktiebolag" }, ra: { RA000544: "Bolagsverket" } };
+  const PARENT = "549300W9JLPW15XIFM52";
 
-  it.each(recordFixtures)("%s carries its normalised record, and a button for it", async (name) => {
+  it("is the record, with the page's URL after the LEI", async () => {
+    const record = await parsedRecord("record-ericsson");
+    const doc = buildDocument(record, context);
+    expect(Object.keys(doc).slice(0, 3)).toEqual(["lei", "url", "legalName"]);
+    expect(doc.url).toBe(`https://whichlei.test/lei/${record.lei}`);
+    // Nothing else is added when there are no names.
+    const { url, ...rest } = JSON.parse(JSON.stringify(doc));
+    expect(url).toBe(doc.url);
+    expect(rest).toEqual(JSON.parse(JSON.stringify(record)));
+    expect(Object.keys(rest)).toEqual(Object.keys(record));
+  });
+
+  it("adds the names of the legal form and the register, and of the parents", async () => {
+    const record = await parsedRecord("record-subsidiary");
+    const doc = buildDocument(record, {
+      ...context,
+      codes: {
+        elf: { XTIQ: "Corporation" },
+        ra: { RA000602: "Delaware Division of Corporations" },
+      },
+      names: new Map([[PARENT, "Telefonaktiebolaget LM Ericsson"]]),
+    });
+    expect(doc.legalForm).toEqual({ code: "XTIQ", other: null, name: "Corporation" });
+    expect(doc.registrationAuthority).toEqual({
+      id: "RA000602",
+      other: null,
+      name: "Delaware Division of Corporations",
+    });
+    const named = { kind: "reported", lei: PARENT, name: "Telefonaktiebolaget LM Ericsson" };
+    expect(doc.directParent).toEqual(named);
+    expect(doc.ultimateParent).toEqual(named);
+    // The record itself is not changed.
+    expect(record.directParent).toEqual({ kind: "reported", lei: PARENT });
+    expect(record.legalForm).not.toHaveProperty("name");
+  });
+
+  it("gives no name to what has none: unknown codes, exceptions, a form GLEIF describes itself", async () => {
+    const ericsson = buildDocument(await parsedRecord("record-ericsson"), {
+      ...context,
+      codes: { elf: {}, ra: {} },
+      names: new Map([[PARENT, "x"]]),
+    });
+    expect(ericsson.legalForm).not.toHaveProperty("name");
+    expect(ericsson.registrationAuthority).not.toHaveProperty("name");
+    expect(ericsson.directParent).toEqual({
+      kind: "exception",
+      reason: "NO_KNOWN_PERSON",
+      reference: null,
+    });
+    const fund = buildDocument(await parsedRecord("record-fund"), {
+      ...context,
+      codes: { elf: { 8888: "OTHER" }, ra: {} },
+    });
+    expect(fund.legalForm).toEqual({ code: "8888", other: "FUND" });
+  });
+
+  it("does not take a name from the codes' prototype", async () => {
+    const record = await parsedRecord("record-ericsson");
+    record.legalForm = { code: "constructor", other: null };
+    record.registrationAuthority = { id: "toString", other: null };
+    const doc = buildDocument(record, { ...context, codes });
+    expect(doc.legalForm).toEqual({ code: "constructor", other: null });
+    expect(doc.registrationAuthority).toEqual({ id: "toString", other: null });
+  });
+
+  it("fills a successor's name when GLEIF left it out, and keeps one it gave", async () => {
+    const record = await parsedRecord("record-retired");
+    record.successors = [
+      { lei: PARENT, name: null },
+      { lei: "549300O897ZC5H7CY412", name: "Given" },
+      { lei: null, name: "No LEI" },
+    ];
+    const doc = buildDocument(record, {
+      ...context,
+      names: new Map([
+        [PARENT, "Looked up"],
+        ["549300O897ZC5H7CY412", "Looked up too"],
+      ]),
+    });
+    expect(doc.successors.map((successor) => successor.name)).toEqual([
+      "Looked up",
+      "Given",
+      "No LEI",
+    ]);
+  });
+
+  it.each(recordFixtures)("%s is embedded for copy json, with a button for it", async (name) => {
     const record = await parsedRecord(name);
-    const page = renderRecordPage(record, context);
-    expect(JSON.parse(block(page))).toEqual(JSON.parse(JSON.stringify(record)));
+    const doc = buildDocument(record, { ...context, codes });
+    const page = renderDocumentPage(doc, "https://whichlei.test");
+    expect(JSON.parse(block(page))).toEqual(JSON.parse(JSON.stringify(doc)));
     expect(page).toContain(
       '<button class="btn" type="button" data-copy-json="record-json" hidden>copy json</button>',
     );
+  });
+
+  it("is what a page makes from a record: the same page either way", async () => {
+    const record = await parsedRecord("record-ericsson");
+    expect(
+      renderDocumentPage(buildDocument(record, { ...context, codes }), context.canonicalOrigin),
+    ).toBe(renderRecordPage(record, { ...context, codes }));
   });
 
   it("keeps a name from closing the data block", async () => {

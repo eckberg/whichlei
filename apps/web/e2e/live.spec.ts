@@ -144,7 +144,7 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
   );
   await page.getByRole("link", { name: "open record" }).click();
   await expect(page).toHaveURL(new RegExp(`/lei/${ERICSSON_LEI}$`));
-  await expect(page.locator("h1")).toHaveText(ERICSSON_LEI);
+  await expect(page.locator("#lei")).toHaveText(ERICSSON_LEI);
   // Not degraded: a page built without the index's code names has a shorter max-age and shows
   // only codes. The apex's Worker reads the index host over the public internet; if that fails
   // the page still renders, which only these two checks would show.
@@ -161,7 +161,7 @@ test("the live site: no cookies, no CSP violations, Fathom sees pages and one se
   await expect(page.locator("#meta")).toContainText("index:");
   await noCookie("the search page after back", page);
   await expect.poll(() => views("/").length, { message: "page view after back" }).toBe(searchLoads);
-  await page.getByRole("button", { name: "about" }).click();
+  await page.getByRole("link", { name: "about" }).click();
   await expect(page.locator("#man")).toContainText("PRIVACY");
   await noCookie("the about page", page);
   await leaving(page);

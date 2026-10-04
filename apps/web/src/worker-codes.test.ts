@@ -50,7 +50,7 @@ describe("a record page with the names of its codes", () => {
   it("keeps the record page in the cache for as long as without names", async () => {
     const t = harness({ gleif: world().gleif });
     await t.get(`/lei/${ERICSSON}`, undefined, env);
-    const page = t.cache.puts.find((put) => put.url.endsWith(`/lei/${ERICSSON}`));
+    const page = t.cache.puts.find((put) => put.url.endsWith(`/lei/${ERICSSON}?doc=1`));
     expect(page?.cacheControl).toBe("public, max-age=82800");
   });
 

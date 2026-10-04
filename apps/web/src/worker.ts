@@ -1,15 +1,25 @@
 // The site Worker. It answers `/lei/*` and `/robots.txt` only (`run_worker_first` in
 // wrangler.jsonc); every other path is a static asset and costs nothing.
 //
-// /lei/<code>: redirect to the canonical form, reject bad check digits without calling GLEIF,
-// then serve from the Cache API or fetch the record live and render it. See DESIGN.md
-// decisions 2, 17 and 18.
+// /lei/<code>, /lei/<code>.json and /lei/<code>.md: redirect to the canonical form, reject bad
+// check digits without calling GLEIF, then serve from the Cache API or fetch the record live.
+// What is cached is the record document (record-document.ts); the page, the JSON and the
+// Markdown are rendered from it on each request. See DESIGN.md decisions 2, 17 and 18.
 
 import { isValidLei } from "@whichlei/core";
-import { type Fetch, fetchRecord, GleifError } from "@whichlei/gleif";
+import { type Fetch, fetchNames, fetchRecord, GleifError } from "@whichlei/gleif";
 import { type Codes, createCodesReader } from "./codes.ts";
-import { renderMessagePage, renderRecordPage } from "./record.ts";
-import { type CacheOutcome, cacheTtl, DEGRADED_TTL } from "./ttl.ts";
+import { renderMarkdown, renderMarkdownMessage } from "./markdown.ts";
+import { type Format, pickFormat } from "./negotiate.ts";
+import { renderDocumentPage, renderMessagePage } from "./record.ts";
+import {
+  buildDocument,
+  leisToName,
+  parseDocument,
+  type RecordDocument,
+} from "./record-document.ts";
+import { robotsText } from "./robots.ts";
+import { cacheTtl, DEGRADED_TTL } from "./ttl.ts";
 
 // The parts of the Workers runtime used here. Declared locally so no extra types package is
 // needed, and so tests can fake them.
@@ -55,12 +65,22 @@ export interface Deps {
   gleifTimeoutMs: number;
   /** How long to wait for the index host (index.json, then codes.json). Defaults to 2000. */
   indexTimeoutMs?: number;
+  /** How long to wait for the names of linked entities, after the record. Defaults to 3000. */
+  namesTimeoutMs?: number;
 }
 
 const BROWSER_MAX_AGE = 3600;
 const REDIRECT_MAX_AGE = 86400;
 const DEFAULT_RETRY_AFTER = 60;
 const GLEIF_TIMEOUT_MS = 8000;
+const NAMES_TIMEOUT_MS = 3000;
+// At most this many linked entities are named; the rest show their LEI.
+const MAX_NAMES = 50;
+
+// The cache key of a record document. Never a public URL: the production Worker before this one
+// kept rendered HTML under `<origin>/lei/<LEI>`, and that must never be read as a document.
+// Change the number when the document's shape changes, so older entries are not read.
+const DOCUMENT_KEY = "doc=1";
 
 // The site itself: styles, fonts and the copy button script are static files. A record page
 // fetches nothing but Fathom's script, its page-view image and its beacon (decision 23); the
@@ -81,16 +101,35 @@ const CSP = [
 interface Answer {
   status: number;
   body: string;
+  /** What the body is. Defaults to HTML. */
+  format?: Format;
+  /** Defaults to the format's own type. */
   contentType?: string;
   /** Cache-Control for the browser. */
   cacheControl: string;
   headers?: Record<string, string>;
 }
 
+const CONTENT_TYPES: Record<Format, string> = {
+  html: "text/html; charset=utf-8",
+  json: "application/json; charset=utf-8",
+  markdown: "text/markdown; charset=utf-8",
+};
+
+/** `/lei/<code>.json` and `/lei/<code>.md`: the path without its extension, and the extension. */
+function splitExtension(pathname: string): { path: string; extension: "" | ".json" | ".md" } {
+  const match = /^(.*[^/])(\.json|\.md)(\/?)$/.exec(pathname);
+  if (match === null) return { path: pathname, extension: "" };
+  return { path: `${match[1]}${match[3]}`, extension: match[2] as ".json" | ".md" };
+}
+
+const EXTENSION_FORMATS = { ".json": "json", ".md": "markdown" } as const;
+
 function respond(request: Request, env: Env, answer: Answer): Response {
   const url = new URL(request.url);
+  const format = answer.format ?? "html";
   const headers = new Headers({
-    "content-type": answer.contentType ?? "text/html; charset=utf-8",
+    "content-type": answer.contentType ?? CONTENT_TYPES[format],
     "cache-control": answer.cacheControl,
     "x-content-type-options": "nosniff",
     "referrer-policy": "no-referrer",
@@ -98,7 +137,12 @@ function respond(request: Request, env: Env, answer: Answer): Response {
     "content-security-policy": CSP,
     ...answer.headers,
   });
-  if (!indexable(env, url)) headers.set("x-robots-tag", "noindex");
+  const { extension } = splitExtension(url.pathname);
+  // `/lei/<code>.json` and `.md` repeat the page and are never indexed. `/lei/<code>` is the
+  // canonical URL whatever format it answers in, so it follows the setting like the page.
+  if (extension !== "" || !indexable(env, url)) headers.set("x-robots-tag", "noindex");
+  // `/lei/<code>` answers in the format `Accept` asks for, whatever the status.
+  if (url.pathname.startsWith("/lei/") && extension === "") headers.set("vary", "accept");
   return new Response(request.method === "HEAD" ? null : answer.body, {
     status: answer.status,
     headers,
@@ -107,21 +151,29 @@ function respond(request: Request, env: Env, answer: Answer): Response {
 
 const publicFor = (seconds: number) => `public, max-age=${seconds}`;
 
-function message(status: number, title: string, heading: string, detail: string, extra = {}) {
-  return {
-    status,
-    body: renderMessagePage({ title, heading, detail }),
-    cacheControl: publicFor(BROWSER_MAX_AGE),
-    ...extra,
-  };
+/** An answer that is not a record. `heading` and `detail` are the site's own text. */
+function message(
+  format: Format,
+  status: number,
+  heading: string,
+  detail: string,
+  extra: Partial<Answer> = {},
+): Answer {
+  const body =
+    format === "json"
+      ? `${JSON.stringify({ error: heading, detail })}\n`
+      : format === "markdown"
+        ? renderMarkdownMessage(heading, detail)
+        : renderMessagePage({ title: heading, heading, detail });
+  return { status, format, body, cacheControl: publicFor(BROWSER_MAX_AGE), ...extra };
 }
 
 /** The answer for a GLEIF failure. Never cached, by us or the browser. */
-function unavailable(retryAfter: number | null): Answer {
+function unavailable(format: Format, retryAfter: number | null): Answer {
   const seconds = Math.max(1, retryAfter ?? DEFAULT_RETRY_AFTER);
   return message(
+    format,
     503,
-    "Try again shortly",
     "Try again shortly",
     "GLEIF did not answer, or asked us to slow down. The record is not lost: reload in a minute.",
     { cacheControl: "no-store", headers: { "retry-after": String(seconds) } },
@@ -154,7 +206,7 @@ const indexable = (env: Env, url: URL): boolean => {
 
 const asciiUpper = (text: string) => text.replace(/[a-z]/g, (c) => c.toUpperCase());
 
-/** What a request path says about the LEI it asks for. */
+/** What a request path (without its extension) says about the LEI it asks for. */
 function readLeiPath(pathname: string): { lei: string; canonical: boolean } | null {
   let segment = pathname.slice("/lei/".length);
   const trailingSlash = segment.endsWith("/");
@@ -170,19 +222,39 @@ function readLeiPath(pathname: string): { lei: string; canonical: boolean } | nu
   return { lei, canonical: segment === lei && !trailingSlash };
 }
 
-/** Fetch and render a record. Anything but a record or an unknown LEI is a failure. */
+/** What a lookup found. Cached, except a failure. */
+type Looked =
+  | {
+      kind: "found";
+      doc: RecordDocument;
+      /** Names that should have been there were not: do not keep it long. */
+      degraded: boolean;
+    }
+  | { kind: "not-found" }
+  | { kind: "failure"; retryAfter: number | null };
+
+/** The names of linked entities, or null when GLEIF did not give them in time. */
+async function readNames(leis: string[], deps: Deps): Promise<Map<string, string> | null> {
+  if (leis.length === 0) return new Map();
+  try {
+    return await fetchNames(leis, {
+      fetch: deps.fetch,
+      signal: AbortSignal.timeout(deps.namesTimeoutMs ?? NAMES_TIMEOUT_MS),
+    });
+  } catch (error) {
+    console.warn(`names: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
+/** Fetch a record and make its document. Anything but a record or an unknown LEI is a failure. */
 async function lookup(
   lei: string,
   origin: string,
   deps: Deps,
   codes: () => Promise<Codes | null>,
   expectCodes: boolean,
-): Promise<{
-  answer: Answer;
-  outcome: CacheOutcome;
-  goldenCopyDate: string | null;
-  degraded: boolean;
-}> {
+): Promise<Looked> {
   try {
     const record = await fetchRecord(lei, {
       fetch: deps.fetch,
@@ -191,44 +263,71 @@ async function lookup(
     // A record for another LEI is an answer we cannot trust: never show or cache it.
     if (record.lei !== lei)
       throw new GleifError("failed", `GLEIF answered ${record.lei} for ${lei}`);
-    // Only for a record that is going to be shown: an unknown LEI costs the index host nothing.
-    // It never rejects: a page without names is still a page.
-    const names = await codes();
-    // Names that should have been there and were not: no browser keeps the page for an hour.
-    const degraded = expectCodes && names === null;
-    const answer = {
-      status: 200,
-      body: renderRecordPage(record, { canonicalOrigin: origin, codes: names }),
-      cacheControl: publicFor(degraded ? DEGRADED_TTL : BROWSER_MAX_AGE),
-    };
-    return {
-      answer,
-      outcome: "found",
-      goldenCopyDate: record.source.goldenCopyDate,
-      // And do not keep it in the cache for a day either.
-      degraded,
-    };
+    // Only for a record that is going to be shown: an unknown LEI costs the index host and
+    // GLEIF nothing more. Neither ever rejects: a page without names is still a page.
+    const [codeNames, linkedNames] = await Promise.all([
+      codes(),
+      readNames(leisToName(record, MAX_NAMES), deps),
+    ]);
+    // Names that should have been there and were not: no browser keeps the page for an hour,
+    // and the cache does not keep it for a day.
+    const degraded = (expectCodes && codeNames === null) || linkedNames === null;
+    const doc = buildDocument(record, {
+      canonicalOrigin: origin,
+      codes: codeNames,
+      names: linkedNames,
+    });
+    return { kind: "found", doc, degraded };
   } catch (error) {
-    if (error instanceof GleifError && error.kind === "not-found") {
-      const answer = message(
-        404,
-        "No such LEI",
-        "No such LEI",
-        `GLEIF has no record for ${lei}. The code is well formed, but no entity has it.`,
-      );
-      return { answer, outcome: "not-found", goldenCopyDate: null, degraded: false };
-    }
-    const retryAfter = error instanceof GleifError ? error.retryAfter : null;
-    return {
-      answer: unavailable(retryAfter),
-      outcome: "failure",
-      goldenCopyDate: null,
-      degraded: false,
-    };
+    if (error instanceof GleifError && error.kind === "not-found") return { kind: "not-found" };
+    return { kind: "failure", retryAfter: error instanceof GleifError ? error.retryAfter : null };
   }
 }
 
-async function fromCache(cache: CacheLike | null, key: Request): Promise<Answer | null> {
+function render(format: Format, doc: RecordDocument, origin: string): string {
+  switch (format) {
+    case "html":
+      return renderDocumentPage(doc, origin);
+    case "json":
+      return `${JSON.stringify(doc, null, 2)}\n`;
+    case "markdown":
+      return renderMarkdown(doc, origin);
+  }
+}
+
+/** The answer in the format asked for. `browserMaxAge` is how long a browser may keep it. */
+function answerFor(
+  format: Format,
+  looked: Looked,
+  lei: string,
+  origin: string,
+  browserMaxAge: number,
+): Answer {
+  switch (looked.kind) {
+    case "found":
+      return {
+        status: 200,
+        format,
+        body: render(format, looked.doc, origin),
+        cacheControl: publicFor(browserMaxAge),
+      };
+    case "not-found":
+      return message(
+        format,
+        404,
+        "No such LEI",
+        `GLEIF has no record for ${lei}. The code is well formed, but no entity has it.`,
+        { cacheControl: publicFor(browserMaxAge) },
+      );
+    case "failure":
+      return unavailable(format, looked.retryAfter);
+  }
+}
+
+async function fromCache(
+  cache: CacheLike | null,
+  key: Request,
+): Promise<{ looked: Looked; browserMaxAge: number } | null> {
   if (cache === null) return null;
   try {
     const hit = await cache.match(key);
@@ -236,14 +335,14 @@ async function fromCache(cache: CacheLike | null, key: Request): Promise<Answer 
     // A browser never keeps a page longer than the cache does: a page stored for 5 minutes
     // (names missing) is kept by browsers for 5 minutes too.
     const stored = Number(/max-age=(\d+)/.exec(hit.headers.get("cache-control") ?? "")?.[1]);
-    return {
-      status: hit.status,
-      body: await hit.text(),
-      cacheControl: publicFor(
-        Number.isFinite(stored) ? Math.min(BROWSER_MAX_AGE, stored) : BROWSER_MAX_AGE,
-      ),
-      headers: { "x-cache": "HIT" },
-    };
+    const browserMaxAge = Number.isFinite(stored)
+      ? Math.min(BROWSER_MAX_AGE, stored)
+      : BROWSER_MAX_AGE;
+    if (hit.status === 404) return { looked: { kind: "not-found" }, browserMaxAge };
+    if (hit.status !== 200) return null;
+    const doc = parseDocument(await hit.text());
+    // Not a document: treated as a miss, and replaced.
+    return doc === null ? null : { looked: { kind: "found", doc, degraded: false }, browserMaxAge };
   } catch {
     return null;
   }
@@ -252,20 +351,25 @@ async function fromCache(cache: CacheLike | null, key: Request): Promise<Answer 
 function toCache(
   cache: CacheLike | null,
   key: Request,
-  answer: Answer,
-  outcome: CacheOutcome,
-  goldenCopyDate: string | null,
-  degraded: boolean,
+  looked: Looked,
   deps: Deps,
   ctx: ExecutionContext,
 ) {
-  const full = cacheTtl(outcome, deps.now(), goldenCopyDate);
-  const ttl = degraded ? Math.min(full, DEGRADED_TTL) : full;
-  if (cache === null || ttl === 0) return;
-  const stored = new Response(answer.body, {
-    status: answer.status,
-    headers: { "content-type": "text/html; charset=utf-8", "cache-control": publicFor(ttl) },
-  });
+  if (cache === null || looked.kind === "failure") return;
+  const full = cacheTtl(
+    looked.kind,
+    deps.now(),
+    looked.kind === "found" ? looked.doc.source.goldenCopyDate : null,
+  );
+  const ttl = looked.kind === "found" && looked.degraded ? Math.min(full, DEGRADED_TTL) : full;
+  if (ttl === 0) return;
+  const stored =
+    looked.kind === "found"
+      ? new Response(JSON.stringify(looked.doc), {
+          status: 200,
+          headers: { "content-type": "application/json", "cache-control": publicFor(ttl) },
+        })
+      : new Response(null, { status: 404, headers: { "cache-control": publicFor(ttl) } });
   ctx.waitUntil(cache.put(key, stored).catch(() => {}));
 }
 
@@ -277,65 +381,88 @@ async function serveLei(
   readCodes: (origin: string | undefined) => Promise<Codes | null>,
 ) {
   const url = new URL(request.url);
-  const asked = readLeiPath(url.pathname);
+  const { path, extension } = splitExtension(url.pathname);
+  const format =
+    extension === "" ? pickFormat(request.headers.get("accept")) : EXTENSION_FORMATS[extension];
+  const asked = readLeiPath(path);
   const origin = canonicalOrigin(env, url);
-  if (asked === null) {
-    return respond(
+  // The JSON and the Markdown point at the page they repeat.
+  const reply = (answer: Answer) =>
+    respond(
       request,
       env,
+      format === "html" || asked === null
+        ? answer
+        : {
+            ...answer,
+            headers: { ...answer.headers, link: `<${origin}/lei/${asked.lei}>; rel="canonical"` },
+          },
+    );
+  if (asked === null) {
+    return reply(
       message(
+        format,
         404,
-        "Not an LEI",
         "Not an LEI",
         "An LEI has 20 characters: letters and digits, the last two digits. Check what you typed.",
       ),
     );
   }
   if (!asked.canonical) {
-    return respond(request, env, {
+    return reply({
       status: 301,
+      format,
       body: "",
       contentType: "text/plain; charset=utf-8",
       cacheControl: publicFor(REDIRECT_MAX_AGE),
-      headers: { location: `${origin}/lei/${asked.lei}` },
+      headers: { location: `${origin}/lei/${asked.lei}${extension}` },
     });
   }
   if (!isValidLei(asked.lei)) {
-    return respond(
-      request,
-      env,
+    return reply(
       message(
+        format,
         404,
-        "Not a valid LEI",
         "Not a valid LEI",
         `${asked.lei} is not an LEI: its check digits do not match (ISO 7064 mod 97-10). Check what you typed.`,
       ),
     );
   }
 
-  // The key is the canonical URL: the query string, which a crawler can vary at will, is
-  // not part of it.
-  const key = new Request(`${origin}/lei/${asked.lei}`);
+  // The key is not the public URL: a document is not a page, and the query string, which a
+  // crawler can vary at will, is not part of it.
+  const key = new Request(`${origin}/lei/${asked.lei}?${DOCUMENT_KEY}`);
   const cache = deps.cache();
   const cached = await fromCache(cache, key);
-  if (cached !== null) return respond(request, env, cached);
+  if (cached !== null) {
+    const answer = answerFor(format, cached.looked, asked.lei, origin, cached.browserMaxAge);
+    return reply({ ...answer, headers: { ...answer.headers, "x-cache": "HIT" } });
+  }
 
-  const { answer, outcome, goldenCopyDate, degraded } = await lookup(
+  const looked = await lookup(
     asked.lei,
     origin,
     deps,
     () => readCodes(env.INDEX_ORIGIN),
     (env.INDEX_ORIGIN ?? "").trim() !== "",
   );
-  toCache(cache, key, answer, outcome, goldenCopyDate, degraded, deps, ctx);
-  return respond(request, env, { ...answer, headers: { ...answer.headers, "x-cache": "MISS" } });
+  toCache(cache, key, looked, deps, ctx);
+  const degraded = looked.kind === "found" && looked.degraded;
+  const answer = answerFor(
+    format,
+    looked,
+    asked.lei,
+    origin,
+    degraded ? DEGRADED_TTL : BROWSER_MAX_AGE,
+  );
+  return reply({ ...answer, headers: { ...answer.headers, "x-cache": "MISS" } });
 }
 
 function serveRobots(request: Request, env: Env): Response {
-  const allowed = indexable(env, new URL(request.url));
+  const url = new URL(request.url);
   return respond(request, env, {
     status: 200,
-    body: `User-agent: *\n${allowed ? "Allow: /" : "Disallow: /"}\n`,
+    body: robotsText(indexable(env, url), canonicalOrigin(env, url)),
     contentType: "text/plain; charset=utf-8",
     cacheControl: publicFor(BROWSER_MAX_AGE),
   });

@@ -47,9 +47,13 @@ export interface FakeGleif {
   calls: string[];
 }
 
+/** A request for the names of several LEIs (`fetchNames`), not for one record. */
+export const isNamesRequest = (url: string): boolean =>
+  new URL(url).searchParams.has("filter[lei]");
+
 /**
- * GLEIF, answering each LEI from its fixture. `override` answers instead, for failures and
- * edited bodies.
+ * GLEIF, answering each LEI from its fixture, and a list of LEIs with the legal names of the
+ * ones the fixtures have. `override` answers instead, for failures and edited bodies.
  */
 export function fakeGleif(
   override?: (url: string, init?: RequestInit) => Response | Promise<Response>,
@@ -67,6 +71,17 @@ export function fakeGleif(
     fetch: async (url, init) => {
       calls.push(url);
       if (override) return override(url, init);
+      if (isNamesRequest(url)) {
+        const asked = (new URL(url).searchParams.get("filter[lei]") ?? "").split(",");
+        const data = asked.flatMap((lei) => {
+          const known = byLei.get(lei);
+          if (known?.status !== 200) return [];
+          const entity = (known.body as { data: { attributes: { entity: unknown } } }).data
+            .attributes.entity;
+          return [{ type: "lei-records", id: lei, attributes: { lei, entity } }];
+        });
+        return new Response(JSON.stringify({ data }), { status: 200 });
+      }
       const lei = /lei-records\/([0-9A-Z]{20})/.exec(url)?.[1] ?? "";
       const fixture = byLei.get(lei);
       if (!fixture) return new Response("<html>Not found</html>", { status: 404 });
@@ -128,6 +143,7 @@ export function harness(
     origin?: string;
     gleifTimeoutMs?: number;
     indexTimeoutMs?: number;
+    namesTimeoutMs?: number;
   } = {},
 ): Harness {
   const gleif = options.gleif ?? fakeGleif();
@@ -140,6 +156,7 @@ export function harness(
     now: () => now,
     gleifTimeoutMs: options.gleifTimeoutMs ?? 8000,
     ...(options.indexTimeoutMs === undefined ? {} : { indexTimeoutMs: options.indexTimeoutMs }),
+    ...(options.namesTimeoutMs === undefined ? {} : { namesTimeoutMs: options.namesTimeoutMs }),
   };
   const worker = createWorker(deps);
   const origin = options.origin ?? "https://whichlei.test";

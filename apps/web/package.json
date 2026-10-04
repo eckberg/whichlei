@@ -8,6 +8,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "e2e": "playwright test",
+    "favicon": "node scripts/favicon.ts",
     "typecheck": "tsc"
   },
   "devDependencies": {

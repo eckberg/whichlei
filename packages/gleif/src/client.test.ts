@@ -1,5 +1,12 @@
 import { describe, expect, test } from "vitest";
-import { fetchIsins, fetchRecord, findByBic, findByIsin, findByRegisterNumber } from "./client.ts";
+import {
+  fetchIsins,
+  fetchNames,
+  fetchRecord,
+  findByBic,
+  findByIsin,
+  findByRegisterNumber,
+} from "./client.ts";
 import { GleifError } from "./errors.ts";
 import { replay, respond } from "./replay.ts";
 
@@ -349,6 +356,71 @@ describe("lookups", () => {
     });
     const page = await findByIsin("SE0000108656", { fetch });
     expect(page.items).toHaveLength(1);
+  });
+});
+
+describe("fetchNames", () => {
+  const LOU = "549300O897ZC5H7CY412";
+  const hit = (lei: string, name: string) => ({
+    type: "lei-records",
+    id: lei,
+    attributes: { lei, entity: { legalName: { name } } },
+  });
+
+  test("gives the legal names of several LEIs in one request", async () => {
+    // The recorded request names both LEIs; replay fails on any other URL.
+    const { fetch, calls } = replay("lookup-names");
+    const names = await fetchNames([ERICSSON, LOU], { fetch });
+    expect(calls).toHaveLength(1);
+    expect(names).toEqual(
+      new Map([
+        [ERICSSON, "Telefonaktiebolaget LM Ericsson"],
+        [LOU, "Nordic Legal Entity Identifier AB"],
+      ]),
+    );
+  });
+
+  test("asks for each LEI once, with a page as big as the list", async () => {
+    const { fetch, calls } = respond(200, { data: [] });
+    await fetchNames([ERICSSON, LOU, ERICSSON], { fetch });
+    expect(calls).toEqual([
+      `https://api.gleif.org/api/v1/lei-records?filter%5Blei%5D=${ERICSSON}%2C${LOU}&page%5Bsize%5D=2`,
+    ]);
+  });
+
+  test("leaves out an LEI GLEIF does not have, and anything it was not asked for", async () => {
+    const { fetch } = respond(200, {
+      data: [hit(ERICSSON, "Ericsson"), hit("549300ZZZZZZZZZZZZ46", "Other")],
+    });
+    const names = await fetchNames([ERICSSON, LOU], { fetch });
+    expect([...names]).toEqual([[ERICSSON, "Ericsson"]]);
+  });
+
+  test("makes no request for no LEIs", async () => {
+    const { fetch, calls } = respond(200, { data: [] });
+    expect(await fetchNames([], { fetch })).toEqual(new Map());
+    expect(calls).toEqual([]);
+  });
+
+  test("asks about at most 200 LEIs, GLEIF's largest page", async () => {
+    const { fetch, calls } = respond(200, { data: [] });
+    const many = Array.from({ length: 250 }, (_, i) => `LEI${String(i).padStart(17, "0")}`);
+    await fetchNames(many, { fetch });
+    const url = new URL(calls[0] ?? "");
+    expect(url.searchParams.get("filter[lei]")?.split(",")).toHaveLength(200);
+    expect(url.searchParams.get("page[size]")).toBe("200");
+  });
+
+  test("fails like the other calls: a rate limit, or a body that is not a list", async () => {
+    const busy = respond(429, "", { "retry-after": "30" });
+    await expect(fetchNames([ERICSSON], { fetch: busy.fetch })).rejects.toMatchObject({
+      kind: "rate-limited",
+      retryAfter: 30,
+    });
+    const odd = respond(200, { data: null });
+    await expect(fetchNames([ERICSSON], { fetch: odd.fetch })).rejects.toMatchObject({
+      kind: "failed",
+    });
   });
 });
 

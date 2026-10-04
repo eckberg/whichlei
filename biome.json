@@ -11,7 +11,8 @@
       "!research",
       "!design",
       "!packages/core/fixtures",
-      "!packages/gleif/fixtures"
+      "!packages/gleif/fixtures",
+      "!apps/web/static/favicon.svg"
     ]
   },
   "formatter": {

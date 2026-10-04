@@ -3,12 +3,17 @@
 //
 //   pnpm --filter @whichlei/web bench
 //
-// "render" is renderRecordPage on a parsed record. "parse + render" adds what a cache miss
-// also costs on our side: reading GLEIF's JSON document into a record. It leaves out the
-// wait for GLEIF, which is not CPU time. Node on a server CPU, not the Workers runtime.
+// "render" is renderRecordPage on a parsed record: it builds the record document and renders
+// the page. "md" and "json" render the Markdown and the JSON from the document. "hit" is a cache
+// hit: reading the stored document back and rendering the page. "parse + render" is a cache
+// miss on our side: reading GLEIF's JSON document into a record, building the document,
+// storing it and rendering the page. It leaves out the wait for GLEIF, which is not CPU time.
+// Node on a server CPU, not the Workers runtime.
 import { readdirSync, readFileSync } from "node:fs";
 import { fetchRecord } from "@whichlei/gleif";
-import { renderRecordPage } from "../src/record.ts";
+import { renderMarkdown } from "../src/markdown.ts";
+import { renderDocumentPage, renderRecordPage } from "../src/record.ts";
+import { buildDocument, parseDocument } from "../src/record-document.ts";
 
 const RUNS = 1000;
 const WARMUP = 200;
@@ -63,17 +68,30 @@ for (const file of readdirSync(dir).filter((f) => f.startsWith("record-"))) {
     });
   const record = await parse();
   const page = renderRecordPage(record, context);
+  const doc = buildDocument(record, context);
+  const stored = JSON.stringify(doc);
 
   const render = measure(() => renderRecordPage(record, context));
-  const both = await measureAsync(async () => renderRecordPage(await parse(), context));
-  worst = Math.max(worst, both.p99);
+  const markdown = measure(() => renderMarkdown(doc, context.canonicalOrigin));
+  const json = measure(() => JSON.stringify(doc, null, 2));
+  const hit = measure(() => {
+    const read = parseDocument(stored);
+    return read && renderDocumentPage(read, context.canonicalOrigin);
+  });
+  const both = await measureAsync(async () => {
+    const built = buildDocument(await parse(), context);
+    JSON.stringify(built);
+    return renderDocumentPage(built, context.canonicalOrigin);
+  });
+  worst = Math.max(worst, both.p99, markdown.p99, json.p99, hit.p99);
   rows.push(
     `${file.slice("record-".length, -".json".length).padEnd(14)} ${String(page.length).padStart(6)} B  ` +
-      `render p50 ${ms(render.p50)}  p99 ${ms(render.p99)} ms   ` +
-      `parse+render p50 ${ms(both.p50)}  p99 ${ms(both.p99)} ms`,
+      `render p50 ${ms(render.p50)} p99 ${ms(render.p99)}  md p99 ${ms(markdown.p99)}  ` +
+      `json p99 ${ms(json.p99)}  hit p99 ${ms(hit.p99)}  ` +
+      `parse+render p50 ${ms(both.p50)} p99 ${ms(both.p99)} ms`,
   );
 }
 
 console.log(`${RUNS} runs per fixture, after ${WARMUP} warm-up runs. Page size is the HTML.`);
 console.log(rows.join("\n"));
-console.log(`Worst parse+render p99: ${worst.toFixed(3)} ms (free plan limit: 10 ms CPU)`);
+console.log(`Worst p99 of any path: ${worst.toFixed(3)} ms (free plan limit: 10 ms CPU)`);

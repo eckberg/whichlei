@@ -136,6 +136,24 @@ describe("loadStats", () => {
     expect(home.replaced).toEqual([{ state: { kept: true }, url: "/#about" }]);
   });
 
+  it("tells Fathom / for a search link, and nothing of the text in its fragment", () => {
+    // /#q=ericsson: the fragment never leaves the browser, and the loader leaves it alone.
+    const r = rig({ pathname: "/", hash: "#q=ericsson" });
+    loadStats(r.env, APEX);
+    r.scripts[0]?.onload?.();
+    expect(r.views).toEqual([{ url: "/", referrer: "" }]);
+    expect(r.replaced).toEqual([]);
+    expect(JSON.stringify([r.views, r.scripts[0]?.src, r.scripts[0]?.attributes])).not.toContain(
+      "ericsson",
+    );
+    // With a query string as well: the string goes, and still nothing reaches Fathom.
+    const both = rig({ pathname: "/", search: "?q=ericsson", hash: "#q=ericsson" });
+    loadStats(both.env, APEX);
+    both.scripts[0]?.onload?.();
+    expect(both.replaced).toEqual([{ state: { kept: true }, url: "/#q=ericsson" }]);
+    expect(both.views).toEqual([{ url: "/", referrer: "" }]);
+  });
+
   it("trims the referrer to its origin, for the page view and for Fathom's own reads", () => {
     const r = rig({}, "https://example.org/find?q=ericsson&x=1#top");
     loadStats(r.env, APEX);
